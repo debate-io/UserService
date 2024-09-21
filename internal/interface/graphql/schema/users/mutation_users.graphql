@@ -1,0 +1,64 @@
+input CreateUserInput {
+    firstName: String!
+    lastName: String!
+    password: String!
+    email: String!
+    username: String!
+    birthDate: Time!
+    gender: Gender!
+    avatarImageId: Int
+}
+
+type CreateUserOutput {
+    user: User
+    jwt: String
+    error: Error
+}
+
+###############################################################################
+
+input UpdateUserCredentialsInput {
+    jwt: String!
+    password: String!
+}
+
+type UpdateUserCredentialsOutput{
+    ok: Boolean!
+    error: Error
+}
+
+###############################################################################
+
+input ConfirmUserInput {
+    jwt: String!
+}
+
+type ConfirmUserOutput {
+    ok: Boolean!
+    error: Error
+}
+
+###############################################################################
+
+input UpdateUserInput {
+    id: Int!
+    firstName: String!
+    lastName: String!
+    avatarImageId: Int
+}
+
+type UpdateUserOutput {
+    user: User
+    error: Error
+}
+
+#################################################################################
+
+input DeleteUserInput {
+    id: Int!
+}
+
+type DeleteUserOutput {
+    ok: Boolean!
+    error: Error
+}

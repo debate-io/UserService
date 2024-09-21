@@ -1,0 +1,73 @@
+# Refer to https://gqlgen.com/config/
+# for detailed .gqlgen.yml documentation.
+
+schema:
+  - internal/interface/graphql/schema/*.graphql
+  - internal/interface/graphql/schema/users/*.graphql
+
+exec:
+  filename: internal/interface/graphql/gen/executor.go
+  package: gen
+
+model:
+  filename: internal/interface/graphql/gen/models.go
+  package: gen
+
+resolver:
+  filename: internal/interface/graphql/resolvers/root.go
+  package: resolvers
+  type: Resolver
+
+models:
+  Image:
+    fields:
+      cropOf:
+        resolver: true
+      tags:
+        resolver: true
+      licensee:
+        resolver: true
+      location:
+        resolver: true
+  Video:
+    fields:
+      url:
+        resolver: true
+      tags:
+        resolver: true
+      licensees:
+        resolver: true
+  Audio:
+    fields:
+      url:
+        resolver: true
+      tags:
+        resolver: true
+      licensee:
+        resolver: true
+  Document:
+    fields:
+      tags:
+        resolver: true
+      licensee:
+        resolver: true
+  EncoderTask:
+    fields:
+      media:
+        resolver: true
+  PhotostockImage:
+    fields:
+      tags:
+        resolver: true
+      thumbnail:
+        resolver: true
+      sizes:
+        resolver: true
+#  PaginationLimit:
+#    model: github.com/debate-io/service-auth/internal/graphql/scalars.PaginationLimit
+#  PaginationSkip:
+#    model: github.com/debate-io/service-auth/internal/graphql/scalars.PaginationSkip
+#  PaginationPage:
+#    model: github.com/debate-io/service-auth/internal/graphql/scalars.PaginationPage
+#  EnsureTagName:
+#    model: github.com/debate-io/service-auth/internal/graphql/scalars.EnsureTagName

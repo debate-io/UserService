@@ -1,0 +1,18 @@
+scalar Time
+
+enum Gender {
+    MALE
+    FEMALE
+}
+
+enum Role {
+    USER
+    SERVICE
+}
+
+enum Status {
+    DELETED
+    BLOCKED
+    CONFIRMED
+    NOT_CONFIRMED
+}
