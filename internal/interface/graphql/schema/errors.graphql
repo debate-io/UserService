@@ -1,0 +1,9 @@
+"""
+Чтобы понять какая придёт, смотри описание метода API
+"""
+enum Error {
+    NOT_FOUND
+    VALIDATION
+    INVALID_CREDENTIALS
+    ALREADY_EXIST
+}
