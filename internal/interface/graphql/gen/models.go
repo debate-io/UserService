@@ -11,17 +11,6 @@ import (
 
 // ###################################################
 //
-//	input GetClaimsInput {
-//	    jwt: String!
-//	}
-//
-//	type GetClaimsOutput {
-//	    claims: Claims
-//	    error: Error
-//	}
-//
-// ###################################################
-//
 //	input GetUserInput {
 //	    id: Int!
 //	    gettingAt: Time
@@ -31,27 +20,6 @@ import (
 //	    user: User
 //	    isUpdated: Boolean
 //	    error: Error
-//	}
-//
-// ###############################################
-//
-//	input GetMessageTokenInput {
-//	    email: String!
-//	}
-//
-//	type GetMessageTokenOutput {
-//	    jwt: String
-//	    error: Error
-//	}
-//
-// ###############################################
-//
-//	input FindUsersInput {
-//	    idAnyOf: [Int!]!
-//	}
-//
-//	type FindUsersOutput {
-//	    users:[User!]!
 //	}
 type AuthenticateUserInput struct {
 	Email    string `json:"email"`
@@ -66,12 +34,6 @@ type AuthenticateUserOutput struct {
 type Query struct {
 }
 
-//	 type Claims {
-//	    userId: Int!
-//	    role: Role!
-//	    expiredAt: Time!
-//	    email: String!
-//	}
 type User struct {
 	ID        int       `json:"id"`
 	Role      Role      `json:"role"`
@@ -79,6 +41,7 @@ type User struct {
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+	ImageURL  string    `json:"ImageUrl"`
 }
 
 // Чтобы понять какая придёт, смотри описание метода API

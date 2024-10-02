@@ -2,11 +2,14 @@ package usecases
 
 import (
 	"context"
+	"errors"
 
 	"github.com/debate-io/service-auth/internal/domain/repo"
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
+	"github.com/debate-io/service-auth/internal/usecases/mappers"
 	"github.com/debate-io/service-auth/internal/usecases/types"
 	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -92,68 +95,36 @@ func (u *User) AuthenticateUser(
 	ctx context.Context,
 	input gen.AuthenticateUserInput,
 ) (*gen.AuthenticateUserOutput, error) {
-	panic("not implemented")
-	/*
-		 	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
-			if err != nil {
-				if errors.Is(err, repo.ErrUserNotFound) {
-					return &gen.AuthenticateUserOutput{
-						Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
-				}
-
-				return nil, err
-			}
-
-			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
-			if err != nil {
-				return &gen.AuthenticateUserOutput{
-					Error: mappers.NewDTOError(gen.ErrorInvalidCredentials)}, nil
-			}
-
-			role, err := u.roleRepo.FindUserByID(ctx, user.RoleID)
-			if err != nil {
-				return nil, err
-			}
-
-			claims, err := types.NewAuthClaims(user.ID, user.Email, role.HeaderKey, u.jwtConfigs.daysAuthExpires)
-			if err != nil {
-				return nil, err
-			}
-
-			token, err := generateTokenByClaims(claims, u.jwtConfigs.jwtSecretAuth)
-			if err != nil {
-				return nil, err
-			}
-
-			return &gen.AuthenticateUserOutput{Jwt: &token}, nil
-	*/
-}
-
-/*
-func (u *User) GetClaims(
-	ctx context.Context,
-	input gen.GetClaimsInput,
-) (*gen.GetClaimsOutput, error) {
-	token, err := jwt.ParseWithClaims(input.Jwt, &types.Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(u.jwtConfigs.jwtSecretAuth), nil
-	})
+	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
 	if err != nil {
-		return &gen.GetClaimsOutput{
-			Error: mappers.NewDTOError(gen.ErrorValidation),
-		}, nil
+		if errors.Is(err, repo.ErrUserNotFound) {
+			return &gen.AuthenticateUserOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+		}
+
+		return nil, err
 	}
 
-	claims, ok := token.Claims.(*types.Claims)
-	if err := claims.Valid(); err != nil || !ok {
-		return &gen.GetClaimsOutput{
-			Error: mappers.NewDTOError(gen.ErrorValidation)}, nil
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
+	if err != nil {
+		return &gen.AuthenticateUserOutput{
+			Error: mappers.NewDTOError(gen.ErrorInvalidCredentials)}, nil
 	}
 
-	return &gen.GetClaimsOutput{Claims: mappers.MapClaimsToDTO(claims)}, nil
+	claims, err := types.NewAuthClaims(int(user.ID), user.Email, string(user.Role), u.jwtConfigs.daysAuthExpires)
+	if err != nil {
+		return nil, err
+	}
+
+	token, err := generateTokenByClaims(claims, u.jwtConfigs.jwtSecretAuth)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gen.AuthenticateUserOutput{Jwt: &token}, nil
 }
-*/
-/*
-func (u *User) GetUser(
+
+/* func (u *User) GetUser(
 	ctx context.Context,
 	input gen.GetUserInput,
 ) (*gen.GetUserOutput, error) {
@@ -195,44 +166,7 @@ func (u *User) GetUser(
 	return output, nil
 }
 */
-/*
-func (u *User) FindUsers(ctx context.Context, input gen.FindUsersInput) (*gen.FindUsersOutput, error) {
-	res, err := u.userRepo.FindUsers(ctx, &repo.FindUsersQuery{IDAnyOf: input.IDAnyOf})
-	if err != nil {
-		return nil, err
-	}
 
-	return &gen.FindUsersOutput{Users: mappers.MapUsersToDTO(res)}, nil
-}
-*/
-/*
-func (u *User) GetMessageToken(
-	ctx context.Context,
-	input gen.GetMessageTokenInput,
-) (*gen.GetMessageTokenOutput, error) {
-	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
-	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
-			return &gen.GetMessageTokenOutput{
-				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
-		}
-
-		return nil, err
-	}
-
-	claims, err := types.NewRecoveryClaims(user.ID, u.jwtConfigs.daysRecoveryExpires)
-	if err != nil {
-		return nil, err
-	}
-
-	token, err := generateTokenByClaims(claims, u.jwtConfigs.jwtSecretMessages)
-	if err != nil {
-		return nil, err
-	}
-
-	return &gen.GetMessageTokenOutput{Jwt: &token}, nil
-}
-*/
 /*
 func (u *User) UpdateUserCredentials(
 	ctx context.Context,

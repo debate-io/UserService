@@ -27,28 +27,11 @@ schema {
 # }
 
 type Query {
-
-        """
-    #Получение клеймов. Может вернуть ошибки: VALIDATION
-    
-    getClaims(input: GetClaimsInput!): GetClaimsOutput!
-    
-    #Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
-    
-    getUser(input: GetUserInput!): GetUserOutput!
-    
-    #Получение токена для сообщений. Может вернуть ошибки: NOT_FOUND
-    
-    getMessageToken(input: GetMessageTokenInput!): GetMessageTokenOutput!
-    
-    #Поиск пользователей.
-    
-    findUsers(input: FindUsersInput!): FindUsersOutput!
-    """
-    
     # Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
     
     authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
-
-
+    
+    #Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
+    
+    #getUser(input: GetUserInput!): GetUserOutput!
 }

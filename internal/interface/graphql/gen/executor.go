@@ -58,6 +58,7 @@ type ComplexityRoot struct {
 		CreatedAt func(childComplexity int) int
 		Email     func(childComplexity int) int
 		ID        func(childComplexity int) int
+		ImageURL  func(childComplexity int) int
 		Role      func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		Username  func(childComplexity int) int
@@ -133,6 +134,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.ID(childComplexity), true
+
+	case "User.ImageUrl":
+		if e.complexity.User.ImageURL == nil {
+			break
+		}
+
+		return e.complexity.User.ImageURL(childComplexity), true
 
 	case "User.role":
 		if e.complexity.User.Role == nil {
@@ -285,30 +293,13 @@ enum Error {
 # }
 
 type Query {
-
-        """
-    #Получение клеймов. Может вернуть ошибки: VALIDATION
-    
-    getClaims(input: GetClaimsInput!): GetClaimsOutput!
-    
-    #Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
-    
-    getUser(input: GetUserInput!): GetUserOutput!
-    
-    #Получение токена для сообщений. Может вернуть ошибки: NOT_FOUND
-    
-    getMessageToken(input: GetMessageTokenInput!): GetMessageTokenOutput!
-    
-    #Поиск пользователей.
-    
-    findUsers(input: FindUsersInput!): FindUsersOutput!
-    """
-    
     # Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
     
     authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
-
-
+    
+    #Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
+    
+    #getUser(input: GetUserInput!): GetUserOutput!
 }
 `, BuiltIn: false},
 	{Name: "../schema/scalars.graphql", Input: `scalar Time
@@ -344,28 +335,9 @@ type GetUserOutput {
     isUpdated: Boolean
     error: Error
 }
-
-###############################################
-
-input GetMessageTokenInput {
-    email: String!
-}
-
-type GetMessageTokenOutput {
-    jwt: String
-    error: Error
-}
-
-###############################################
-input FindUsersInput {
-    idAnyOf: [Int!]!
-}
-
-type FindUsersOutput {
-    users:[User!]!
-}
 """
 
+###############################################
 input AuthenticateUserInput {
     email: String!
     password: String!
@@ -374,22 +346,15 @@ input AuthenticateUserInput {
 type AuthenticateUserOutput {
     jwt: String
     error: Error
-}
-`, BuiltIn: false},
-	{Name: "../schema/users/users.graphql", Input: `""" type Claims {
-    userId: Int!
-    role: Role!
-    expiredAt: Time!
-    email: String!
-} """
-
-type User {
+}`, BuiltIn: false},
+	{Name: "../schema/users/users.graphql", Input: `type User {
     id: Int!
     role: Role!
     username: String!
     email: String!
     createdAt: Time!
     updatedAt: Time!
+    ImageUrl: String!
 }
 `, BuiltIn: false},
 }
@@ -1066,6 +1031,50 @@ func (ec *executionContext) fieldContext_User_updatedAt(_ context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_ImageUrl(ctx context.Context, field graphql.CollectedField, obj *User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_ImageUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ImageURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_User_ImageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3034,6 +3043,11 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "updatedAt":
 			out.Values[i] = ec._User_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "ImageUrl":
+			out.Values[i] = ec._User_ImageUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
