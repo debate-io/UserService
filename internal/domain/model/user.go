@@ -23,7 +23,7 @@ type User struct {
 	Password  string    `pg:"password"`   // Пароль, обязательное
 	CreatedAt time.Time `pg:"created_at`  // Время создания с умолчанием
 	UpdatedAt time.Time `pg:"updated_at"` // Время обновления с умолчанием
-	Image     *int      `pg:"image"`      // Поле для OID (ссылки на файл), может быть NULL
+	Image     []byte    `pg:"image"`      // Ебвло пользователя
 }
 
 // Валидация полей структуры User

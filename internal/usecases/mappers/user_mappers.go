@@ -1,6 +1,8 @@
 package mappers
 
 import (
+	"fmt"
+
 	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
 )
@@ -13,6 +15,7 @@ func MapUserToDTO(user *model.User) *gen.User {
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+		ImageURL:  fmt.Sprintf("/user_image/%s", string(user.ID)),
 	}
 }
 
@@ -29,12 +32,3 @@ func MapUsersToDTO(values []*model.User) []*gen.User {
 
 	return res
 }
-
-/* func MapClaimsToDTO(claims *types.Claims) *gen.Claims {
-	return &gen.Claims{
-		UserID:    claims.UserID,
-		Role:      gen.Role(claims.Role),
-		ExpiredAt: claims.ExpiredAt.Time,
-		Email:     claims.Email,
-	}
-} */

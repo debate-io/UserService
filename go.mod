@@ -17,6 +17,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.16
 	github.com/ztrue/tracerr v0.3.0
 	go.uber.org/zap v1.21.0
+	golang.org/x/crypto v0.27.0
 	gopkg.in/tylerb/graceful.v1 v1.2.15
 )
 
@@ -47,7 +48,6 @@ require (
 	github.com/vmihailenco/tagparser v0.1.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
