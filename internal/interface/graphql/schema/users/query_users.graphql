@@ -1,13 +1,4 @@
-input AuthenticateUserInput {
-    email: String!
-    password: String!
-}
-
-type AuthenticateUserOutput {
-    jwt: String
-    error: Error
-}
-
+"""
 ###################################################
 
 input GetClaimsInput {
@@ -50,4 +41,15 @@ input FindUsersInput {
 
 type FindUsersOutput {
     users:[User!]!
+}
+"""
+
+input AuthenticateUserInput {
+    email: String!
+    password: String!
+}
+
+type AuthenticateUserOutput {
+    jwt: String
+    error: Error
 }

@@ -5,12 +5,32 @@ SERVICE_NAME ?= service-auth
 
 ################################################################################################################
 
-.PHONY: create-empty-db
+.PHONY: create-empty-db run
+
+# Команда для создания базы данных, если контейнер не существует
 create-empty-db:
 	$(call _info, $(SEP))
-	$(call _info,"Creating empty db")
+	$(call _info,"Checking if the database container exists")
 	$(call _info, $(SEP))
-	docker run -d --name auth_db -p 5432:5432 -e POSTGRES_PASSWORD=123123 -e POSTGRES_USER=postgres -e POSTGRES_DB=auth_db postgres:alpine
+	@if [ $$(docker ps -a -f name=auth_db --format '{{.Names}}') = "auth_db" ]; then \
+		echo "Database container 'auth_db' already exists."; \
+		if [ $$(docker inspect -f '{{.State.Running}}' auth_db) = "false" ]; then \
+			echo "Starting existing container 'auth_db'..."; \
+			docker start auth_db; \
+		else \
+			echo "Database container 'auth_db' is already running."; \
+		fi \
+	else \
+		echo "Database container 'auth_db' does not exist. Creating a new one..."; \
+		docker run -d --name auth_db -p 5434:5432 -e POSTGRES_PASSWORD=123123 -e POSTGRES_USER=user-owner -e POSTGRES_DB=user-db postgres:alpine; \
+	fi
+
+# Команда для запуска приложения
+run: create-empty-db
+	$(call _info, $(SEP))
+	$(call _info,"Starting the application")
+	$(call _info, $(SEP))
+	go run cmd/app/main.go
 
 ################################################################################################################
 
@@ -31,8 +51,8 @@ lint-code:
 .PHONY: env
 
 define ENV_SAMPLE
-SERVICE_NAME=service-auth
-POSTGRES_DSN=postgresql://postgres:123123@localhost:5432/auth_db?sslmode=disable
+SERVICE_NAME=user-service
+POSTGRES_DSN=postgresql://user-owner:123123@localhost:5434/user-db?sslmode=disable
 SERVER_ADDRESS=:9090
 IS_DEBUG=true
 JWT_SECRET_AUTH=nigganigga

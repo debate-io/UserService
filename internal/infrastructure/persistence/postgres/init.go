@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+
 	"github.com/go-pg/pg/v9"
 	"github.com/ztrue/tracerr"
 	"go.uber.org/zap"

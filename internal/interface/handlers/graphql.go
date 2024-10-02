@@ -3,12 +3,14 @@ package handlers
 import (
 	"context"
 	"fmt"
+
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/inhies/go-bytesize"
+	"github.com/vektah/gqlparser/v2/ast"
 	"go.uber.org/zap"
 )
 
@@ -32,7 +34,7 @@ func NewGraphqlHandler(
 		MaxUploadSize: int64(maxUploadSize),
 		MaxMemory:     int64(maxMemorySize),
 	})
-	srv.SetQueryCache(lru.New(cacheQuery))
+	srv.SetQueryCache(lru.New[*ast.QueryDocument](cacheQuery))
 	srv.Use(extension.Introspection{})
 
 	if isDebug {

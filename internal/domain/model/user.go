@@ -3,38 +3,34 @@ package model
 import (
 	"time"
 
-	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
+type RoleEnum string
+
+const (
+	RoleAdmin          RoleEnum = "ADMIN"
+	RoleContentManager RoleEnum = "CONTENT_MANAGER"
+	RoleDefaultUser    RoleEnum = "DEFAULT_USER"
+)
+
 type User struct {
-	tableName     struct{}   `pg:"public.users,alias:users"` // nolint
-	ID            int        `pg:"id"`
-	FirstName     string     `pg:"firstName"`
-	LastName      string     `pg:"lastName"`
-	Email         string     `pg:"email"`
-	Username      string     `pg:"username"`
-	CreatedAt     time.Time  `pg:"createdAt"`
-	UpdatedAt     time.Time  `pg:"updatedAt"`
-	AvatarImageID *int       `pg:"avatarImageId,,use_zero"`
-	BirthDate     time.Time  `pg:"birthDate"`
-	Gender        gen.Gender `pg:"gender"`
-	RoleID        int        `pg:"roleId"`
-	Status        gen.Status `pg:"status"`
-	Password      string     `pg:"password"`
+	ID        int64     `pg:"id,pk"`      // BIGINT и PRIMARY KEY
+	Role      RoleEnum  `pg:"role`        // role_enum с умолчанием
+	Username  string    `pg:"username"`   // Текстовое поле, обязательное
+	Email     string    `pg:"email"`      // Email с уникальностью
+	Password  string    `pg:"password"`   // Пароль, обязательное
+	CreatedAt time.Time `pg:"created_at`  // Время создания с умолчанием
+	UpdatedAt time.Time `pg:"updated_at"` // Время обновления с умолчанием
+	Image     *int      `pg:"image"`      // Поле для OID (ссылки на файл), может быть NULL
 }
 
+// Валидация полей структуры User
 func (u *User) Validate() error {
 	return validation.ValidateStruct(u,
-		validation.Field(&u.Email, validation.Required, is.Email),
-		validation.Field(&u.Username, validation.Required),
-		validation.Field(&u.FirstName, validation.Required),
-		validation.Field(&u.LastName, validation.Required),
-		validation.Field(&u.BirthDate, validation.Required),
+		validation.Field(&u.Email, validation.Required, is.Email), // Проверка, что Email валиден
+		validation.Field(&u.Username, validation.Required),        // Поле username обязательно
+		validation.Field(&u.Password, validation.Required),        // Поле password обязательно
 	)
-}
-
-func (u *User) SetAvatarImageID(val int) {
-	u.AvatarImageID = &val
 }

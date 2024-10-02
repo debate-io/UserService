@@ -2,16 +2,11 @@ package usecases
 
 import (
 	"context"
-	"errors"
-	"time"
 
-	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
-	"github.com/debate-io/service-auth/internal/usecases/mappers"
 	"github.com/debate-io/service-auth/internal/usecases/types"
 	"github.com/golang-jwt/jwt/v4"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -21,7 +16,6 @@ const (
 
 type User struct {
 	userRepo   repo.UserRepository
-	roleRepo   repo.RoleRepository
 	jwtConfigs JwtConfigs
 }
 
@@ -32,8 +26,8 @@ type JwtConfigs struct {
 	daysRecoveryExpires int
 }
 
-func NewUserUseCases(userRepo repo.UserRepository, roleRepo repo.RoleRepository, jwtConfigs JwtConfigs) *User {
-	return &User{userRepo: userRepo, roleRepo: roleRepo, jwtConfigs: jwtConfigs}
+func NewUserUseCases(userRepo repo.UserRepository, jwtConfigs JwtConfigs) *User {
+	return &User{userRepo: userRepo, jwtConfigs: jwtConfigs}
 }
 
 func NewJwtConfigsUseCases(jwtSecretAuth string, jwtSecretMessage string, daysAuthExpires int, daysRecoveryExpires int) *JwtConfigs {
@@ -45,7 +39,7 @@ func NewJwtConfigsUseCases(jwtSecretAuth string, jwtSecretMessage string, daysAu
 	}
 }
 
-func (u *User) CreateUser(
+/* func (u *User) CreateUser(
 	ctx context.Context,
 	input gen.CreateUserInput,
 ) (*gen.CreateUserOutput, error) {
@@ -97,45 +91,50 @@ func (u *User) CreateUser(
 
 	return &gen.CreateUserOutput{User: mappers.MapUserToDTO(user), Jwt: &jwt}, nil
 }
+*/
 
 func (u *User) AuthenticateUser(
 	ctx context.Context,
 	input gen.AuthenticateUserInput,
 ) (*gen.AuthenticateUserOutput, error) {
-	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
-	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
-			return &gen.AuthenticateUserOutput{
-				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
-		}
+	panic("not implemented")
+	/*
+		 	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
+			if err != nil {
+				if errors.Is(err, repo.ErrUserNotFound) {
+					return &gen.AuthenticateUserOutput{
+						Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+				}
 
-		return nil, err
-	}
+				return nil, err
+			}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
-	if err != nil {
-		return &gen.AuthenticateUserOutput{
-			Error: mappers.NewDTOError(gen.ErrorInvalidCredentials)}, nil
-	}
+			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
+			if err != nil {
+				return &gen.AuthenticateUserOutput{
+					Error: mappers.NewDTOError(gen.ErrorInvalidCredentials)}, nil
+			}
 
-	role, err := u.roleRepo.FindUserByID(ctx, user.RoleID)
-	if err != nil {
-		return nil, err
-	}
+			role, err := u.roleRepo.FindUserByID(ctx, user.RoleID)
+			if err != nil {
+				return nil, err
+			}
 
-	claims, err := types.NewAuthClaims(user.ID, user.Email, role.HeaderKey, u.jwtConfigs.daysAuthExpires)
-	if err != nil {
-		return nil, err
-	}
+			claims, err := types.NewAuthClaims(user.ID, user.Email, role.HeaderKey, u.jwtConfigs.daysAuthExpires)
+			if err != nil {
+				return nil, err
+			}
 
-	token, err := generateTokenByClaims(claims, u.jwtConfigs.jwtSecretAuth)
-	if err != nil {
-		return nil, err
-	}
+			token, err := generateTokenByClaims(claims, u.jwtConfigs.jwtSecretAuth)
+			if err != nil {
+				return nil, err
+			}
 
-	return &gen.AuthenticateUserOutput{Jwt: &token}, nil
+			return &gen.AuthenticateUserOutput{Jwt: &token}, nil
+	*/
 }
 
+/*
 func (u *User) GetClaims(
 	ctx context.Context,
 	input gen.GetClaimsInput,
@@ -157,7 +156,8 @@ func (u *User) GetClaims(
 
 	return &gen.GetClaimsOutput{Claims: mappers.MapClaimsToDTO(claims)}, nil
 }
-
+*/
+/*
 func (u *User) GetUser(
 	ctx context.Context,
 	input gen.GetUserInput,
@@ -199,7 +199,8 @@ func (u *User) GetUser(
 
 	return output, nil
 }
-
+*/
+/*
 func (u *User) FindUsers(ctx context.Context, input gen.FindUsersInput) (*gen.FindUsersOutput, error) {
 	res, err := u.userRepo.FindUsers(ctx, &repo.FindUsersQuery{IDAnyOf: input.IDAnyOf})
 	if err != nil {
@@ -208,7 +209,8 @@ func (u *User) FindUsers(ctx context.Context, input gen.FindUsersInput) (*gen.Fi
 
 	return &gen.FindUsersOutput{Users: mappers.MapUsersToDTO(res)}, nil
 }
-
+*/
+/*
 func (u *User) GetMessageToken(
 	ctx context.Context,
 	input gen.GetMessageTokenInput,
@@ -235,7 +237,8 @@ func (u *User) GetMessageToken(
 
 	return &gen.GetMessageTokenOutput{Jwt: &token}, nil
 }
-
+*/
+/*
 func (u *User) UpdateUserCredentials(
 	ctx context.Context,
 	input gen.UpdateUserCredentialsInput,
@@ -272,7 +275,8 @@ func (u *User) UpdateUserCredentials(
 
 	return &gen.UpdateUserCredentialsOutput{Ok: true}, nil
 }
-
+*/
+/*
 func (u *User) ConfirmUser(
 	ctx context.Context,
 	input gen.ConfirmUserInput,
@@ -305,7 +309,8 @@ func (u *User) ConfirmUser(
 
 	return &gen.ConfirmUserOutput{Ok: true}, nil
 }
-
+*/
+/*
 func (u *User) UpdateUser(
 	ctx context.Context,
 	input gen.UpdateUserInput,
@@ -335,7 +340,8 @@ func (u *User) UpdateUser(
 
 	return &gen.UpdateUserOutput{User: mappers.MapUserToDTO(user)}, nil
 }
-
+*/
+/*
 func (u *User) DeleteUser(
 	ctx context.Context,
 	input gen.DeleteUserInput,
@@ -363,7 +369,9 @@ func (u *User) DeleteUser(
 
 	return &gen.DeleteUserOutput{Ok: true}, nil
 }
+*/
 
+// дважды перепроверить функцию, но вроде она не затронута
 func generateTokenByClaims(claims *types.Claims, secret string) (string, error) {
 	signBytes := []byte(secret)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

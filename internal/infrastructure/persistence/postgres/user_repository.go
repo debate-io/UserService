@@ -55,15 +55,15 @@ func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*mod
 	return user, nil
 }
 
-func (u *UserRepository) FindUsers(ctx context.Context, query *repo.FindUsersQuery) ([]*model.User, error) {
+func (u *UserRepository) FindUsersByIds(ctx context.Context, targetIds []int) ([]*model.User, error) {
 	result := []*model.User{}
 	q := u.db.ModelContext(ctx, &result)
 
-	if query.IDAnyOf == nil || len(query.IDAnyOf) == 0 {
+	if len(targetIds) == 0 {
 		return result, nil
 	}
 
-	q = q.Where(`"id" in (?)`, pg.In(query.IDAnyOf))
+	q = q.Where(`"id" in (?)`, pg.In(targetIds))
 
 	if err := q.Select(); err != nil {
 		return nil, err

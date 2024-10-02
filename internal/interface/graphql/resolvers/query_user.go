@@ -1,5 +1,7 @@
 package resolvers
 
+/*
+
 import (
 	"context"
 
@@ -9,6 +11,7 @@ import (
 func (q queryResolver) AuthenticateUser(
 	ctx context.Context,
 	input gen.AuthenticateUserInput,
+
 ) (*gen.AuthenticateUserOutput, error) {
 	output, err := q.useCases.Users.AuthenticateUser(ctx, input)
 	if err != nil {
@@ -55,4 +58,4 @@ func (q queryResolver) GetMessageToken(
 	}
 
 	return output, nil
-}
+} */
