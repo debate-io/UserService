@@ -3,7 +3,7 @@ module github.com/debate-io/service-auth
 go 1.23
 
 require (
-	github.com/99designs/gqlgen v0.17.54
+	github.com/99designs/gqlgen v0.17.55
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
@@ -14,7 +14,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/inhies/go-bytesize v0.0.0-20210819104631-275770b98743
 	github.com/joho/godotenv v1.4.0
-	github.com/vektah/gqlparser/v2 v2.5.16
+	github.com/vektah/gqlparser/v2 v2.5.17
 	github.com/ztrue/tracerr v0.3.0
 	go.uber.org/zap v1.21.0
 	gopkg.in/tylerb/graceful.v1 v1.2.15

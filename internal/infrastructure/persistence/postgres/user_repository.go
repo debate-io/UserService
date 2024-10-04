@@ -39,7 +39,7 @@ func (u *UserRepository) CreateUser(ctx context.Context, user *model.User) (*mod
 	return user, nil
 }
 
-func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*model.User, error) {
+/* func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*model.User, error) {
 	_, err := u.db.ModelContext(ctx, user).
 		Where("id in (?)", user.ID).
 		Update()
@@ -53,24 +53,7 @@ func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*mod
 	}
 
 	return user, nil
-}
-
-func (u *UserRepository) FindUsersByIds(ctx context.Context, targetIds []int) ([]*model.User, error) {
-	result := []*model.User{}
-	q := u.db.ModelContext(ctx, &result)
-
-	if len(targetIds) == 0 {
-		return result, nil
-	}
-
-	q = q.Where(`"id" in (?)`, pg.In(targetIds))
-
-	if err := q.Select(); err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
+} */
 
 func (u *UserRepository) FindUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	result := &model.User{}
@@ -88,7 +71,7 @@ func (u *UserRepository) FindUserByEmail(ctx context.Context, email string) (*mo
 	return result, nil
 }
 
-func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User, error) {
+/* func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User, error) {
 	result := &model.User{}
 	q := u.db.ModelContext(ctx, result).Where("id = ?", id)
 
@@ -101,4 +84,4 @@ func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User,
 	}
 
 	return result, nil
-}
+}*/

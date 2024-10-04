@@ -310,7 +310,6 @@ type Query {
 
 
 }
-
 `, BuiltIn: false},
 	{Name: "../schema/scalars.graphql", Input: `scalar Time
 
@@ -320,6 +319,7 @@ enum Role {
     ADMIN
 }
 `, BuiltIn: false},
+	{Name: "../schema/users/mutation_users.graphql", Input: ``, BuiltIn: false},
 	{Name: "../schema/users/query_users.graphql", Input: `"""
 ###################################################
 

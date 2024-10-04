@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"time"
 
 	pg "github.com/go-pg/pg/v9"
@@ -53,7 +54,7 @@ func startMigrate(config *Config, logger *zap.Logger) error {
 	defer migrate.Close()
 
 	if err = migrate.Up(); err != nil && err != goMigrate.ErrNoChange {
-		return err
+		return errors.Join(errors.New("migrate failed: "), err)
 	}
 
 	if err == goMigrate.ErrNoChange {

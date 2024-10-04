@@ -1,7 +1,5 @@
 package resolvers
 
-/*
-
 import (
 	"context"
 
@@ -13,14 +11,18 @@ func (q queryResolver) AuthenticateUser(
 	input gen.AuthenticateUserInput,
 
 ) (*gen.AuthenticateUserOutput, error) {
-	output, err := q.useCases.Users.AuthenticateUser(ctx, input)
-	if err != nil {
-		return nil, NewResolverError("can't authenticate user", err)
-	}
+	panic("not implemented")
+	/*
+		 	output, err := q.useCases.Users.AuthenticateUser(ctx, input)
+			if err != nil {
+				return nil, NewResolverError("can't authenticate user", err)
+			}
 
-	return output, nil
+			return output, nil
+	*/
 }
 
+/*
 func (q queryResolver) GetClaims(ctx context.Context, input gen.GetClaimsInput) (*gen.GetClaimsOutput, error) {
 	output, err := q.useCases.Users.GetClaims(ctx, input)
 	if err != nil {

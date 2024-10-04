@@ -8,8 +8,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *model.User) (*model.User, error)
-	UpdateUser(ctx context.Context, user *model.User) (*model.User, error)
+	//UpdateUser(ctx context.Context, user *model.User) (*model.User, error)
 	FindUserByEmail(ctx context.Context, email string) (*model.User, error)
-	FindUsersByIds(ctx context.Context, targetIds []int) ([]*model.User, error)
-	FindUserByID(ctx context.Context, ID int) (*model.User, error)
+	//FindUserByID(ctx context.Context, ID int) (*model.User, error)
 }

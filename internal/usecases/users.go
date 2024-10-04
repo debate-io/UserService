@@ -9,11 +9,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const (
-	RoleUserID  = 1
-	RoleUserKey = "USER"
-)
-
 type User struct {
 	userRepo   repo.UserRepository
 	jwtConfigs JwtConfigs
