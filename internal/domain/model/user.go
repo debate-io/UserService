@@ -16,6 +16,7 @@ const (
 )
 
 type User struct {
+	tableName struct{}  `pg:"public.users,alias:users"`
 	ID        int64     `pg:"id,pk"`      // BIGINT и PRIMARY KEY
 	Role      RoleEnum  `pg:"role`        // role_enum с умолчанием
 	Username  string    `pg:"username"`   // Текстовое поле, обязательное
