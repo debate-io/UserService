@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"errors"
+
 	"github.com/go-pg/pg/v9"
 )
 

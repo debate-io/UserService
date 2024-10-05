@@ -12,17 +12,19 @@ create-empty-db:
 	$(call _info, $(SEP))
 	$(call _info,"Checking if the database container exists")
 	$(call _info, $(SEP))
-	@if [ $$(docker ps -a -f name=auth_db --format '{{.Names}}') = "auth_db" ]; then \
-		echo "Database container 'auth_db' already exists."; \
-		if [ $$(docker inspect -f '{{.State.Running}}' auth_db) = "false" ]; then \
-			echo "Starting existing container 'auth_db'..."; \
-			docker start auth_db; \
+	@if test "$$(docker ps -a -f name=user_db --format '{{.Names}}')" = "user_db"; then \
+		echo "Database container 'user_db' already exists."; \
+		if test "$$(docker inspect -f '{{.State.Running}}' user_db)" = "false"; then \
+			echo "Starting existing container 'user_db'..."; \
+			docker start user_db; \
 		else \
-			echo "Database container 'auth_db' is already running."; \
+			echo "Database container 'user_db' is already running."; \
 		fi \
 	else \
-		echo "Database container 'auth_db' does not exist. Creating a new one..."; \
-		docker run -d --name auth_db -p 5434:5432 -e POSTGRES_PASSWORD=123123 -e POSTGRES_USER=user-owner -e POSTGRES_DB=user-db postgres:alpine; \
+		echo "Database container 'user_db' does not exist. Creating a new one..."; \
+		docker run -d --name user_db -p 5434:5432 -e POSTGRES_PASSWORD=123123 -e POSTGRES_USER=user-owner -e POSTGRES_DB=user-db postgres:alpine; \
+		echo "Sleep. Waiting create container..."; \
+		sleep 3; \
 	fi
 
 # Команда для запуска приложения

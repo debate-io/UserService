@@ -31,7 +31,7 @@ type User struct {
 	Password  string    `pg:"password"`
 	CreatedAt time.Time `pg:"created_at`
 	UpdatedAt time.Time `pg:"updated_at"`
-	ImageId   *Image    `pg:"rel:has-one"`
+	Image     *Image    `pg:"image_id, rel:has-one"`
 }
 
 // Валидация полей структуры User

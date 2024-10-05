@@ -10,15 +10,13 @@ func (q queryResolver) AuthenticateUser(
 	ctx context.Context,
 	input gen.AuthenticateUserInput,
 ) (*gen.AuthenticateUserOutput, error) {
-	panic("not implemented")
-	/*
-		 	output, err := q.useCases.Users.AuthenticateUser(ctx, input)
-			if err != nil {
-				return nil, NewResolverError("can't authenticate user", err)
-			}
 
-			return output, nil
-	*/
+	output, err := q.useCases.Users.AuthenticateUser(ctx, input)
+	if err != nil {
+		return nil, NewResolverError("can't authenticate user", err)
+	}
+
+	return output, nil
 }
 
 /* func (q queryResolver) GetUser(ctx context.Context, input gen.GetUserInput) (*gen.GetUserOutput, error) {

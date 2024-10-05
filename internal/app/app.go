@@ -1,16 +1,11 @@
 package app
 
 import (
-	"errors"
 	"time"
 
 	pg "github.com/go-pg/pg/v9"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-
-	goMigrate "github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres" // Импорт драйвера для PostgreSQL
-	_ "github.com/golang-migrate/migrate/v4/source/file"       // Импорт драйвера для работы с файлами
 
 	"github.com/debate-io/service-auth/internal/infrastructure/persistence/postgres"
 	"github.com/debate-io/service-auth/internal/interface/server"
@@ -33,37 +28,12 @@ func NewApp(config *Config) *App {
 		logger.Error("can't connect to postgres database", zap.Error(err))
 	}
 
-	err = startMigrate(config, logger)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-
 	return &App{
 		Logger: logger,
 		Server: server.NewServer(logger),
 		DB:     db,
 		Config: config,
 	}
-}
-
-func startMigrate(config *Config, logger *zap.Logger) error {
-	migrate, err := goMigrate.New("file://migrations", config.PostgresDsn)
-	if err != nil {
-		return err
-	}
-	defer migrate.Close()
-
-	if err = migrate.Up(); err != nil && err != goMigrate.ErrNoChange {
-		return errors.Join(errors.New("migrate failed: "), err)
-	}
-
-	if err == goMigrate.ErrNoChange {
-		logger.Info("База в актуальном состоянии")
-	} else {
-		logger.Info("Миграции успешно установлены")
-	}
-
-	return nil
 }
 
 func NewLogger(isDebug bool) *zap.Logger {

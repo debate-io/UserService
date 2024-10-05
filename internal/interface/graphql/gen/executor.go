@@ -135,7 +135,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
-	case "User.ImageUrl":
+	case "User.imageUrl":
 		if e.complexity.User.ImageURL == nil {
 			break
 		}
@@ -311,19 +311,8 @@ enum Role {
 }
 `, BuiltIn: false},
 	{Name: "../schema/users/mutation_users.graphql", Input: ``, BuiltIn: false},
-	{Name: "../schema/users/query_users.graphql", Input: `"""
-###################################################
-
-input GetClaimsInput {
-    jwt: String!
-}
-
-type GetClaimsOutput {
-    claims: Claims
-    error: Error
-}
-
-###################################################
+	{Name: "../schema/users/query_users.graphql", Input: `
+""" ###################################################
 
 input GetUserInput {
     id: Int!
@@ -354,7 +343,7 @@ type AuthenticateUserOutput {
     email: String!
     createdAt: Time!
     updatedAt: Time!
-    ImageUrl: String!
+    imageUrl: String!
 }
 `, BuiltIn: false},
 }
@@ -1036,8 +1025,8 @@ func (ec *executionContext) fieldContext_User_updatedAt(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _User_ImageUrl(ctx context.Context, field graphql.CollectedField, obj *User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_ImageUrl(ctx, field)
+func (ec *executionContext) _User_imageUrl(ctx context.Context, field graphql.CollectedField, obj *User) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_User_imageUrl(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1067,7 +1056,7 @@ func (ec *executionContext) _User_ImageUrl(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_User_ImageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_imageUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -3046,8 +3035,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "ImageUrl":
-			out.Values[i] = ec._User_ImageUrl(ctx, field, obj)
+		case "imageUrl":
+			out.Values[i] = ec._User_imageUrl(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

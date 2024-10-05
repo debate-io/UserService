@@ -41,7 +41,7 @@ type User struct {
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
-	ImageURL  string    `json:"ImageUrl"`
+	ImageURL  string    `json:"imageUrl"`
 }
 
 // Чтобы понять какая придёт, смотри описание метода API

@@ -1,13 +1,6 @@
 package mappers
 
-import (
-	"fmt"
-
-	"github.com/debate-io/service-auth/internal/domain/model"
-	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
-)
-
-func MapUserToDTO(user *model.User) *gen.User {
+/* func MapUserToDTO(user *model.User) *gen.User {
 	return &gen.User{
 		ID:        int(user.ID),
 		Role:      gen.Role(user.Role),
@@ -15,20 +8,6 @@ func MapUserToDTO(user *model.User) *gen.User {
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
-		ImageURL:  fmt.Sprintf("/user_image/%s", string(user.ID)),
+		ImageURL:  fmt.Sprintf("/user_image/%s.ext", string(user.ID)), подставлять id и расширение файла из таблицы картинок (с)Даня
 	}
-}
-
-func MapUsersToDTO(values []*model.User) []*gen.User {
-	res := []*gen.User{}
-
-	if values == nil || len(values) == 0 {
-		return res
-	}
-
-	for _, val := range values {
-		res = append(res, MapUserToDTO(val))
-	}
-
-	return res
-}
+} */
