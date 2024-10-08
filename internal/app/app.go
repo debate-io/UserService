@@ -83,11 +83,10 @@ func (app *App) beforeShutdown() {
 
 func (app *App) NewContainer() *registry.Container {
 	userRepo := postgres.NewUserRepository(app.DB)
-	roleRepo := postgres.NewRoleRepository(app.DB)
 	JwtConfigs := usecases.NewJwtConfigsUseCases(app.Config.JwtSecretAuth, app.Config.JwtSecretMessages, app.Config.DaysAuthExpires, app.Config.DaysRecoveryExpires)
 
 	useCases := &registry.UseCases{
-		Users: usecases.NewUserUseCases(userRepo, roleRepo, *JwtConfigs),
+		Users: usecases.NewUserUseCases(userRepo, *JwtConfigs),
 	}
 
 	return &registry.Container{UseCases: useCases, Logger: app.Logger}

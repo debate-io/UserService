@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+
 	"github.com/go-pg/pg/v9"
 	"github.com/ztrue/tracerr"
 	"go.uber.org/zap"
@@ -19,6 +20,8 @@ func NewPostgresDatabase(dsn string, appName string, logger *zap.Logger) (*pg.DB
 
 	db := pg.Connect(options)
 	db.AddQueryHook(QueryLogger{Logger: logger})
+
+	startMigrate(dsn, logger)
 
 	return db, nil
 }

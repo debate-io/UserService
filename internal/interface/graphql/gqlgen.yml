@@ -13,11 +13,6 @@ model:
   filename: internal/interface/graphql/gen/models.go
   package: gen
 
-resolver:
-  filename: internal/interface/graphql/resolvers/root.go
-  package: resolvers
-  type: Resolver
-
 models:
   Image:
     fields:

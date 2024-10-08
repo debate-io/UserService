@@ -1,25 +1,5 @@
-input AuthenticateUserInput {
-    email: String!
-    password: String!
-}
 
-type AuthenticateUserOutput {
-    jwt: String
-    error: Error
-}
-
-###################################################
-
-input GetClaimsInput {
-    jwt: String!
-}
-
-type GetClaimsOutput {
-    claims: Claims
-    error: Error
-}
-
-###################################################
+""" ###################################################
 
 input GetUserInput {
     id: Int!
@@ -31,23 +11,16 @@ type GetUserOutput {
     isUpdated: Boolean
     error: Error
 }
+"""
 
 ###############################################
 
-input GetMessageTokenInput {
+input AuthenticateUserInput {
     email: String!
+    password: String!
 }
 
-type GetMessageTokenOutput {
+type AuthenticateUserOutput {
     jwt: String
     error: Error
-}
-
-###############################################
-input FindUsersInput {
-    idAnyOf: [Int!]!
-}
-
-type FindUsersOutput {
-    users:[User!]!
 }

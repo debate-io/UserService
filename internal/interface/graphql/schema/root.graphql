@@ -1,50 +1,37 @@
 schema {
     query: Query
-    mutation: Mutation
+  #  mutation: Mutation
 }
+# type Mutation {
+#     """
+#     #Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION
+    
+#     createUser(input: CreateUserInput!): CreateUserOutput!
+    
+#     #Обновление пароля. Может вернуть ошибки: VALIDATION
+    
+#     updateUserCredentials(input: UpdateUserCredentialsInput!): UpdateUserCredentialsOutput!
+    
+#     #Подтверждение пользователя. Может вернуть ошибки: VALIDATION
+    
+#     confirmUser(input: ConfirmUserInput!): ConfirmUserOutput!
+    
+#     #Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
+    
+#     updateUser(input: UpdateUserInput!): UpdateUserOutput!
+    
+#     #Удаление пользователя. Может вернуть ошибки: VALIDATION_ERROR, NOT_FOUND
+    
+#     deleteUser(input: DeleteUserInput!): DeleteUserOutput!
+#     """
+# }
 
 type Query {
-    """
-    Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
-    """
+    # Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
+    
     authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
-    """
-    Получение клеймов. Может вернуть ошибки: VALIDATION
-    """
-    getClaims(input: GetClaimsInput!): GetClaimsOutput!
-    """
-    Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
-    """
-    getUser(input: GetUserInput!): GetUserOutput!
-    """
-    Получение токена для сообщений. Может вернуть ошибки: NOT_FOUND
-    """
-    getMessageToken(input: GetMessageTokenInput!): GetMessageTokenOutput!
-    """
-    Поиск пользователей.
-    """
-    findUsers(input: FindUsersInput!): FindUsersOutput!
-}
-
-type Mutation {
-    """
-    Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION
-    """
-    createUser(input: CreateUserInput!): CreateUserOutput!
-    """
-    Обновление пароля. Может вернуть ошибки: VALIDATION
-    """
-    updateUserCredentials(input: UpdateUserCredentialsInput!): UpdateUserCredentialsOutput!
-    """
-    Подтверждение пользователя. Может вернуть ошибки: VALIDATION
-    """
-    confirmUser(input: ConfirmUserInput!): ConfirmUserOutput!
-    """
-    Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
-    """
-    updateUser(input: UpdateUserInput!): UpdateUserOutput!
-    """
-    Удаление пользователя. Может вернуть ошибки: VALIDATION_ERROR, NOT_FOUND
-    """
-    deleteUser(input: DeleteUserInput!): DeleteUserOutput!
+    
+    #Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
+    
+    #getUser(input: GetUserInput!): GetUserOutput!
 }

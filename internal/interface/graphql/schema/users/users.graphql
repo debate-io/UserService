@@ -1,20 +1,9 @@
 type User {
     id: Int!
-    firstName: String!
-    lastName: String!
-    email: String!
+    role: Role!
     username: String!
+    email: String!
     createdAt: Time!
     updatedAt: Time!
-    avatarImageId: Int
-    birthDate: Time!
-    gender: Gender!
-    status: Status!
-}
-
-type Claims {
-    userId: Int!
-    role: Role!
-    expiredAt: Time!
-    email: String!
+    imageUrl: String!
 }

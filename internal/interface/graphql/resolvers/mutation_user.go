@@ -1,5 +1,6 @@
 package resolvers
 
+/*
 import (
 	"context"
 
@@ -52,4 +53,4 @@ func (m *mutationResolver) DeleteUser(ctx context.Context, input gen.DeleteUserI
 	}
 
 	return output, err
-}
+} */
