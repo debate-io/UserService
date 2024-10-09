@@ -1,6 +1,11 @@
 package mappers
 
-/* func MapUserToDTO(user *model.User) *gen.User {
+import (
+	"github.com/debate-io/service-auth/internal/domain/model"
+	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
+)
+
+func MapUserToDTO(user *model.User) *gen.User {
 	return &gen.User{
 		ID:        int(user.ID),
 		Role:      gen.Role(user.Role),
@@ -8,6 +13,7 @@ package mappers
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
-		ImageURL:  fmt.Sprintf("/user_image/%s.ext", string(user.ID)), подставлять id и расширение файла из таблицы картинок (с)Даня
+		// TODO: change mock to real image URL
+		ImageURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlwq2pr4enZ_frUAdm0vcxieKI3E1ZYxA-8Q&s",
 	}
-} */
+}

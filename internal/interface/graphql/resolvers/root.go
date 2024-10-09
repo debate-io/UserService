@@ -5,6 +5,7 @@ import (
 
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
 	"github.com/debate-io/service-auth/internal/registry"
+	"github.com/ztrue/tracerr"
 )
 
 type Resolver struct {
@@ -21,18 +22,21 @@ func NewResolver(
 
 type queryResolver struct{ *Resolver }
 
-//type mutationResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
 
 func (r *Resolver) Query() gen.QueryResolver { return &queryResolver{r} }
 
-//func (r *Resolver) Mutation() gen.MutationResolver { return &mutationResolver{r} }
+func (r *Resolver) Mutation() gen.MutationResolver { return &mutationResolver{r} }
 
 func NewResolverError(
 	responseError string,
 	originalError error,
 ) *ResolverError {
 	fmt.Println(originalError)
-	return &ResolverError{}
+	return &ResolverError{
+		tracerr.Errorf(responseError),
+		originalError,
+	}
 }
 
 type ResolverError struct {

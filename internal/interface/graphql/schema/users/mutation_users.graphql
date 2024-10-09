@@ -1,0 +1,13 @@
+input RegisterUserInput {
+    username: String!
+    email: String!
+    password: String!
+}
+
+type RegisterUserOutput {
+    user: User
+    jwt: String
+    error: Error
+}
+
+###############################################################################################

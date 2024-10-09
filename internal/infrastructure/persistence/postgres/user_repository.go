@@ -25,7 +25,7 @@ func NewUserRepository(
 	}
 }
 
-/* func (u *UserRepository) CreateUser(ctx context.Context, user *model.User) (*model.User, error) {
+func (u *UserRepository) CreateUser(ctx context.Context, user *model.User) (*model.User, error) {
 	_, err := u.db.ModelContext(ctx, user).Insert()
 
 	if err != nil {
@@ -37,7 +37,7 @@ func NewUserRepository(
 	}
 
 	return user, nil
-} */
+}
 
 /* func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*model.User, error) {
 	_, err := u.db.ModelContext(ctx, user).

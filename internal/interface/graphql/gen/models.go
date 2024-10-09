@@ -31,7 +31,22 @@ type AuthenticateUserOutput struct {
 	Error *Error  `json:"error,omitempty"`
 }
 
+type Mutation struct {
+}
+
 type Query struct {
+}
+
+type RegisterUserInput struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type RegisterUserOutput struct {
+	User  *User   `json:"user,omitempty"`
+	Jwt   *string `json:"jwt,omitempty"`
+	Error *Error  `json:"error,omitempty"`
 }
 
 type User struct {

@@ -3,7 +3,9 @@ package usecases
 import (
 	"context"
 	"errors"
+	"time"
 
+	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
 	"github.com/debate-io/service-auth/internal/usecases/mappers"
@@ -37,22 +39,23 @@ func NewJwtConfigsUseCases(jwtSecretAuth string, jwtSecretMessage string, daysAu
 	}
 }
 
-/* func (u *User) CreateUser(
+func (u *User) CreateUser(
 	ctx context.Context,
-	input gen.CreateUserInput,
-) (*gen.CreateUserOutput, error) {
+	input gen.RegisterUserInput,
+) (*gen.RegisterUserOutput, error) {
 	user := &model.User{
-		FirstName:     input.FirstName,
-		LastName:      input.LastName,
-		Email:         input.Email,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
-		Username:      input.Username,
-		AvatarImageID: input.AvatarImageID,
-		BirthDate:     input.BirthDate,
-		Gender:        input.Gender,
-		RoleID:        RoleUserID,
-		Status:        gen.StatusNotConfirmed,
+		Email:     input.Email,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Username:  input.Username,
+		Password:  input.Password,
+		Image:     nil,
+		Role:      model.RoleDefaultUser,
+	}
+
+	if err := user.Validate(); err != nil {
+		return &gen.RegisterUserOutput{
+			Error: mappers.NewDTOError(gen.ErrorValidation)}, nil
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
@@ -62,22 +65,17 @@ func NewJwtConfigsUseCases(jwtSecretAuth string, jwtSecretMessage string, daysAu
 
 	user.Password = string(hashedPassword)
 
-	if err := user.Validate(); err != nil {
-		return &gen.CreateUserOutput{
-			Error: mappers.NewDTOError(gen.ErrorValidation)}, nil
-	}
-
 	_, err = u.userRepo.CreateUser(ctx, user)
 	if err != nil {
 		if errors.Is(err, repo.ErrUserAlreadyExist) {
-			return &gen.CreateUserOutput{
+			return &gen.RegisterUserOutput{
 				Error: mappers.NewDTOError(gen.ErrorAlreadyExist)}, nil
 		}
 
 		return nil, err
 	}
 
-	claims, err := types.NewAuthClaims(user.ID, user.Email, RoleUserKey, u.jwtConfigs.daysAuthExpires)
+	claims, err := types.NewAuthClaims(user.ID, user.Email, string(user.Role), u.jwtConfigs.daysAuthExpires)
 	if err != nil {
 		return nil, err
 	}
@@ -87,9 +85,8 @@ func NewJwtConfigsUseCases(jwtSecretAuth string, jwtSecretMessage string, daysAu
 		return nil, err
 	}
 
-	return &gen.CreateUserOutput{User: mappers.MapUserToDTO(user), Jwt: &jwt}, nil
+	return &gen.RegisterUserOutput{User: mappers.MapUserToDTO(user), Jwt: &jwt}, nil
 }
-*/
 
 func (u *User) AuthenticateUser(
 	ctx context.Context,
@@ -111,7 +108,7 @@ func (u *User) AuthenticateUser(
 			Error: mappers.NewDTOError(gen.ErrorInvalidCredentials)}, nil
 	}
 
-	claims, err := types.NewAuthClaims(int(user.ID), user.Email, string(user.Role), u.jwtConfigs.daysAuthExpires)
+	claims, err := types.NewAuthClaims(user.ID, user.Email, string(user.Role), u.jwtConfigs.daysAuthExpires)
 	if err != nil {
 		return nil, err
 	}

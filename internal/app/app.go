@@ -1,6 +1,7 @@
 package app
 
 import (
+	"os"
 	"time"
 
 	pg "github.com/go-pg/pg/v9"
@@ -22,6 +23,10 @@ type App struct {
 
 func NewApp(config *Config) *App {
 	logger := NewLogger(config.IsDebug)
+
+	if err := setOsTimezone("UTC"); err != nil {
+		logger.Error("can't set timezone in OS environment", zap.Error(err))
+	}
 
 	db, err := postgres.NewPostgresDatabase(config.PostgresDsn, config.ServiceName, logger)
 	if err != nil {
@@ -90,4 +95,8 @@ func (app *App) NewContainer() *registry.Container {
 	}
 
 	return &registry.Container{UseCases: useCases, Logger: app.Logger}
+}
+
+func setOsTimezone(tz string) error {
+	return os.Setenv("TZ", tz)
 }
