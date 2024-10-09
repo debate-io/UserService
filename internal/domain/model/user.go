@@ -16,20 +16,22 @@ const (
 )
 
 type Image struct {
-	tableName struct{} `pg:"images"`
-	ID        int64    `pg:"id,pk"`
-	Format    string   `pg:"format"`
-	File      []byte   `pg:"file"`
+	tableName   struct{}  `pg:"images"`
+	ID          int64     `pg:"id,pk"`
+	ContentType string    `pg:"content_type"`
+	File        []byte    `pg:"file"`
+	CreatedAt   time.Time `pg:"created_at"`
+	UpdatedAt   time.Time `pg:"updated_at"`
 }
 
 type User struct {
 	tableName struct{}  `pg:"users"`
-	ID        int64     `pg:"id,pk"`
-	Role      RoleEnum  `pg:"role`
+	ID        int       `pg:"id,pk"`
+	Role      RoleEnum  `pg:"role"`
 	Username  string    `pg:"username"`
 	Email     string    `pg:"email"`
 	Password  string    `pg:"password"`
-	CreatedAt time.Time `pg:"created_at`
+	CreatedAt time.Time `pg:"created_at"`
 	UpdatedAt time.Time `pg:"updated_at"`
 	Image     *Image    `pg:"image_id, rel:has-one"`
 }
@@ -50,7 +52,7 @@ func (u *User) Validate() error {
 // Валидация полей структуры Image
 func (i *Image) Validate() error {
 	return validation.ValidateStruct(i,
-		validation.Field(&i.Format, validation.Required), // Поле обязательно
-		validation.Field(&i.File, validation.Required),   // Поле обязательно
+		validation.Field(&i.ContentType, validation.Required), // Поле обязательно
+		validation.Field(&i.File, validation.Required),        // Поле обязательно
 	)
 }

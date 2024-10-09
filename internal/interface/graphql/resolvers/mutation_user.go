@@ -1,13 +1,12 @@
 package resolvers
 
-/*
 import (
 	"context"
 
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
 )
 
-func (m *mutationResolver) CreateUser(ctx context.Context, input gen.CreateUserInput) (*gen.CreateUserOutput, error) {
+func (m *mutationResolver) RegisterUser(ctx context.Context, input gen.RegisterUserInput) (*gen.RegisterUserOutput, error) {
 	output, err := m.useCases.Users.CreateUser(ctx, input)
 	if err != nil {
 		return nil, NewResolverError("failed to create user", err)
@@ -15,6 +14,8 @@ func (m *mutationResolver) CreateUser(ctx context.Context, input gen.CreateUserI
 
 	return output, nil
 }
+
+/*
 
 func (m *mutationResolver) UpdateUserCredentials(
 	ctx context.Context,
