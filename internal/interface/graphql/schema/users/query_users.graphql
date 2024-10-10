@@ -24,3 +24,14 @@ type AuthenticateUserOutput {
     jwt: String
     error: Error
 }
+
+###############################################
+
+input VerifyRecoveryCodeInput {
+    code: String!
+    email: String!
+}
+
+type VerifyRecoveryCodeOutput {
+    error: Error
+}

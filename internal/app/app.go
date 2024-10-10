@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/debate-io/service-auth/internal/infrastructure/smtp"
 	"os"
 	"time"
 
@@ -15,10 +16,11 @@ import (
 )
 
 type App struct {
-	Logger *zap.Logger
-	Server *server.Server
-	DB     *pg.DB
-	Config *Config
+	Logger     *zap.Logger
+	Server     *server.Server
+	DB         *pg.DB
+	SmtpSender *smtp.Sender
+	Config     *Config
 }
 
 func NewApp(config *Config) *App {
@@ -33,11 +35,24 @@ func NewApp(config *Config) *App {
 		logger.Error("can't connect to postgres database", zap.Error(err))
 	}
 
+	smtpClient, err := smtp.NewSender(&smtp.Config{
+		Host:     config.Smtp.Host,
+		Port:     config.Smtp.Port,
+		Username: config.Smtp.Username,
+		Password: config.Smtp.Password,
+		SSL:      config.Smtp.SSL,
+		From:     config.Smtp.From,
+	})
+	if err != nil {
+		logger.Error("can't connect to SMTP server", zap.Error(err))
+	}
+
 	return &App{
-		Logger: logger,
-		Server: server.NewServer(logger),
-		DB:     db,
-		Config: config,
+		Logger:     logger,
+		Server:     server.NewServer(logger),
+		DB:         db,
+		SmtpSender: smtpClient,
+		Config:     config,
 	}
 }
 
@@ -88,10 +103,11 @@ func (app *App) beforeShutdown() {
 
 func (app *App) NewContainer() *registry.Container {
 	userRepo := postgres.NewUserRepository(app.DB)
+	recoveryCodeRepo := postgres.NewRecoveryCodeRepository(app.DB)
 	JwtConfigs := usecases.NewJwtConfigsUseCases(app.Config.JwtSecretAuth, app.Config.JwtSecretMessages, app.Config.DaysAuthExpires, app.Config.DaysRecoveryExpires)
 
 	useCases := &registry.UseCases{
-		Users: usecases.NewUserUseCases(userRepo, *JwtConfigs),
+		Users: usecases.NewUserUseCases(userRepo, recoveryCodeRepo, app.SmtpSender, *JwtConfigs),
 	}
 
 	return &registry.Container{UseCases: useCases, Logger: app.Logger}

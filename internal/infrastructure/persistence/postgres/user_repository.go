@@ -39,7 +39,7 @@ func (u *UserRepository) CreateUser(ctx context.Context, user *model.User) (*mod
 	return user, nil
 }
 
-/* func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*model.User, error) {
+func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*model.User, error) {
 	_, err := u.db.ModelContext(ctx, user).
 		Where("id in (?)", user.ID).
 		Update()
@@ -53,7 +53,7 @@ func (u *UserRepository) CreateUser(ctx context.Context, user *model.User) (*mod
 	}
 
 	return user, nil
-} */
+}
 
 func (u *UserRepository) FindUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	result := &model.User{}

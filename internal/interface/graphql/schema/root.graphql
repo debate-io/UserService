@@ -6,32 +6,44 @@ schema {
 type Mutation {
     """
     Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION
-    """    
+    """
     registerUser(input: RegisterUserInput!): RegisterUserOutput!
 
-  # Обновление пароля. Может вернуть ошибки: VALIDATION
+    # Обновление пароля. Может вернуть ошибки: VALIDATION
 
-  # updateUserCredentials(input: UpdateUserCredentialsInput!): UpdateUserCredentialsOutput!
+    # updateUserCredentials(input: UpdateUserCredentialsInput!): UpdateUserCredentialsOutput!
 
-  # Подтверждение пользователя. Может вернуть ошибки: VALIDATION
+    # Подтверждение пользователя. Может вернуть ошибки: VALIDATION
 
-  # confirmUser(input: ConfirmUserInput!): ConfirmUserOutput!
+    # confirmUser(input: ConfirmUserInput!): ConfirmUserOutput!
 
-  # Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
+    # Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
 
-  # updateUser(input: UpdateUserInput!): UpdateUserOutput!
+    # updateUser(input: UpdateUserInput!): UpdateUserOutput!
 
-  # Удаление пользователя. Может вернуть ошибки: VALIDATION_ERROR, NOT_FOUND
+    # Удаление пользователя. Может вернуть ошибки: VALIDATION_ERROR, NOT_FOUND
 
-  # deleteUser(input: DeleteUserInput!): DeleteUserOutput!    
+    # deleteUser(input: DeleteUserInput!): DeleteUserOutput!
+
+    # Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
+
+    recoveryPassword(input: RecoveryPasswordInput!): RecoveryPasswordOutput!
+
+    # Восстановление пароля - проверка кода восстановления и сброс пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND
+
+    resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
 }
 
 type Query {
     # Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
-    
+
     authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
-    
+
     #Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
-    
+
     #getUser(input: GetUserInput!): GetUserOutput!
+
+    # Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
+
+    verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
 }
