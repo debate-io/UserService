@@ -55,3 +55,29 @@ func (m *mutationResolver) DeleteUser(ctx context.Context, input gen.DeleteUserI
 
 	return output, err
 } */
+
+func (m mutationResolver) RecoveryPassword(
+	ctx context.Context,
+	input gen.RecoveryPasswordInput,
+) (*gen.RecoveryPasswordOutput, error) {
+
+	output, err := m.useCases.Users.RecoveryPassword(ctx, input)
+	if err != nil {
+		return nil, NewResolverError("can't recovery password", err)
+	}
+
+	return output, nil
+}
+
+func (m mutationResolver) ResetPassword(
+	ctx context.Context,
+	input gen.ResetPasswordInput,
+) (*gen.ResetPasswordOutput, error) {
+
+	output, err := m.useCases.Users.ResetPassword(ctx, input)
+	if err != nil {
+		return nil, NewResolverError("can't reset password", err)
+	}
+
+	return output, nil
+}

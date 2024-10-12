@@ -37,6 +37,14 @@ type Mutation struct {
 type Query struct {
 }
 
+type RecoveryPasswordInput struct {
+	Email string `json:"email"`
+}
+
+type RecoveryPasswordOutput struct {
+	Error *Error `json:"error,omitempty"`
+}
+
 type RegisterUserInput struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
@@ -49,6 +57,16 @@ type RegisterUserOutput struct {
 	Error *Error  `json:"error,omitempty"`
 }
 
+type ResetPasswordInput struct {
+	Code     string `json:"code"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type ResetPasswordOutput struct {
+	Error *Error `json:"error,omitempty"`
+}
+
 type User struct {
 	ID        int       `json:"id"`
 	Role      Role      `json:"role"`
@@ -57,6 +75,15 @@ type User struct {
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 	ImageURL  string    `json:"imageUrl"`
+}
+
+type VerifyRecoveryCodeInput struct {
+	Code  string `json:"code"`
+	Email string `json:"email"`
+}
+
+type VerifyRecoveryCodeOutput struct {
+	Error *Error `json:"error,omitempty"`
 }
 
 // Чтобы понять какая придёт, смотри описание метода API

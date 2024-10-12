@@ -3,20 +3,29 @@ package usecases
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
+	"github.com/debate-io/service-auth/internal/infrastructure/smtp"
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
 	"github.com/debate-io/service-auth/internal/usecases/mappers"
 	"github.com/debate-io/service-auth/internal/usecases/types"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
+	"math/rand"
+	"time"
+)
+
+const (
+	CodeLength = 6
+	CodeTTL    = 5 // in minute
 )
 
 type User struct {
-	userRepo   repo.UserRepository
-	jwtConfigs JwtConfigs
+	userRepo         repo.UserRepository
+	recoveryCodeRepo repo.RecoveryCodeRepository
+	smtpSender       *smtp.Sender
+	jwtConfigs       JwtConfigs
 }
 
 type JwtConfigs struct {
@@ -26,8 +35,8 @@ type JwtConfigs struct {
 	daysRecoveryExpires int
 }
 
-func NewUserUseCases(userRepo repo.UserRepository, jwtConfigs JwtConfigs) *User {
-	return &User{userRepo: userRepo, jwtConfigs: jwtConfigs}
+func NewUserUseCases(userRepo repo.UserRepository, recoveryCodeRepo repo.RecoveryCodeRepository, smtpClient *smtp.Sender, jwtConfigs JwtConfigs) *User {
+	return &User{userRepo: userRepo, recoveryCodeRepo: recoveryCodeRepo, smtpSender: smtpClient, jwtConfigs: jwtConfigs}
 }
 
 func NewJwtConfigsUseCases(jwtSecretAuth string, jwtSecretMessage string, daysAuthExpires int, daysRecoveryExpires int) *JwtConfigs {
@@ -297,6 +306,81 @@ func (u *User) DeleteUser(
 }
 */
 
+func (u *User) RecoveryPassword(ctx context.Context, input gen.RecoveryPasswordInput) (*gen.RecoveryPasswordOutput, error) {
+	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
+	if err != nil {
+		if errors.Is(err, repo.ErrUserNotFound) {
+			return &gen.RecoveryPasswordOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+		}
+
+		return nil, err
+	}
+
+	code := &model.RecoveryCode{
+		UserEmail: user.Email,
+		User:      user,
+		Code:      generateCode(CodeLength),
+		ExpiredAt: time.Now().Add(CodeTTL * time.Minute),
+	}
+	_, err = u.recoveryCodeRepo.CreateRecoveryCode(ctx, code)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Add rendering template HTML message
+	err = u.smtpSender.SendPlainMessage("Код для восстановления пароля", code.Code, input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return &gen.RecoveryPasswordOutput{}, nil
+}
+
+func (u *User) VerifyRecoveryCode(ctx context.Context, input gen.VerifyRecoveryCodeInput) (*gen.VerifyRecoveryCodeOutput, error) {
+	exists, err := u.recoveryCodeRepo.ExistsRecoveryCodeByEmailAndCode(ctx, input.Email, input.Code)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return &gen.VerifyRecoveryCodeOutput{
+			Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+	}
+
+	return &gen.VerifyRecoveryCodeOutput{}, nil
+}
+
+func (u *User) ResetPassword(ctx context.Context, input gen.ResetPasswordInput) (*gen.ResetPasswordOutput, error) {
+	code, err := u.recoveryCodeRepo.FindRecoveryCodeByEmailAndCode(ctx, input.Email, input.Code)
+	if err != nil {
+		if errors.Is(err, repo.ErrRecoveryCodeNotFound) {
+			return &gen.ResetPasswordOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+		}
+
+		return nil, err
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	code.User.Password = string(hashedPassword)
+
+	_, err = u.userRepo.UpdateUser(ctx, code.User)
+	if err != nil {
+		if errors.Is(err, repo.ErrUserNotFound) {
+			return &gen.ResetPasswordOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+		}
+
+		return nil, err
+	}
+
+	return &gen.ResetPasswordOutput{}, nil
+}
+
 // дважды перепроверить функцию, но вроде она не затронута
 func generateTokenByClaims(claims *types.Claims, secret string) (string, error) {
 	signBytes := []byte(secret)
@@ -308,4 +392,14 @@ func generateTokenByClaims(claims *types.Claims, secret string) (string, error) 
 	}
 
 	return ss, nil
+}
+
+func generateCode(length int) string {
+	code := make([]byte, length)
+
+	for i := range code {
+		code[i] = byte(rand.Intn(10) + '0')
+	}
+
+	return string(code)
 }

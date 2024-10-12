@@ -1,3 +1,22 @@
+input RecoveryPasswordInput {
+    email: String!
+}
+
+type RecoveryPasswordOutput {
+    error: Error
+}
+
+###############################################
+
+input ResetPasswordInput {
+    code: String!
+    email: String!
+    password: String!
+}
+
+type ResetPasswordOutput {
+    error: Error
+}
 input RegisterUserInput {
     username: String!
     email: String!
