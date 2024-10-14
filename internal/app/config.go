@@ -24,8 +24,8 @@ type SmtpConfig struct {
 	Port     int    `validate:"required"`
 	Username string `validate:"required"`
 	Password string `validate:"required"`
-	SSL      bool   `validate:"required"`
 	From     string `validate:"required"`
+	SSL      bool
 }
 
 func (c Config) Validate() error {
