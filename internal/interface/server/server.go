@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"net/http"
 	"time"
 
@@ -71,6 +72,8 @@ func (s *Server) InitRoutes(container *registry.Container, isDebug bool) {
 		),
 		isDebug,
 	)
+
+	graphqlHandler.Use(extension.Introspection{})
 
 	s.router.Handle("/*", graphqlHandler)
 }

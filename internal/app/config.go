@@ -26,6 +26,7 @@ type SmtpConfig struct {
 	Password string `validate:"required"`
 	SSL      bool   `validate:"omitempty"`
 	From     string `validate:"required"`
+	SSL      bool
 }
 
 func (c Config) Validate() error {
