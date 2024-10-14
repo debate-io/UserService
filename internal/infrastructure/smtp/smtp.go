@@ -2,6 +2,7 @@ package smtp
 
 import (
 	"crypto/tls"
+
 	"github.com/ztrue/tracerr"
 	"gopkg.in/gomail.v2"
 )
@@ -23,7 +24,7 @@ type Sender struct {
 
 func NewSender(cfg *Config) (*Sender, error) {
 	d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.Username, cfg.Password)
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: cfg.SSL}
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: !cfg.SSL}
 
 	// Check connection to SMTP server
 	closer, err := d.Dial()

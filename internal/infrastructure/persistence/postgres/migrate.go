@@ -25,7 +25,7 @@ func startMigrate(dsn string, logger *zap.Logger) error {
 
 	migrate, err := goMigrate.New("file://migrations", dsn)
 	if err != nil {
-		return err
+		return errors.Join(errors.New("migrate failed: "), err)
 	}
 	defer migrate.Close()
 

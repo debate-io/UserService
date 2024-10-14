@@ -11,7 +11,7 @@ type Config struct {
 	ServiceName         string `validate:"required"`
 	PostgresDsn         string `validate:"required"`
 	Address             string `validate:"required"`
-	IsDebug             bool   `validate:"required"`
+	IsDebug             bool   `validate:"omitempty"`
 	JwtSecretAuth       string `validate:"required"`
 	JwtSecretMessages   string `validate:"required"`
 	DaysAuthExpires     int    `validate:"required"`
@@ -24,7 +24,7 @@ type SmtpConfig struct {
 	Port     int    `validate:"required"`
 	Username string `validate:"required"`
 	Password string `validate:"required"`
-	SSL      bool   `validate:"required"`
+	SSL      bool   `validate:"omitempty"`
 	From     string `validate:"required"`
 }
 

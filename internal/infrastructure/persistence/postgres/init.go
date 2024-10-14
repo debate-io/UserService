@@ -21,7 +21,9 @@ func NewPostgresDatabase(dsn string, appName string, logger *zap.Logger) (*pg.DB
 	db := pg.Connect(options)
 	db.AddQueryHook(QueryLogger{Logger: logger})
 
-	startMigrate(dsn, logger)
+	if err := startMigrate(dsn, logger); err != nil {
+		return nil, err
+	}
 
 	return db, nil
 }
