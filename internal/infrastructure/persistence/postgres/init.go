@@ -21,7 +21,10 @@ func NewPostgresDatabase(dsn string, appName string, logger *zap.Logger) (*pg.DB
 	db := pg.Connect(options)
 	db.AddQueryHook(QueryLogger{Logger: logger})
 
-	logger.Sugar().Errorf("failed to run migrations: %v", startMigrate(dsn, logger))
+	if err := startMigrate(dsn, logger); err != nil {
+		logger.Sugar().Errorf("failed to run migrations: %v", err)
+		return nil, err
+	}
 
 	return db, nil
 }

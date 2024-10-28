@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"math/rand"
+	"time"
+
 	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
 	"github.com/debate-io/service-auth/internal/infrastructure/smtp"
@@ -12,8 +15,6 @@ import (
 	"github.com/debate-io/service-auth/internal/usecases/types"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
-	"math/rand"
-	"time"
 )
 
 const (
@@ -24,6 +25,8 @@ const (
 type User struct {
 	userRepo         repo.UserRepository
 	recoveryCodeRepo repo.RecoveryCodeRepository
+	gameStatsRepo    repo.GameStatsRepository
+	achievementRepo  repo.AchievmentsRepository
 	smtpSender       *smtp.Sender
 	jwtConfigs       JwtConfigs
 }
@@ -35,8 +38,15 @@ type JwtConfigs struct {
 	daysRecoveryExpires int
 }
 
-func NewUserUseCases(userRepo repo.UserRepository, recoveryCodeRepo repo.RecoveryCodeRepository, smtpClient *smtp.Sender, jwtConfigs JwtConfigs) *User {
-	return &User{userRepo: userRepo, recoveryCodeRepo: recoveryCodeRepo, smtpSender: smtpClient, jwtConfigs: jwtConfigs}
+func NewUserUseCases(userRepo repo.UserRepository, recoveryCodeRepo repo.RecoveryCodeRepository, gameStatsRepo repo.GameStatsRepository, achievementRepo repo.AchievmentsRepository, smtpClient *smtp.Sender, jwtConfigs JwtConfigs) *User {
+	return &User{
+		userRepo:         userRepo,
+		recoveryCodeRepo: recoveryCodeRepo,
+		gameStatsRepo:    gameStatsRepo,
+		achievementRepo:  achievementRepo,
+		smtpSender:       smtpClient,
+		jwtConfigs:       jwtConfigs,
+	}
 }
 
 func NewJwtConfigsUseCases(jwtSecretAuth string, jwtSecretMessage string, daysAuthExpires int, daysRecoveryExpires int) *JwtConfigs {
@@ -130,7 +140,7 @@ func (u *User) AuthenticateUser(
 	return &gen.AuthenticateUserOutput{Jwt: &token}, nil
 }
 
-/* func (u *User) GetUser(
+func (u *User) GetUser(
 	ctx context.Context,
 	input gen.GetUserInput,
 ) (*gen.GetUserOutput, error) {
@@ -145,33 +155,42 @@ func (u *User) AuthenticateUser(
 		return nil, err
 	}
 
-	if input.GettingAt != nil {
-		isUpdated := false
-		if input.GettingAt.Before(user.UpdatedAt) {
-			isUpdated = true
-		}
-
-		return &gen.GetUserOutput{
-			IsUpdated: &isUpdated,
-		}, nil
-	}
-
-	output := &gen.GetUserOutput{}
-
-	if input.GettingAt != nil {
-		isUpdated := false
-		if user.UpdatedAt.After(*input.GettingAt) {
-			isUpdated = true
-		}
-
-		output.IsUpdated = &isUpdated
-	}
-
-	output.User = mappers.MapUserToDTO(user)
-
-	return output, nil
+	return &gen.GetUserOutput{User: mappers.MapUserToDTO(user)}, nil
 }
-*/
+
+func (u *User) GetGamesStats(
+	ctx context.Context,
+	input gen.GetGamesStatsInput,
+) (*gen.GetGamesStatsOutput, error) {
+	stat, err := u.gameStatsRepo.GetTotalGamesStatsByUserId(ctx, input.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &gen.GetGamesStatsOutput{
+		GamesAmount: stat.TotalGamesStats.GamesAmount,
+		WinsAmout:   stat.TotalGamesStats.WinsAmount,
+	}
+	if stat.TotalGamesStats.GamesAmount != 0 {
+		result.WinsPercents = 100. * float64(stat.TotalGamesStats.WinsAmount) / float64(stat.TotalGamesStats.GamesAmount)
+	}
+
+	for metatopic, stat := range stat.MetaTopicStats {
+		element := &gen.MetatopicsStats{
+			Matatpoic:   metatopic,
+			GamesAmount: stat.GamesAmount,
+			WinsAmout:   stat.WinsAmount,
+		}
+
+		if stat.GamesAmount != 0 {
+			element.WinsPercents = 100. * float64(stat.WinsAmount) / float64(stat.GamesAmount)
+		}
+
+		result.MetatopicsStats = append(result.MetatopicsStats, element)
+	}
+
+	return result, nil
+}
 
 /*
 func (u *User) UpdateUserCredentials(
@@ -245,7 +264,7 @@ func (u *User) ConfirmUser(
 	return &gen.ConfirmUserOutput{Ok: true}, nil
 }
 */
-/*
+
 func (u *User) UpdateUser(
 	ctx context.Context,
 	input gen.UpdateUserInput,
@@ -260,9 +279,12 @@ func (u *User) UpdateUser(
 		return nil, err
 	}
 
-	user.FirstName = input.FirstName
-	user.LastName = input.LastName
-	user.AvatarImageID = input.AvatarImageID
+	if input.Username != nil {
+		user.Username = *input.Username
+	}
+	if input.ImageID != nil {
+		user.Image.ID = *input.ImageID
+	}
 
 	if err := user.Validate(); err != nil {
 		return &gen.UpdateUserOutput{
@@ -275,7 +297,7 @@ func (u *User) UpdateUser(
 
 	return &gen.UpdateUserOutput{User: mappers.MapUserToDTO(user)}, nil
 }
-*/
+
 /*
 func (u *User) DeleteUser(
 	ctx context.Context,
@@ -351,6 +373,86 @@ func (u *User) VerifyRecoveryCode(ctx context.Context, input gen.VerifyRecoveryC
 	return &gen.VerifyRecoveryCodeOutput{}, nil
 }
 
+func (u *User) UpdatePassword(ctx context.Context, input gen.UpdatePasswordInput) (*gen.UpdatePasswordOutput, error) {
+	user, err := u.userRepo.FindUserByID(ctx, input.ID)
+	if err != nil {
+		if errors.Is(err, repo.ErrUserNotFound) {
+			return &gen.UpdatePasswordOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+		}
+
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.OldPassword)); err != nil {
+		return &gen.UpdatePasswordOutput{
+			Error: mappers.NewDTOError(gen.ErrorInvalidCredentials)}, nil
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	user.Password = string(hashedPassword)
+
+	if _, err := u.userRepo.UpdateUser(ctx, user); err != nil {
+		if errors.Is(err, repo.ErrUserNotFound) {
+			return &gen.UpdatePasswordOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+		}
+		return &gen.UpdatePasswordOutput{}, err
+	}
+
+	return &gen.UpdatePasswordOutput{}, nil
+}
+
+func (u *User) UpdateEmail(ctx context.Context, input gen.UpdateEmailInput) (*gen.UpdateEmailOutput, error) {
+	user, err := u.userRepo.FindUserByID(ctx, input.ID)
+	if err != nil {
+		if errors.Is(err, repo.ErrUserNotFound) {
+			return &gen.UpdateEmailOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+		}
+
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
+		return &gen.UpdateEmailOutput{
+			Error: mappers.NewDTOError(gen.ErrorInvalidCredentials)}, nil
+	}
+
+	user.Email = input.Email
+	if _, err := u.userRepo.UpdateUser(ctx, user); err != nil {
+		if errors.Is(err, repo.ErrUserNotFound) {
+			return &gen.UpdateEmailOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
+		}
+		return &gen.UpdateEmailOutput{}, err
+	}
+
+	return &gen.UpdateEmailOutput{}, nil
+}
+
+func (u *User) GetAchievmentsByUserId(ctx context.Context, userId int, limit int, offset int) ([]*gen.Achievement, error) {
+	achievs, err := u.achievementRepo.GetAchievmentsByUserId(ctx, userId, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	var result []*gen.Achievement
+	for _, achiev := range achievs {
+		element := &gen.Achievement{
+			ID:          achiev.ID,
+			Name:        achiev.Name,
+			Description: achiev.Description,
+			CreatedAt:   achiev.CreateAt,
+		}
+		result = append(result, element)
+	}
+	return result, nil
+}
+
 func (u *User) ResetPassword(ctx context.Context, input gen.ResetPasswordInput) (*gen.ResetPasswordOutput, error) {
 	code, err := u.recoveryCodeRepo.FindRecoveryCodeByEmailAndCode(ctx, input.Email, input.Code)
 	if err != nil {
@@ -381,7 +483,6 @@ func (u *User) ResetPassword(ctx context.Context, input gen.ResetPasswordInput) 
 	return &gen.ResetPasswordOutput{}, nil
 }
 
-// дважды перепроверить функцию, но вроде она не затронута
 func generateTokenByClaims(claims *types.Claims, secret string) (string, error) {
 	signBytes := []byte(secret)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

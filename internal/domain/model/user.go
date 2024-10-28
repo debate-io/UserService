@@ -17,7 +17,7 @@ const (
 
 type Image struct {
 	tableName   struct{}  `pg:"images"`
-	ID          int64     `pg:"id,pk"`
+	ID          int       `pg:"id,pk"`
 	ContentType string    `pg:"content_type"`
 	File        []byte    `pg:"file"`
 	CreatedAt   time.Time `pg:"created_at"`

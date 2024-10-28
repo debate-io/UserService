@@ -46,20 +46,53 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Achievement struct {
+		CreatedAt   func(childComplexity int) int
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Name        func(childComplexity int) int
+	}
+
 	AuthenticateUserOutput struct {
 		Error func(childComplexity int) int
 		Jwt   func(childComplexity int) int
+	}
+
+	GetGamesStatsOutput struct {
+		Error           func(childComplexity int) int
+		GamesAmount     func(childComplexity int) int
+		MetatopicsStats func(childComplexity int) int
+		WinsAmout       func(childComplexity int) int
+		WinsPercents    func(childComplexity int) int
+	}
+
+	GetUserOutput struct {
+		Error func(childComplexity int) int
+		User  func(childComplexity int) int
+	}
+
+	MetatopicsStats struct {
+		GamesAmount  func(childComplexity int) int
+		Matatpoic    func(childComplexity int) int
+		WinsAmout    func(childComplexity int) int
+		WinsPercents func(childComplexity int) int
 	}
 
 	Mutation struct {
 		RecoveryPassword func(childComplexity int, input RecoveryPasswordInput) int
 		RegisterUser     func(childComplexity int, input RegisterUserInput) int
 		ResetPassword    func(childComplexity int, input ResetPasswordInput) int
+		UpdateEmail      func(childComplexity int, input UpdateEmailInput) int
+		UpdatePassword   func(childComplexity int, input UpdatePasswordInput) int
+		UpdateUser       func(childComplexity int, input UpdateUserInput) int
 	}
 
 	Query struct {
-		AuthenticateUser   func(childComplexity int, input AuthenticateUserInput) int
-		VerifyRecoveryCode func(childComplexity int, input VerifyRecoveryCodeInput) int
+		AuthenticateUser    func(childComplexity int, input AuthenticateUserInput) int
+		GetGamesStats       func(childComplexity int, input GetGamesStatsInput) int
+		GetUser             func(childComplexity int, input GetUserInput) int
+		GetUserAchievements func(childComplexity int, userID int, limit int, offset int) int
+		VerifyRecoveryCode  func(childComplexity int, input VerifyRecoveryCodeInput) int
 	}
 
 	RecoveryPasswordOutput struct {
@@ -74,6 +107,19 @@ type ComplexityRoot struct {
 
 	ResetPasswordOutput struct {
 		Error func(childComplexity int) int
+	}
+
+	UpdateEmailOutput struct {
+		Error func(childComplexity int) int
+	}
+
+	UpdatePasswordOutput struct {
+		Error func(childComplexity int) int
+	}
+
+	UpdateUserOutput struct {
+		Error func(childComplexity int) int
+		User  func(childComplexity int) int
 	}
 
 	User struct {
@@ -93,11 +139,17 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	RegisterUser(ctx context.Context, input RegisterUserInput) (*RegisterUserOutput, error)
+	UpdateUser(ctx context.Context, input UpdateUserInput) (*UpdateUserOutput, error)
+	UpdatePassword(ctx context.Context, input UpdatePasswordInput) (*UpdatePasswordOutput, error)
+	UpdateEmail(ctx context.Context, input UpdateEmailInput) (*UpdateEmailOutput, error)
 	RecoveryPassword(ctx context.Context, input RecoveryPasswordInput) (*RecoveryPasswordOutput, error)
 	ResetPassword(ctx context.Context, input ResetPasswordInput) (*ResetPasswordOutput, error)
 }
 type QueryResolver interface {
 	AuthenticateUser(ctx context.Context, input AuthenticateUserInput) (*AuthenticateUserOutput, error)
+	GetUser(ctx context.Context, input GetUserInput) (*GetUserOutput, error)
+	GetGamesStats(ctx context.Context, input GetGamesStatsInput) (*GetGamesStatsOutput, error)
+	GetUserAchievements(ctx context.Context, userID int, limit int, offset int) ([]*Achievement, error)
 	VerifyRecoveryCode(ctx context.Context, input VerifyRecoveryCodeInput) (*VerifyRecoveryCodeOutput, error)
 }
 
@@ -120,6 +172,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Achievement.created_at":
+		if e.complexity.Achievement.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Achievement.CreatedAt(childComplexity), true
+
+	case "Achievement.description":
+		if e.complexity.Achievement.Description == nil {
+			break
+		}
+
+		return e.complexity.Achievement.Description(childComplexity), true
+
+	case "Achievement.id":
+		if e.complexity.Achievement.ID == nil {
+			break
+		}
+
+		return e.complexity.Achievement.ID(childComplexity), true
+
+	case "Achievement.name":
+		if e.complexity.Achievement.Name == nil {
+			break
+		}
+
+		return e.complexity.Achievement.Name(childComplexity), true
+
 	case "AuthenticateUserOutput.error":
 		if e.complexity.AuthenticateUserOutput.Error == nil {
 			break
@@ -133,6 +213,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AuthenticateUserOutput.Jwt(childComplexity), true
+
+	case "GetGamesStatsOutput.error":
+		if e.complexity.GetGamesStatsOutput.Error == nil {
+			break
+		}
+
+		return e.complexity.GetGamesStatsOutput.Error(childComplexity), true
+
+	case "GetGamesStatsOutput.gamesAmount":
+		if e.complexity.GetGamesStatsOutput.GamesAmount == nil {
+			break
+		}
+
+		return e.complexity.GetGamesStatsOutput.GamesAmount(childComplexity), true
+
+	case "GetGamesStatsOutput.metatopicsStats":
+		if e.complexity.GetGamesStatsOutput.MetatopicsStats == nil {
+			break
+		}
+
+		return e.complexity.GetGamesStatsOutput.MetatopicsStats(childComplexity), true
+
+	case "GetGamesStatsOutput.winsAmout":
+		if e.complexity.GetGamesStatsOutput.WinsAmout == nil {
+			break
+		}
+
+		return e.complexity.GetGamesStatsOutput.WinsAmout(childComplexity), true
+
+	case "GetGamesStatsOutput.WinsPercents":
+		if e.complexity.GetGamesStatsOutput.WinsPercents == nil {
+			break
+		}
+
+		return e.complexity.GetGamesStatsOutput.WinsPercents(childComplexity), true
+
+	case "GetUserOutput.error":
+		if e.complexity.GetUserOutput.Error == nil {
+			break
+		}
+
+		return e.complexity.GetUserOutput.Error(childComplexity), true
+
+	case "GetUserOutput.user":
+		if e.complexity.GetUserOutput.User == nil {
+			break
+		}
+
+		return e.complexity.GetUserOutput.User(childComplexity), true
+
+	case "MetatopicsStats.gamesAmount":
+		if e.complexity.MetatopicsStats.GamesAmount == nil {
+			break
+		}
+
+		return e.complexity.MetatopicsStats.GamesAmount(childComplexity), true
+
+	case "MetatopicsStats.matatpoic":
+		if e.complexity.MetatopicsStats.Matatpoic == nil {
+			break
+		}
+
+		return e.complexity.MetatopicsStats.Matatpoic(childComplexity), true
+
+	case "MetatopicsStats.winsAmout":
+		if e.complexity.MetatopicsStats.WinsAmout == nil {
+			break
+		}
+
+		return e.complexity.MetatopicsStats.WinsAmout(childComplexity), true
+
+	case "MetatopicsStats.WinsPercents":
+		if e.complexity.MetatopicsStats.WinsPercents == nil {
+			break
+		}
+
+		return e.complexity.MetatopicsStats.WinsPercents(childComplexity), true
 
 	case "Mutation.recoveryPassword":
 		if e.complexity.Mutation.RecoveryPassword == nil {
@@ -170,6 +327,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.ResetPassword(childComplexity, args["input"].(ResetPasswordInput)), true
 
+	case "Mutation.updateEmail":
+		if e.complexity.Mutation.UpdateEmail == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateEmail_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateEmail(childComplexity, args["input"].(UpdateEmailInput)), true
+
+	case "Mutation.updatePassword":
+		if e.complexity.Mutation.UpdatePassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePassword_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePassword(childComplexity, args["input"].(UpdatePasswordInput)), true
+
+	case "Mutation.updateUser":
+		if e.complexity.Mutation.UpdateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(UpdateUserInput)), true
+
 	case "Query.authenticateUser":
 		if e.complexity.Query.AuthenticateUser == nil {
 			break
@@ -181,6 +374,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AuthenticateUser(childComplexity, args["input"].(AuthenticateUserInput)), true
+
+	case "Query.getGamesStats":
+		if e.complexity.Query.GetGamesStats == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getGamesStats_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetGamesStats(childComplexity, args["input"].(GetGamesStatsInput)), true
+
+	case "Query.getUser":
+		if e.complexity.Query.GetUser == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUser(childComplexity, args["input"].(GetUserInput)), true
+
+	case "Query.getUserAchievements":
+		if e.complexity.Query.GetUserAchievements == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUserAchievements_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUserAchievements(childComplexity, args["userId"].(int), args["limit"].(int), args["offset"].(int)), true
 
 	case "Query.verifyRecoveryCode":
 		if e.complexity.Query.VerifyRecoveryCode == nil {
@@ -228,6 +457,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ResetPasswordOutput.Error(childComplexity), true
+
+	case "UpdateEmailOutput.error":
+		if e.complexity.UpdateEmailOutput.Error == nil {
+			break
+		}
+
+		return e.complexity.UpdateEmailOutput.Error(childComplexity), true
+
+	case "UpdatePasswordOutput.error":
+		if e.complexity.UpdatePasswordOutput.Error == nil {
+			break
+		}
+
+		return e.complexity.UpdatePasswordOutput.Error(childComplexity), true
+
+	case "UpdateUserOutput.error":
+		if e.complexity.UpdateUserOutput.Error == nil {
+			break
+		}
+
+		return e.complexity.UpdateUserOutput.Error(childComplexity), true
+
+	case "UpdateUserOutput.user":
+		if e.complexity.UpdateUserOutput.User == nil {
+			break
+		}
+
+		return e.complexity.UpdateUserOutput.User(childComplexity), true
 
 	case "User.createdAt":
 		if e.complexity.User.CreatedAt == nil {
@@ -294,9 +551,14 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAuthenticateUserInput,
+		ec.unmarshalInputGetGamesStatsInput,
+		ec.unmarshalInputGetUserInput,
 		ec.unmarshalInputRecoveryPasswordInput,
 		ec.unmarshalInputRegisterUserInput,
 		ec.unmarshalInputResetPasswordInput,
+		ec.unmarshalInputUpdateEmailInput,
+		ec.unmarshalInputUpdatePasswordInput,
+		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputVerifyRecoveryCodeInput,
 	)
 	first := true
@@ -424,34 +686,61 @@ type Mutation {
 
     # confirmUser(input: ConfirmUserInput!): ConfirmUserOutput!
 
-    # Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
+    """
+    Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
+    """
+    updateUser(input: UpdateUserInput!): UpdateUserOutput!
 
-    # updateUser(input: UpdateUserInput!): UpdateUserOutput!
+    """
+    Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
+    """
+    updatePassword(input: UpdatePasswordInput!): UpdatePasswordOutput!
+
+    """
+    Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
+    """
+    updateEmail(input: UpdateEmailInput!): UpdateEmailOutput!
 
     # Удаление пользователя. Может вернуть ошибки: VALIDATION_ERROR, NOT_FOUND
 
     # deleteUser(input: DeleteUserInput!): DeleteUserOutput!
 
-    # Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
-
+    """
+    Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
+    """
     recoveryPassword(input: RecoveryPasswordInput!): RecoveryPasswordOutput!
 
-    # Восстановление пароля - проверка кода восстановления и сброс пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND
+    """
+    Восстановление пароля - проверка кода восстановления и сброс пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND
+    """
 
     resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
 }
 
 type Query {
-    # Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
-
+    """
+    Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
+    """
     authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
 
-    #Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
+    """
+    Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
+    """
+    getUser(input: GetUserInput!): GetUserOutput!
 
-    #getUser(input: GetUserInput!): GetUserOutput!
+    """
+    Получение статистики пользователя по играм и метатемам. Может вернуть ошибки: NOT_FOUND
+    """
+    getGamesStats(input: GetGamesStatsInput!): GetGamesStatsOutput!
 
-    # Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
-
+    """
+    Получение ачивок пользователя.
+    """
+    getUserAchievements(userId: Int!, limit: Int!, offset: Int!): [Achievement!]!
+    
+    """
+    Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
+    """
     verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
 }
 `, BuiltIn: false},
@@ -471,7 +760,7 @@ type RecoveryPasswordOutput {
     error: Error
 }
 
-###############################################
+###############################################################################################
 
 input ResetPasswordInput {
     code: String!
@@ -482,6 +771,9 @@ input ResetPasswordInput {
 type ResetPasswordOutput {
     error: Error
 }
+
+###############################################################################################
+
 input RegisterUserInput {
     username: String!
     email: String!
@@ -495,21 +787,50 @@ type RegisterUserOutput {
 }
 
 ###############################################################################################
-`, BuiltIn: false},
-	{Name: "../schema/users/query_users.graphql", Input: `
-""" ###################################################
 
-input GetUserInput {
+input UpdateUserInput {
     id: Int!
-    gettingAt: Time
+    username: String
+    imageId: Int
+}
+
+type UpdateUserOutput {
+    user: User!
+    error: Error
+}
+
+###############################################################################################
+
+input UpdatePasswordInput {
+    id: Int!
+    oldPassword: String!
+    newPassword: String!
+}
+
+type UpdatePasswordOutput {
+    error: Error
+}
+
+###############################################################################################
+
+input UpdateEmailInput {
+    id: Int!
+    email: String!
+    password: String!
+}
+
+type UpdateEmailOutput {
+    error: Error
+}
+`, BuiltIn: false},
+	{Name: "../schema/users/query_users.graphql", Input: `input GetUserInput {
+    id: Int!
 }
 
 type GetUserOutput {
     user: User
-    isUpdated: Boolean
     error: Error
 }
-"""
 
 ###############################################
 
@@ -532,6 +853,36 @@ input VerifyRecoveryCodeInput {
 
 type VerifyRecoveryCodeOutput {
     error: Error
+}
+
+###############################################
+
+input GetGamesStatsInput {
+    userId: Int!
+}
+
+type MetatopicsStats {
+    matatpoic: String!
+    gamesAmount: Int!
+    winsAmout: Int!
+    WinsPercents: Float!    
+}
+
+type GetGamesStatsOutput {
+    gamesAmount: Int!
+    winsAmout: Int!
+    WinsPercents: Float!
+    metatopicsStats: [MetatopicsStats]
+    error: Error
+}
+
+###############################################
+
+type Achievement {
+  id: Int!
+  name: String!
+  description: String!
+  created_at: Time!
 }
 `, BuiltIn: false},
 	{Name: "../schema/users/users.graphql", Input: `type User {
@@ -647,6 +998,102 @@ func (ec *executionContext) field_Mutation_resetPassword_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_updateEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_updateEmail_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateEmail_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (UpdateEmailInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal UpdateEmailInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateEmailInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateEmailInput(ctx, tmp)
+	}
+
+	var zeroVal UpdateEmailInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_updatePassword_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updatePassword_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (UpdatePasswordInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal UpdatePasswordInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdatePasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdatePasswordInput(ctx, tmp)
+	}
+
+	var zeroVal UpdatePasswordInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_updateUser_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateUser_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (UpdateUserInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal UpdateUserInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateUserInput(ctx, tmp)
+	}
+
+	var zeroVal UpdateUserInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -708,6 +1155,156 @@ func (ec *executionContext) field_Query_authenticateUser_argsInput(
 	}
 
 	var zeroVal AuthenticateUserInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getGamesStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Query_getGamesStats_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getGamesStats_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (GetGamesStatsInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal GetGamesStatsInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGetGamesStatsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetGamesStatsInput(ctx, tmp)
+	}
+
+	var zeroVal GetGamesStatsInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getUserAchievements_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Query_getUserAchievements_argsUserID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["userId"] = arg0
+	arg1, err := ec.field_Query_getUserAchievements_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := ec.field_Query_getUserAchievements_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+func (ec *executionContext) field_Query_getUserAchievements_argsUserID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["userId"]
+	if !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+	if tmp, ok := rawArgs["userId"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getUserAchievements_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["limit"]
+	if !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getUserAchievements_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["offset"]
+	if !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Query_getUser_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getUser_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (GetUserInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal GetUserInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGetUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetUserInput(ctx, tmp)
+	}
+
+	var zeroVal GetUserInput
 	return zeroVal, nil
 }
 
@@ -815,6 +1412,182 @@ func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _Achievement_id(ctx context.Context, field graphql.CollectedField, obj *Achievement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Achievement_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Achievement_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Achievement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Achievement_name(ctx context.Context, field graphql.CollectedField, obj *Achievement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Achievement_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Achievement_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Achievement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Achievement_description(ctx context.Context, field graphql.CollectedField, obj *Achievement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Achievement_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Achievement_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Achievement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Achievement_created_at(ctx context.Context, field graphql.CollectedField, obj *Achievement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Achievement_created_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Achievement_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Achievement",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AuthenticateUserOutput_jwt(ctx context.Context, field graphql.CollectedField, obj *AuthenticateUserOutput) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AuthenticateUserOutput_jwt(ctx, field)
 	if err != nil {
@@ -897,6 +1670,504 @@ func (ec *executionContext) fieldContext_AuthenticateUserOutput_error(_ context.
 	return fc, nil
 }
 
+func (ec *executionContext) _GetGamesStatsOutput_gamesAmount(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetGamesStatsOutput_gamesAmount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GamesAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetGamesStatsOutput_gamesAmount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetGamesStatsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetGamesStatsOutput_winsAmout(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetGamesStatsOutput_winsAmout(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WinsAmout, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetGamesStatsOutput_winsAmout(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetGamesStatsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetGamesStatsOutput_WinsPercents(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetGamesStatsOutput_WinsPercents(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WinsPercents, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetGamesStatsOutput_WinsPercents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetGamesStatsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetGamesStatsOutput_metatopicsStats(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetGamesStatsOutput_metatopicsStats(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MetatopicsStats, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*MetatopicsStats)
+	fc.Result = res
+	return ec.marshalOMetatopicsStats2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopicsStats(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetGamesStatsOutput_metatopicsStats(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetGamesStatsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "matatpoic":
+				return ec.fieldContext_MetatopicsStats_matatpoic(ctx, field)
+			case "gamesAmount":
+				return ec.fieldContext_MetatopicsStats_gamesAmount(ctx, field)
+			case "winsAmout":
+				return ec.fieldContext_MetatopicsStats_winsAmout(ctx, field)
+			case "WinsPercents":
+				return ec.fieldContext_MetatopicsStats_WinsPercents(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MetatopicsStats", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetGamesStatsOutput_error(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetGamesStatsOutput_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetGamesStatsOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetGamesStatsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetUserOutput_user(ctx context.Context, field graphql.CollectedField, obj *GetUserOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetUserOutput_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*User)
+	fc.Result = res
+	return ec.marshalOUser2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetUserOutput_user(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetUserOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_User_imageUrl(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetUserOutput_error(ctx context.Context, field graphql.CollectedField, obj *GetUserOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetUserOutput_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetUserOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetUserOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetatopicsStats_matatpoic(ctx context.Context, field graphql.CollectedField, obj *MetatopicsStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetatopicsStats_matatpoic(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Matatpoic, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetatopicsStats_matatpoic(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetatopicsStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetatopicsStats_gamesAmount(ctx context.Context, field graphql.CollectedField, obj *MetatopicsStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetatopicsStats_gamesAmount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GamesAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetatopicsStats_gamesAmount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetatopicsStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetatopicsStats_winsAmout(ctx context.Context, field graphql.CollectedField, obj *MetatopicsStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetatopicsStats_winsAmout(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WinsAmout, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetatopicsStats_winsAmout(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetatopicsStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MetatopicsStats_WinsPercents(ctx context.Context, field graphql.CollectedField, obj *MetatopicsStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetatopicsStats_WinsPercents(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WinsPercents, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MetatopicsStats_WinsPercents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MetatopicsStats",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_registerUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_registerUser(ctx, field)
 	if err != nil {
@@ -954,6 +2225,185 @@ func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_registerUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["input"].(UpdateUserInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*UpdateUserOutput)
+	fc.Result = res
+	return ec.marshalNUpdateUserOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateUserOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "user":
+				return ec.fieldContext_UpdateUserOutput_user(ctx, field)
+			case "error":
+				return ec.fieldContext_UpdateUserOutput_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateUserOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updatePassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePassword(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePassword(rctx, fc.Args["input"].(UpdatePasswordInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*UpdatePasswordOutput)
+	fc.Result = res
+	return ec.marshalNUpdatePasswordOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdatePasswordOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePassword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "error":
+				return ec.fieldContext_UpdatePasswordOutput_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdatePasswordOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePassword_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateEmail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateEmail(rctx, fc.Args["input"].(UpdateEmailInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*UpdateEmailOutput)
+	fc.Result = res
+	return ec.marshalNUpdateEmailOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateEmailOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "error":
+				return ec.fieldContext_UpdateEmailOutput_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateEmailOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1133,6 +2583,199 @@ func (ec *executionContext) fieldContext_Query_authenticateUser(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_authenticateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUser(rctx, fc.Args["input"].(GetUserInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GetUserOutput)
+	fc.Result = res
+	return ec.marshalNGetUserOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetUserOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "user":
+				return ec.fieldContext_GetUserOutput_user(ctx, field)
+			case "error":
+				return ec.fieldContext_GetUserOutput_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GetUserOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getGamesStats(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getGamesStats(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetGamesStats(rctx, fc.Args["input"].(GetGamesStatsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GetGamesStatsOutput)
+	fc.Result = res
+	return ec.marshalNGetGamesStatsOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetGamesStatsOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getGamesStats(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "gamesAmount":
+				return ec.fieldContext_GetGamesStatsOutput_gamesAmount(ctx, field)
+			case "winsAmout":
+				return ec.fieldContext_GetGamesStatsOutput_winsAmout(ctx, field)
+			case "WinsPercents":
+				return ec.fieldContext_GetGamesStatsOutput_WinsPercents(ctx, field)
+			case "metatopicsStats":
+				return ec.fieldContext_GetGamesStatsOutput_metatopicsStats(ctx, field)
+			case "error":
+				return ec.fieldContext_GetGamesStatsOutput_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GetGamesStatsOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getGamesStats_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getUserAchievements(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUserAchievements(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUserAchievements(rctx, fc.Args["userId"].(int), fc.Args["limit"].(int), fc.Args["offset"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Achievement)
+	fc.Result = res
+	return ec.marshalNAchievement2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAchievementᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUserAchievements(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Achievement_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Achievement_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Achievement_description(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Achievement_created_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Achievement", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getUserAchievements_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -1538,6 +3181,189 @@ func (ec *executionContext) _ResetPasswordOutput_error(ctx context.Context, fiel
 func (ec *executionContext) fieldContext_ResetPasswordOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ResetPasswordOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateEmailOutput_error(ctx context.Context, field graphql.CollectedField, obj *UpdateEmailOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateEmailOutput_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateEmailOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateEmailOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdatePasswordOutput_error(ctx context.Context, field graphql.CollectedField, obj *UpdatePasswordOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdatePasswordOutput_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdatePasswordOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdatePasswordOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateUserOutput_user(ctx context.Context, field graphql.CollectedField, obj *UpdateUserOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateUserOutput_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateUserOutput_user(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateUserOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "imageUrl":
+				return ec.fieldContext_User_imageUrl(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateUserOutput_error(ctx context.Context, field graphql.CollectedField, obj *UpdateUserOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateUserOutput_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateUserOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateUserOutput",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -3704,6 +5530,60 @@ func (ec *executionContext) unmarshalInputAuthenticateUserInput(ctx context.Cont
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGetGamesStatsInput(ctx context.Context, obj interface{}) (GetGamesStatsInput, error) {
+	var it GetGamesStatsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGetUserInput(ctx context.Context, obj interface{}) (GetUserInput, error) {
+	var it GetUserInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRecoveryPasswordInput(ctx context.Context, obj interface{}) (RecoveryPasswordInput, error) {
 	var it RecoveryPasswordInput
 	asMap := map[string]interface{}{}
@@ -3813,6 +5693,129 @@ func (ec *executionContext) unmarshalInputResetPasswordInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, obj interface{}) (UpdateEmailInput, error) {
+	var it UpdateEmailInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "email", "password"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Password = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdatePasswordInput(ctx context.Context, obj interface{}) (UpdatePasswordInput, error) {
+	var it UpdatePasswordInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "oldPassword", "newPassword"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "oldPassword":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("oldPassword"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OldPassword = data
+		case "newPassword":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("newPassword"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NewPassword = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj interface{}) (UpdateUserInput, error) {
+	var it UpdateUserInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "username", "imageId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "username":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Username = data
+		case "imageId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("imageId"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ImageID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputVerifyRecoveryCodeInput(ctx context.Context, obj interface{}) (VerifyRecoveryCodeInput, error) {
 	var it VerifyRecoveryCodeInput
 	asMap := map[string]interface{}{}
@@ -3855,6 +5858,60 @@ func (ec *executionContext) unmarshalInputVerifyRecoveryCodeInput(ctx context.Co
 
 // region    **************************** object.gotpl ****************************
 
+var achievementImplementors = []string{"Achievement"}
+
+func (ec *executionContext) _Achievement(ctx context.Context, sel ast.SelectionSet, obj *Achievement) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, achievementImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Achievement")
+		case "id":
+			out.Values[i] = ec._Achievement_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Achievement_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Achievement_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "created_at":
+			out.Values[i] = ec._Achievement_created_at(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var authenticateUserOutputImplementors = []string{"AuthenticateUserOutput"}
 
 func (ec *executionContext) _AuthenticateUserOutput(ctx context.Context, sel ast.SelectionSet, obj *AuthenticateUserOutput) graphql.Marshaler {
@@ -3870,6 +5927,151 @@ func (ec *executionContext) _AuthenticateUserOutput(ctx context.Context, sel ast
 			out.Values[i] = ec._AuthenticateUserOutput_jwt(ctx, field, obj)
 		case "error":
 			out.Values[i] = ec._AuthenticateUserOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var getGamesStatsOutputImplementors = []string{"GetGamesStatsOutput"}
+
+func (ec *executionContext) _GetGamesStatsOutput(ctx context.Context, sel ast.SelectionSet, obj *GetGamesStatsOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getGamesStatsOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GetGamesStatsOutput")
+		case "gamesAmount":
+			out.Values[i] = ec._GetGamesStatsOutput_gamesAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "winsAmout":
+			out.Values[i] = ec._GetGamesStatsOutput_winsAmout(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "WinsPercents":
+			out.Values[i] = ec._GetGamesStatsOutput_WinsPercents(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "metatopicsStats":
+			out.Values[i] = ec._GetGamesStatsOutput_metatopicsStats(ctx, field, obj)
+		case "error":
+			out.Values[i] = ec._GetGamesStatsOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var getUserOutputImplementors = []string{"GetUserOutput"}
+
+func (ec *executionContext) _GetUserOutput(ctx context.Context, sel ast.SelectionSet, obj *GetUserOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getUserOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GetUserOutput")
+		case "user":
+			out.Values[i] = ec._GetUserOutput_user(ctx, field, obj)
+		case "error":
+			out.Values[i] = ec._GetUserOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var metatopicsStatsImplementors = []string{"MetatopicsStats"}
+
+func (ec *executionContext) _MetatopicsStats(ctx context.Context, sel ast.SelectionSet, obj *MetatopicsStats) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, metatopicsStatsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MetatopicsStats")
+		case "matatpoic":
+			out.Values[i] = ec._MetatopicsStats_matatpoic(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "gamesAmount":
+			out.Values[i] = ec._MetatopicsStats_gamesAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "winsAmout":
+			out.Values[i] = ec._MetatopicsStats_winsAmout(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "WinsPercents":
+			out.Values[i] = ec._MetatopicsStats_WinsPercents(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3915,6 +6117,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "registerUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_registerUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateUser":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatePassword":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePassword(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateEmail":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateEmail(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -3985,6 +6208,72 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_authenticateUser(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getUser":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUser(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getGamesStats":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getGamesStats(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getUserAchievements":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserAchievements(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4139,6 +6428,119 @@ func (ec *executionContext) _ResetPasswordOutput(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("ResetPasswordOutput")
 		case "error":
 			out.Values[i] = ec._ResetPasswordOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateEmailOutputImplementors = []string{"UpdateEmailOutput"}
+
+func (ec *executionContext) _UpdateEmailOutput(ctx context.Context, sel ast.SelectionSet, obj *UpdateEmailOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateEmailOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateEmailOutput")
+		case "error":
+			out.Values[i] = ec._UpdateEmailOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updatePasswordOutputImplementors = []string{"UpdatePasswordOutput"}
+
+func (ec *executionContext) _UpdatePasswordOutput(ctx context.Context, sel ast.SelectionSet, obj *UpdatePasswordOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updatePasswordOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdatePasswordOutput")
+		case "error":
+			out.Values[i] = ec._UpdatePasswordOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateUserOutputImplementors = []string{"UpdateUserOutput"}
+
+func (ec *executionContext) _UpdateUserOutput(ctx context.Context, sel ast.SelectionSet, obj *UpdateUserOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateUserOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateUserOutput")
+		case "user":
+			out.Values[i] = ec._UpdateUserOutput_user(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._UpdateUserOutput_error(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4593,6 +6995,60 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAchievement2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAchievementᚄ(ctx context.Context, sel ast.SelectionSet, v []*Achievement) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAchievement2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAchievement(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAchievement2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAchievement(ctx context.Context, sel ast.SelectionSet, v *Achievement) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Achievement(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNAuthenticateUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAuthenticateUserInput(ctx context.Context, v interface{}) (AuthenticateUserInput, error) {
 	res, err := ec.unmarshalInputAuthenticateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4625,6 +7081,59 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloatContext(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) unmarshalNGetGamesStatsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetGamesStatsInput(ctx context.Context, v interface{}) (GetGamesStatsInput, error) {
+	res, err := ec.unmarshalInputGetGamesStatsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGetGamesStatsOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetGamesStatsOutput(ctx context.Context, sel ast.SelectionSet, v GetGamesStatsOutput) graphql.Marshaler {
+	return ec._GetGamesStatsOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGetGamesStatsOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetGamesStatsOutput(ctx context.Context, sel ast.SelectionSet, v *GetGamesStatsOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GetGamesStatsOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGetUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetUserInput(ctx context.Context, v interface{}) (GetUserInput, error) {
+	res, err := ec.unmarshalInputGetUserInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGetUserOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetUserOutput(ctx context.Context, sel ast.SelectionSet, v GetUserOutput) graphql.Marshaler {
+	return ec._GetUserOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGetUserOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetUserOutput(ctx context.Context, sel ast.SelectionSet, v *GetUserOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GetUserOutput(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -4737,6 +7246,73 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateEmailInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateEmailInput(ctx context.Context, v interface{}) (UpdateEmailInput, error) {
+	res, err := ec.unmarshalInputUpdateEmailInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateEmailOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateEmailOutput(ctx context.Context, sel ast.SelectionSet, v UpdateEmailOutput) graphql.Marshaler {
+	return ec._UpdateEmailOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateEmailOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateEmailOutput(ctx context.Context, sel ast.SelectionSet, v *UpdateEmailOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateEmailOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdatePasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdatePasswordInput(ctx context.Context, v interface{}) (UpdatePasswordInput, error) {
+	res, err := ec.unmarshalInputUpdatePasswordInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdatePasswordOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdatePasswordOutput(ctx context.Context, sel ast.SelectionSet, v UpdatePasswordOutput) graphql.Marshaler {
+	return ec._UpdatePasswordOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdatePasswordOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdatePasswordOutput(ctx context.Context, sel ast.SelectionSet, v *UpdatePasswordOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdatePasswordOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateUserInput(ctx context.Context, v interface{}) (UpdateUserInput, error) {
+	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateUserOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateUserOutput(ctx context.Context, sel ast.SelectionSet, v UpdateUserOutput) graphql.Marshaler {
+	return ec._UpdateUserOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateUserOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateUserOutput(ctx context.Context, sel ast.SelectionSet, v *UpdateUserOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateUserOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNVerifyRecoveryCodeInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐVerifyRecoveryCodeInput(ctx context.Context, v interface{}) (VerifyRecoveryCodeInput, error) {
@@ -5051,6 +7627,70 @@ func (ec *executionContext) marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋservic
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
+func (ec *executionContext) marshalOMetatopicsStats2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopicsStats(ctx context.Context, sel ast.SelectionSet, v []*MetatopicsStats) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOMetatopicsStats2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopicsStats(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMetatopicsStats2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopicsStats(ctx context.Context, sel ast.SelectionSet, v *MetatopicsStats) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MetatopicsStats(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

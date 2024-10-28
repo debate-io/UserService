@@ -6,7 +6,7 @@ type RecoveryPasswordOutput {
     error: Error
 }
 
-###############################################
+###############################################################################################
 
 input ResetPasswordInput {
     code: String!
@@ -17,6 +17,9 @@ input ResetPasswordInput {
 type ResetPasswordOutput {
     error: Error
 }
+
+###############################################################################################
+
 input RegisterUserInput {
     username: String!
     email: String!
@@ -30,3 +33,38 @@ type RegisterUserOutput {
 }
 
 ###############################################################################################
+
+input UpdateUserInput {
+    id: Int!
+    username: String
+    imageId: Int
+}
+
+type UpdateUserOutput {
+    user: User!
+    error: Error
+}
+
+###############################################################################################
+
+input UpdatePasswordInput {
+    id: Int!
+    oldPassword: String!
+    newPassword: String!
+}
+
+type UpdatePasswordOutput {
+    error: Error
+}
+
+###############################################################################################
+
+input UpdateEmailInput {
+    id: Int!
+    email: String!
+    password: String!
+}
+
+type UpdateEmailOutput {
+    error: Error
+}
