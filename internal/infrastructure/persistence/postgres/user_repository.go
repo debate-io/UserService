@@ -71,7 +71,7 @@ func (u *UserRepository) FindUserByEmail(ctx context.Context, email string) (*mo
 	return result, nil
 }
 
-/* func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User, error) {
+func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User, error) {
 	result := &model.User{}
 	q := u.db.ModelContext(ctx, result).Where("id = ?", id)
 
@@ -84,4 +84,4 @@ func (u *UserRepository) FindUserByEmail(ctx context.Context, email string) (*mo
 	}
 
 	return result, nil
-}*/
+}

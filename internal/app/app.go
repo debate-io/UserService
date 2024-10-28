@@ -1,9 +1,10 @@
 package app
 
 import (
-	"github.com/debate-io/service-auth/internal/infrastructure/smtp"
 	"os"
 	"time"
+
+	"github.com/debate-io/service-auth/internal/infrastructure/smtp"
 
 	pg "github.com/go-pg/pg/v9"
 	"go.uber.org/zap"
@@ -32,7 +33,7 @@ func NewApp(config *Config) *App {
 
 	db, err := postgres.NewPostgresDatabase(config.PostgresDsn, config.ServiceName, logger)
 	if err != nil {
-		logger.Error("can't connect to postgres database", zap.Error(err))
+		logger.Fatal("can't connect to postgres database", zap.Error(err))
 	}
 
 	smtpClient, err := smtp.NewSender(&smtp.Config{
@@ -104,10 +105,13 @@ func (app *App) beforeShutdown() {
 func (app *App) NewContainer() *registry.Container {
 	userRepo := postgres.NewUserRepository(app.DB)
 	recoveryCodeRepo := postgres.NewRecoveryCodeRepository(app.DB)
+	gameStatsRepository := postgres.NewGameStatsRepository(app.DB)
+	achievementRepository := postgres.NewAchievementRepository(app.DB)
+
 	JwtConfigs := usecases.NewJwtConfigsUseCases(app.Config.JwtSecretAuth, app.Config.JwtSecretMessages, app.Config.DaysAuthExpires, app.Config.DaysRecoveryExpires)
 
 	useCases := &registry.UseCases{
-		Users: usecases.NewUserUseCases(userRepo, recoveryCodeRepo, app.SmtpSender, *JwtConfigs),
+		Users: usecases.NewUserUseCases(userRepo, recoveryCodeRepo, gameStatsRepository, achievementRepository, app.SmtpSender, *JwtConfigs),
 	}
 
 	return &registry.Container{UseCases: useCases, Logger: app.Logger}

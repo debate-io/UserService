@@ -9,18 +9,13 @@ import (
 	"time"
 )
 
-// ###################################################
-//
-//	input GetUserInput {
-//	    id: Int!
-//	    gettingAt: Time
-//	}
-//
-//	type GetUserOutput {
-//	    user: User
-//	    isUpdated: Boolean
-//	    error: Error
-//	}
+type Achievement struct {
+	ID          int       `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 type AuthenticateUserInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -29,6 +24,34 @@ type AuthenticateUserInput struct {
 type AuthenticateUserOutput struct {
 	Jwt   *string `json:"jwt,omitempty"`
 	Error *Error  `json:"error,omitempty"`
+}
+
+type GetGamesStatsInput struct {
+	UserID int `json:"userId"`
+}
+
+type GetGamesStatsOutput struct {
+	GamesAmount     int                `json:"gamesAmount"`
+	WinsAmout       int                `json:"winsAmout"`
+	WinsPercents    float64            `json:"WinsPercents"`
+	MetatopicsStats []*MetatopicsStats `json:"metatopicsStats,omitempty"`
+	Error           *Error             `json:"error,omitempty"`
+}
+
+type GetUserInput struct {
+	ID int `json:"id"`
+}
+
+type GetUserOutput struct {
+	User  *User  `json:"user,omitempty"`
+	Error *Error `json:"error,omitempty"`
+}
+
+type MetatopicsStats struct {
+	Matatpoic    string  `json:"matatpoic"`
+	GamesAmount  int     `json:"gamesAmount"`
+	WinsAmout    int     `json:"winsAmout"`
+	WinsPercents float64 `json:"WinsPercents"`
 }
 
 type Mutation struct {
@@ -64,6 +87,37 @@ type ResetPasswordInput struct {
 }
 
 type ResetPasswordOutput struct {
+	Error *Error `json:"error,omitempty"`
+}
+
+type UpdateEmailInput struct {
+	ID       int    `json:"id"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type UpdateEmailOutput struct {
+	Error *Error `json:"error,omitempty"`
+}
+
+type UpdatePasswordInput struct {
+	ID          int    `json:"id"`
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+}
+
+type UpdatePasswordOutput struct {
+	Error *Error `json:"error,omitempty"`
+}
+
+type UpdateUserInput struct {
+	ID       int     `json:"id"`
+	Username *string `json:"username,omitempty"`
+	ImageID  *int    `json:"imageId,omitempty"`
+}
+
+type UpdateUserOutput struct {
+	User  *User  `json:"user"`
 	Error *Error `json:"error,omitempty"`
 }
 

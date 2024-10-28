@@ -1,17 +1,11 @@
-
-""" ###################################################
-
 input GetUserInput {
     id: Int!
-    gettingAt: Time
 }
 
 type GetUserOutput {
     user: User
-    isUpdated: Boolean
     error: Error
 }
-"""
 
 ###############################################
 
@@ -34,4 +28,34 @@ input VerifyRecoveryCodeInput {
 
 type VerifyRecoveryCodeOutput {
     error: Error
+}
+
+###############################################
+
+input GetGamesStatsInput {
+    userId: Int!
+}
+
+type MetatopicsStats {
+    matatpoic: String!
+    gamesAmount: Int!
+    winsAmout: Int!
+    WinsPercents: Float!    
+}
+
+type GetGamesStatsOutput {
+    gamesAmount: Int!
+    winsAmout: Int!
+    WinsPercents: Float!
+    metatopicsStats: [MetatopicsStats]
+    error: Error
+}
+
+###############################################
+
+type Achievement {
+  id: Int!
+  name: String!
+  description: String!
+  created_at: Time!
 }
