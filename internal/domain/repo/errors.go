@@ -7,5 +7,6 @@ var (
 	ErrUserNotFound         = tracerr.New("user not found")
 	ErrRecoveryCodeNotFound = tracerr.New("user code not found")
 
+	ErrTopicAlreadyExist = tracerr.New("topic already exist")
 	//role?
 )
