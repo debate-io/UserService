@@ -90,6 +90,22 @@ type ResetPasswordOutput struct {
 	Error *Error `json:"error,omitempty"`
 }
 
+type SuggestTopicInput struct {
+	Name string `json:"name"`
+}
+
+type SuggestTopicOutput struct {
+	Topic *Topic `json:"topic,omitempty"`
+	Error *Error `json:"error,omitempty"`
+}
+
+type Topic struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	Status    string    `json:"status"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
 type UpdateEmailInput struct {
 	ID       int    `json:"id"`
 	Email    string `json:"email"`

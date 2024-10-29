@@ -109,9 +109,11 @@ func (app *App) NewContainer() *registry.Container {
 	achievementRepository := postgres.NewAchievementRepository(app.DB)
 
 	JwtConfigs := usecases.NewJwtConfigsUseCases(app.Config.JwtSecretAuth, app.Config.JwtSecretMessages, app.Config.DaysAuthExpires, app.Config.DaysRecoveryExpires)
+	topicRepo := postgres.NewTopicRepository(app.DB)
 
 	useCases := &registry.UseCases{
-		Users: usecases.NewUserUseCases(userRepo, recoveryCodeRepo, gameStatsRepository, achievementRepository, app.SmtpSender, *JwtConfigs),
+		Users:  usecases.NewUserUseCases(userRepo, recoveryCodeRepo, gameStatsRepository, achievementRepository, app.SmtpSender, *JwtConfigs),
+		Topics: usecases.NewTopicUseCase(topicRepo),
 	}
 
 	return &registry.Container{UseCases: useCases, Logger: app.Logger}

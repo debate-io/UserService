@@ -4,73 +4,44 @@ schema {
 }
 
 type Mutation {
-    """
-    Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION
-    """
-    registerUser(input: RegisterUserInput!): RegisterUserOutput!
+    ##### Users #####
+        """ Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION """
+        registerUser(input: RegisterUserInput!): RegisterUserOutput!
 
-    # Обновление пароля. Может вернуть ошибки: VALIDATION
+        """ Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR """
+        updateUser(input: UpdateUserInput!): UpdateUserOutput!
 
-    # updateUserCredentials(input: UpdateUserCredentialsInput!): UpdateUserCredentialsOutput!
+        """ Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS """
+        updatePassword(input: UpdatePasswordInput!): UpdatePasswordOutput!
 
-    # Подтверждение пользователя. Может вернуть ошибки: VALIDATION
+        """ Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS """
+        updateEmail(input: UpdateEmailInput!): UpdateEmailOutput!
 
-    # confirmUser(input: ConfirmUserInput!): ConfirmUserOutput!
+        """ Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
+        recoveryPassword(input: RecoveryPasswordInput!): RecoveryPasswordOutput!
 
-    """
-    Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
-    """
-    updateUser(input: UpdateUserInput!): UpdateUserOutput!
+        """ Восстановление пароля - проверка кода восстановления и сброс пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND """
+        resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
 
-    """
-    Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS
-    """
-    updatePassword(input: UpdatePasswordInput!): UpdatePasswordOutput!
-
-    """
-    Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS
-    """
-    updateEmail(input: UpdateEmailInput!): UpdateEmailOutput!
-
-    # Удаление пользователя. Может вернуть ошибки: VALIDATION_ERROR, NOT_FOUND
-
-    # deleteUser(input: DeleteUserInput!): DeleteUserOutput!
-
-    """
-    Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
-    """
-    recoveryPassword(input: RecoveryPasswordInput!): RecoveryPasswordOutput!
-
-    """
-    Восстановление пароля - проверка кода восстановления и сброс пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND
-    """
-
-    resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
+    ##### Topics #####
+        """ Предложение создания новой темы. Может вернуть ошибки: ALREADY_EXIST """
+        suggestTopic(input: SuggestTopicInput!): SuggestTopicOutput!
 }
 
 type Query {
-    """
-    Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
-    """
-    authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
+    ##### Users #####
+        """ Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS """
+        authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
 
-    """
-    Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
-    """
-    getUser(input: GetUserInput!): GetUserOutput!
+        """ Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION """
+        getUser(input: GetUserInput!): GetUserOutput!
 
-    """
-    Получение статистики пользователя по играм и метатемам. Может вернуть ошибки: NOT_FOUND
-    """
-    getGamesStats(input: GetGamesStatsInput!): GetGamesStatsOutput!
+        """ Получение статистики пользователя по играм и метатемам. Может вернуть ошибки: NOT_FOUND """
+        getGamesStats(input: GetGamesStatsInput!): GetGamesStatsOutput!
 
-    """
-    Получение ачивок пользователя.
-    """
-    getUserAchievements(userId: Int!, limit: Int!, offset: Int!): [Achievement!]!
-    
-    """
-    Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
-    """
-    verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
+        """ Получение ачивок пользователя. """
+        getUserAchievements(userId: Int!, limit: Int!, offset: Int!): [Achievement!]!
+        
+        """ Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
+        verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
 }

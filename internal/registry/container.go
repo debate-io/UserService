@@ -6,7 +6,8 @@ import (
 )
 
 type UseCases struct {
-	Users *usecases.User
+	Users  *usecases.User
+	Topics *usecases.Topic
 }
 
 type Container struct {

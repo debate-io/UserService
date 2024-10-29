@@ -82,6 +82,7 @@ type ComplexityRoot struct {
 		RecoveryPassword func(childComplexity int, input RecoveryPasswordInput) int
 		RegisterUser     func(childComplexity int, input RegisterUserInput) int
 		ResetPassword    func(childComplexity int, input ResetPasswordInput) int
+		SuggestTopic     func(childComplexity int, input SuggestTopicInput) int
 		UpdateEmail      func(childComplexity int, input UpdateEmailInput) int
 		UpdatePassword   func(childComplexity int, input UpdatePasswordInput) int
 		UpdateUser       func(childComplexity int, input UpdateUserInput) int
@@ -107,6 +108,18 @@ type ComplexityRoot struct {
 
 	ResetPasswordOutput struct {
 		Error func(childComplexity int) int
+	}
+
+	SuggestTopicOutput struct {
+		Error func(childComplexity int) int
+		Topic func(childComplexity int) int
+	}
+
+	Topic struct {
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Status    func(childComplexity int) int
 	}
 
 	UpdateEmailOutput struct {
@@ -144,6 +157,7 @@ type MutationResolver interface {
 	UpdateEmail(ctx context.Context, input UpdateEmailInput) (*UpdateEmailOutput, error)
 	RecoveryPassword(ctx context.Context, input RecoveryPasswordInput) (*RecoveryPasswordOutput, error)
 	ResetPassword(ctx context.Context, input ResetPasswordInput) (*ResetPasswordOutput, error)
+	SuggestTopic(ctx context.Context, input SuggestTopicInput) (*SuggestTopicOutput, error)
 }
 type QueryResolver interface {
 	AuthenticateUser(ctx context.Context, input AuthenticateUserInput) (*AuthenticateUserOutput, error)
@@ -327,6 +341,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.ResetPassword(childComplexity, args["input"].(ResetPasswordInput)), true
 
+	case "Mutation.suggestTopic":
+		if e.complexity.Mutation.SuggestTopic == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_suggestTopic_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SuggestTopic(childComplexity, args["input"].(SuggestTopicInput)), true
+
 	case "Mutation.updateEmail":
 		if e.complexity.Mutation.UpdateEmail == nil {
 			break
@@ -458,6 +484,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ResetPasswordOutput.Error(childComplexity), true
 
+	case "SuggestTopicOutput.error":
+		if e.complexity.SuggestTopicOutput.Error == nil {
+			break
+		}
+
+		return e.complexity.SuggestTopicOutput.Error(childComplexity), true
+
+	case "SuggestTopicOutput.topic":
+		if e.complexity.SuggestTopicOutput.Topic == nil {
+			break
+		}
+
+		return e.complexity.SuggestTopicOutput.Topic(childComplexity), true
+
+	case "Topic.createdAt":
+		if e.complexity.Topic.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Topic.CreatedAt(childComplexity), true
+
+	case "Topic.id":
+		if e.complexity.Topic.ID == nil {
+			break
+		}
+
+		return e.complexity.Topic.ID(childComplexity), true
+
+	case "Topic.name":
+		if e.complexity.Topic.Name == nil {
+			break
+		}
+
+		return e.complexity.Topic.Name(childComplexity), true
+
+	case "Topic.status":
+		if e.complexity.Topic.Status == nil {
+			break
+		}
+
+		return e.complexity.Topic.Status(childComplexity), true
+
 	case "UpdateEmailOutput.error":
 		if e.complexity.UpdateEmailOutput.Error == nil {
 			break
@@ -556,6 +624,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputRecoveryPasswordInput,
 		ec.unmarshalInputRegisterUserInput,
 		ec.unmarshalInputResetPasswordInput,
+		ec.unmarshalInputSuggestTopicInput,
 		ec.unmarshalInputUpdateEmailInput,
 		ec.unmarshalInputUpdatePasswordInput,
 		ec.unmarshalInputUpdateUserInput,
@@ -673,75 +742,46 @@ enum Error {
 }
 
 type Mutation {
-    """
-    Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION
-    """
-    registerUser(input: RegisterUserInput!): RegisterUserOutput!
+    ##### Users #####
+        """ Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION """
+        registerUser(input: RegisterUserInput!): RegisterUserOutput!
 
-    # Обновление пароля. Может вернуть ошибки: VALIDATION
+        """ Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR """
+        updateUser(input: UpdateUserInput!): UpdateUserOutput!
 
-    # updateUserCredentials(input: UpdateUserCredentialsInput!): UpdateUserCredentialsOutput!
+        """ Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS """
+        updatePassword(input: UpdatePasswordInput!): UpdatePasswordOutput!
 
-    # Подтверждение пользователя. Может вернуть ошибки: VALIDATION
+        """ Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS """
+        updateEmail(input: UpdateEmailInput!): UpdateEmailOutput!
 
-    # confirmUser(input: ConfirmUserInput!): ConfirmUserOutput!
+        """ Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
+        recoveryPassword(input: RecoveryPasswordInput!): RecoveryPasswordOutput!
 
-    """
-    Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
-    """
-    updateUser(input: UpdateUserInput!): UpdateUserOutput!
+        """ Восстановление пароля - проверка кода восстановления и сброс пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND """
+        resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
 
-    """
-    Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
-    """
-    updatePassword(input: UpdatePasswordInput!): UpdatePasswordOutput!
-
-    """
-    Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR
-    """
-    updateEmail(input: UpdateEmailInput!): UpdateEmailOutput!
-
-    # Удаление пользователя. Может вернуть ошибки: VALIDATION_ERROR, NOT_FOUND
-
-    # deleteUser(input: DeleteUserInput!): DeleteUserOutput!
-
-    """
-    Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
-    """
-    recoveryPassword(input: RecoveryPasswordInput!): RecoveryPasswordOutput!
-
-    """
-    Восстановление пароля - проверка кода восстановления и сброс пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND
-    """
-
-    resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
+    ##### Topics #####
+        """ Предложение создания новой темы. Может вернуть ошибки: ALREADY_EXIST """
+        suggestTopic(input: SuggestTopicInput!): SuggestTopicOutput!
 }
 
 type Query {
-    """
-    Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS
-    """
-    authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
+    ##### Users #####
+        """ Аутентификация пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND, INVALID_CREDENTIALS """
+        authenticateUser(input: AuthenticateUserInput!): AuthenticateUserOutput!
 
-    """
-    Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION
-    """
-    getUser(input: GetUserInput!): GetUserOutput!
+        """ Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION """
+        getUser(input: GetUserInput!): GetUserOutput!
 
-    """
-    Получение статистики пользователя по играм и метатемам. Может вернуть ошибки: NOT_FOUND
-    """
-    getGamesStats(input: GetGamesStatsInput!): GetGamesStatsOutput!
+        """ Получение статистики пользователя по играм и метатемам. Может вернуть ошибки: NOT_FOUND """
+        getGamesStats(input: GetGamesStatsInput!): GetGamesStatsOutput!
 
-    """
-    Получение ачивок пользователя.
-    """
-    getUserAchievements(userId: Int!, limit: Int!, offset: Int!): [Achievement!]!
-    
-    """
-    Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND
-    """
-    verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
+        """ Получение ачивок пользователя. """
+        getUserAchievements(userId: Int!, limit: Int!, offset: Int!): [Achievement!]!
+        
+        """ Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
+        verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
 }
 `, BuiltIn: false},
 	{Name: "../schema/scalars.graphql", Input: `scalar Time
@@ -895,6 +935,22 @@ type Achievement {
     imageUrl: String!
 }
 `, BuiltIn: false},
+	{Name: "../schema/topics/mutation_topics.graphql", Input: `input SuggestTopicInput {
+    name: String!
+} 
+
+type SuggestTopicOutput {
+    topic: Topic
+    error: Error
+}
+`, BuiltIn: false},
+	{Name: "../schema/topics/topics.graphql", Input: `type Topic {
+    id: Int!
+    name: String!
+    status: String!
+    createdAt: Time!
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -995,6 +1051,38 @@ func (ec *executionContext) field_Mutation_resetPassword_argsInput(
 	}
 
 	var zeroVal ResetPasswordInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_suggestTopic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_suggestTopic_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_suggestTopic_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (SuggestTopicInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal SuggestTopicInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNSuggestTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐSuggestTopicInput(ctx, tmp)
+	}
+
+	var zeroVal SuggestTopicInput
 	return zeroVal, nil
 }
 
@@ -2528,6 +2616,67 @@ func (ec *executionContext) fieldContext_Mutation_resetPassword(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_suggestTopic(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_suggestTopic(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SuggestTopic(rctx, fc.Args["input"].(SuggestTopicInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*SuggestTopicOutput)
+	fc.Result = res
+	return ec.marshalNSuggestTopicOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐSuggestTopicOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_suggestTopic(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "topic":
+				return ec.fieldContext_SuggestTopicOutput_topic(ctx, field)
+			case "error":
+				return ec.fieldContext_SuggestTopicOutput_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SuggestTopicOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_suggestTopic_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_authenticateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_authenticateUser(ctx, field)
 	if err != nil {
@@ -3186,6 +3335,274 @@ func (ec *executionContext) fieldContext_ResetPasswordOutput_error(_ context.Con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SuggestTopicOutput_topic(ctx context.Context, field graphql.CollectedField, obj *SuggestTopicOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SuggestTopicOutput_topic(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Topic, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Topic)
+	fc.Result = res
+	return ec.marshalOTopic2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopic(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SuggestTopicOutput_topic(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SuggestTopicOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Topic_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Topic_name(ctx, field)
+			case "status":
+				return ec.fieldContext_Topic_status(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Topic_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Topic", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SuggestTopicOutput_error(ctx context.Context, field graphql.CollectedField, obj *SuggestTopicOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SuggestTopicOutput_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SuggestTopicOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SuggestTopicOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Topic_id(ctx context.Context, field graphql.CollectedField, obj *Topic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Topic_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Topic_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Topic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Topic_name(ctx context.Context, field graphql.CollectedField, obj *Topic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Topic_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Topic_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Topic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Topic_status(ctx context.Context, field graphql.CollectedField, obj *Topic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Topic_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Topic_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Topic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Topic_createdAt(ctx context.Context, field graphql.CollectedField, obj *Topic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Topic_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Topic_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Topic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5693,6 +6110,33 @@ func (ec *executionContext) unmarshalInputResetPasswordInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSuggestTopicInput(ctx context.Context, obj interface{}) (SuggestTopicInput, error) {
+	var it SuggestTopicInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, obj interface{}) (UpdateEmailInput, error) {
 	var it UpdateEmailInput
 	asMap := map[string]interface{}{}
@@ -6156,6 +6600,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "suggestTopic":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_suggestTopic(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6428,6 +6879,98 @@ func (ec *executionContext) _ResetPasswordOutput(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("ResetPasswordOutput")
 		case "error":
 			out.Values[i] = ec._ResetPasswordOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var suggestTopicOutputImplementors = []string{"SuggestTopicOutput"}
+
+func (ec *executionContext) _SuggestTopicOutput(ctx context.Context, sel ast.SelectionSet, obj *SuggestTopicOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, suggestTopicOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SuggestTopicOutput")
+		case "topic":
+			out.Values[i] = ec._SuggestTopicOutput_topic(ctx, field, obj)
+		case "error":
+			out.Values[i] = ec._SuggestTopicOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var topicImplementors = []string{"Topic"}
+
+func (ec *executionContext) _Topic(ctx context.Context, sel ast.SelectionSet, obj *Topic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, topicImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Topic")
+		case "id":
+			out.Values[i] = ec._Topic_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Topic_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "status":
+			out.Values[i] = ec._Topic_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Topic_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7233,6 +7776,25 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNSuggestTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐSuggestTopicInput(ctx context.Context, v interface{}) (SuggestTopicInput, error) {
+	res, err := ec.unmarshalInputSuggestTopicInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNSuggestTopicOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐSuggestTopicOutput(ctx context.Context, sel ast.SelectionSet, v SuggestTopicOutput) graphql.Marshaler {
+	return ec._SuggestTopicOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSuggestTopicOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐSuggestTopicOutput(ctx context.Context, sel ast.SelectionSet, v *SuggestTopicOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SuggestTopicOutput(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7707,6 +8269,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOTopic2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopic(ctx context.Context, sel ast.SelectionSet, v *Topic) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Topic(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {

@@ -26,3 +26,7 @@ type GameStatsRepository interface {
 type AchievmentsRepository interface {
 	GetAchievmentsByUserId(ctx context.Context, userId int, limit int, offset int) ([]*model.Achievements, error)
 }
+
+type TopicRepository interface {
+	SuggestTopic(ctx context.Context, topic model.Topic) (*model.Topic, error)
+}

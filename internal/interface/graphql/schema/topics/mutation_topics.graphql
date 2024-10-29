@@ -1,0 +1,8 @@
+input SuggestTopicInput {
+    name: String!
+} 
+
+type SuggestTopicOutput {
+    topic: Topic
+    error: Error
+}

@@ -1,0 +1,6 @@
+type Topic {
+    id: Int!
+    name: String!
+    status: String!
+    createdAt: Time!
+}
