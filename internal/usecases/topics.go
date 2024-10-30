@@ -2,11 +2,9 @@ package usecases
 
 import (
 	"context"
-	"errors"
 
+	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
-	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
-	"github.com/debate-io/service-auth/internal/usecases/mappers"
 )
 
 type Topic struct {
@@ -21,20 +19,7 @@ func NewTopicUseCase(topicRepo repo.TopicRepository) *Topic {
 
 func (t *Topic) SuggestTopic(
 	ctx context.Context,
-	input gen.SuggestTopicInput,
-) (*gen.SuggestTopicOutput, error) {
-	topic, err := t.topicRepo.SuggestTopic(ctx, *mappers.MapSuggestInputToTopic(&input))
-	if err != nil {
-		if errors.Is(err, repo.ErrTopicAlreadyExist) {
-			return &gen.SuggestTopicOutput{
-				Topic: nil,
-				Error: mappers.NewDTOError(gen.ErrorAlreadyExist),
-			}, nil
-		}
-		return nil, err
-	}
-	return &gen.SuggestTopicOutput{
-		Topic: mappers.MapTopicToTopicDTO(topic),
-		Error: nil,
-	}, nil
+	input *model.Topic,
+) (*model.Topic, error) {
+	return t.topicRepo.SuggestTopic(ctx, *input)
 }

@@ -86,7 +86,7 @@ func (u *User) CreateUser(
 
 	_, err = u.userRepo.CreateUser(ctx, user)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserAlreadyExist) {
+		if errors.Is(err, repo.ErrAlreadyExist) {
 			return &gen.RegisterUserOutput{
 				Error: mappers.NewDTOError(gen.ErrorAlreadyExist)}, nil
 		}
@@ -113,7 +113,7 @@ func (u *User) AuthenticateUser(
 ) (*gen.AuthenticateUserOutput, error) {
 	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.AuthenticateUserOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -146,7 +146,7 @@ func (u *User) GetUser(
 ) (*gen.GetUserOutput, error) {
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.GetUserOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound),
 			}, nil
@@ -271,7 +271,7 @@ func (u *User) UpdateUser(
 ) (output *gen.UpdateUserOutput, err error) {
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.UpdateUserOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -305,7 +305,7 @@ func (u *User) DeleteUser(
 ) (output *gen.DeleteUserOutput, err error) {
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.DeleteUserOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -331,7 +331,7 @@ func (u *User) DeleteUser(
 func (u *User) RecoveryPassword(ctx context.Context, input gen.RecoveryPasswordInput) (*gen.RecoveryPasswordOutput, error) {
 	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.RecoveryPasswordOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -376,7 +376,7 @@ func (u *User) VerifyRecoveryCode(ctx context.Context, input gen.VerifyRecoveryC
 func (u *User) UpdatePassword(ctx context.Context, input gen.UpdatePasswordInput) (*gen.UpdatePasswordOutput, error) {
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.UpdatePasswordOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -397,7 +397,7 @@ func (u *User) UpdatePassword(ctx context.Context, input gen.UpdatePasswordInput
 	user.Password = string(hashedPassword)
 
 	if _, err := u.userRepo.UpdateUser(ctx, user); err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.UpdatePasswordOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -410,7 +410,7 @@ func (u *User) UpdatePassword(ctx context.Context, input gen.UpdatePasswordInput
 func (u *User) UpdateEmail(ctx context.Context, input gen.UpdateEmailInput) (*gen.UpdateEmailOutput, error) {
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.UpdateEmailOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -425,7 +425,7 @@ func (u *User) UpdateEmail(ctx context.Context, input gen.UpdateEmailInput) (*ge
 
 	user.Email = input.Email
 	if _, err := u.userRepo.UpdateUser(ctx, user); err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.UpdateEmailOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -456,7 +456,7 @@ func (u *User) GetAchievmentsByUserId(ctx context.Context, userId int, limit int
 func (u *User) ResetPassword(ctx context.Context, input gen.ResetPasswordInput) (*gen.ResetPasswordOutput, error) {
 	code, err := u.recoveryCodeRepo.FindRecoveryCodeByEmailAndCode(ctx, input.Email, input.Code)
 	if err != nil {
-		if errors.Is(err, repo.ErrRecoveryCodeNotFound) {
+		if errors.Is(err, repo.ErrAlreadyExist) {
 			return &gen.ResetPasswordOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}
@@ -472,7 +472,7 @@ func (u *User) ResetPassword(ctx context.Context, input gen.ResetPasswordInput) 
 
 	_, err = u.userRepo.UpdateUser(ctx, code.User)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, repo.ErrNotFound) {
 			return &gen.ResetPasswordOutput{
 				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
 		}

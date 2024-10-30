@@ -11,29 +11,29 @@ const (
 )
 
 type Metatopic struct {
-	tableName struct{}            `pg:"mrtatopics"`
-	ID        int64               `pg:"id,pk`
+	tableName struct{}            `pg:"public.metatopic"`
+	ID        int                 `pg:"id,pk`
 	Name      string              `pg:"name"`
 	Status    ApprovingStatusEnum `pg:"is_approved"` // always use approved
 	CreatedAt time.Time           `pg:"created_at"`
 }
 
 type Topic struct {
-	tableName struct{}            `pg:"topics"`
-	ID        int64               `pg:"id,pk"`
+	tableName struct{}            `pg:"public.topics"`
+	ID        int                 `pg:"id,pk"`
 	Name      string              `pg:"name"`
 	Status    ApprovingStatusEnum `pg:"is_approved"`
 	CreatedAt time.Time           `pg:"created_at"`
 }
 
 type MetatopicsTopics struct {
-	tableName   struct{} `pg:"metatopics_topics"`
-	MetatopicID int64    `db:"metatopics_id"`
-	TopicID     int64    `db:"topics_id"`
+	tableName   struct{} `pg:"public.metatopics_topics"`
+	MetatopicID int      `pg:"metatopics_id"`
+	TopicID     int      `pg:"topics_id"`
 }
 
 type UserMetatopic struct {
-	tableName   struct{} `pg:"users_metatopics"`
-	UserID      int64    `db:"user_id"`
-	MetatopicID int64    `db:"metatopic_id"`
+	tableName   struct{} `pg:"public.users_metatopics"`
+	UserID      int      `pg:"user_id"`
+	MetatopicID int      `pg:"metatopic_id"`
 }

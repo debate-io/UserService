@@ -30,7 +30,7 @@ func (u *UserRepository) CreateUser(ctx context.Context, user *model.User) (*mod
 
 	if err != nil {
 		if isMultiRowsError(err) || getConstraint(err) != "" {
-			return nil, repo.ErrUserAlreadyExist
+			return nil, repo.ErrAlreadyExist
 		}
 
 		return nil, tracerr.Errorf("failed insert user: %w", err)
@@ -46,7 +46,7 @@ func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*mod
 
 	if err != nil {
 		if isNoRowsError(err) {
-			return nil, repo.ErrUserNotFound
+			return nil, repo.ErrNotFound
 		}
 
 		return nil, tracerr.Errorf("failed update user: %w", err)
@@ -62,7 +62,7 @@ func (u *UserRepository) FindUserByEmail(ctx context.Context, email string) (*mo
 
 	if err := q.Select(); err != nil {
 		if isNoRowsError(err) {
-			return nil, repo.ErrUserNotFound
+			return nil, repo.ErrNotFound
 		}
 
 		return nil, tracerr.Errorf("failed to find user: %w", err)
@@ -77,7 +77,7 @@ func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User,
 
 	if err := q.Select(); err != nil {
 		if isNoRowsError(err) {
-			return nil, repo.ErrUserNotFound
+			return nil, repo.ErrNotFound
 		}
 
 		return nil, tracerr.Errorf("failed to find user: %w", err)

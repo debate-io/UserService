@@ -3,10 +3,6 @@ package repo
 import "github.com/ztrue/tracerr"
 
 var (
-	ErrUserAlreadyExist     = tracerr.New("user already register")
-	ErrUserNotFound         = tracerr.New("user not found")
-	ErrRecoveryCodeNotFound = tracerr.New("user code not found")
-
-	ErrTopicAlreadyExist = tracerr.New("topic already exist")
-	//role?
+	ErrAlreadyExist = tracerr.New("already exists")
+	ErrNotFound     = tracerr.New("not found")
 )
