@@ -24,19 +24,13 @@ func NewTopicRepository(db *pg.DB) *TopicRepository {
 }
 
 func (t *TopicRepository) SuggestTopic(ctx context.Context, topic model.Topic) (*model.Topic, error) {
-	count, err := t.db.ModelContext(ctx, &model.Topic{}).
-		Where("name = ?", topic.Name).
-		Count()
-
-	if err == nil && count == 0 {
-		_, err = t.db.ModelContext(ctx, &topic).Insert()
-	}
-
+	_, err := t.db.ModelContext(ctx, &topic).Insert()
 	if err != nil {
+		if getConstraint(err) != "" {
+			return nil, repo.ErrAlreadyExist
+		}
 		return nil, tracerr.Errorf("failed suggest topic: %w", err)
 	}
-	if count > 0 {
-		return nil, repo.ErrTopicAlreadyExist
-	}
+
 	return &topic, nil
 }

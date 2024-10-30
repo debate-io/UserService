@@ -49,7 +49,7 @@ func (c *RecoveryCodeRepository) FindRecoveryCodeByEmailAndCode(ctx context.Cont
 
 	if err := q.Select(); err != nil {
 		if isNoRowsError(err) {
-			return nil, repo.ErrRecoveryCodeNotFound
+			return nil, repo.ErrNotFound
 		}
 
 		return nil, tracerr.Errorf("failed to find recovery code by code: %w", err)
