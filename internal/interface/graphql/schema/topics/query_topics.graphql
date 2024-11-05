@@ -1,0 +1,26 @@
+input GetTopicsInput {
+    pageSize: Int!
+    pageNumber: Int!
+    topicStatus: [TopicStatus!]!
+}
+
+type GetTopicsOutput {
+    pageSize: Int!
+    pageNumber: Int!
+    pageCount: Int!
+    topics: [TopicMetatopics!]!
+}
+
+#########################################3
+
+input GetMetatopicsInput {
+    pageSize: Int!
+    pageNumber: Int!
+}
+
+type GetMetatopicsOutput {
+    pageSize: Int!
+    pageNumber: Int!
+    pageCount: Int!
+    metatopics: [Metatopic!]!
+}

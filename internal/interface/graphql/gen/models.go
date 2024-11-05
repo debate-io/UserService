@@ -38,6 +38,31 @@ type GetGamesStatsOutput struct {
 	Error           *Error             `json:"error,omitempty"`
 }
 
+type GetMetatopicsInput struct {
+	PageSize   int `json:"pageSize"`
+	PageNumber int `json:"pageNumber"`
+}
+
+type GetMetatopicsOutput struct {
+	PageSize   int          `json:"pageSize"`
+	PageNumber int          `json:"pageNumber"`
+	PageCount  int          `json:"pageCount"`
+	Metatopics []*Metatopic `json:"metatopics"`
+}
+
+type GetTopicsInput struct {
+	PageSize    int           `json:"pageSize"`
+	PageNumber  int           `json:"pageNumber"`
+	TopicStatus []TopicStatus `json:"topicStatus"`
+}
+
+type GetTopicsOutput struct {
+	PageSize   int                `json:"pageSize"`
+	PageNumber int                `json:"pageNumber"`
+	PageCount  int                `json:"pageCount"`
+	Topics     []*TopicMetatopics `json:"topics"`
+}
+
 type GetUserInput struct {
 	ID int `json:"id"`
 }
@@ -45,6 +70,12 @@ type GetUserInput struct {
 type GetUserOutput struct {
 	User  *User  `json:"user,omitempty"`
 	Error *Error `json:"error,omitempty"`
+}
+
+type Metatopic struct {
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type MetatopicsStats struct {
@@ -100,10 +131,22 @@ type SuggestTopicOutput struct {
 }
 
 type Topic struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Status    string    `json:"status"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        int         `json:"id"`
+	Name      string      `json:"name"`
+	Status    TopicStatus `json:"status"`
+	CreatedAt time.Time   `json:"createdAt"`
+}
+
+type TopicInput struct {
+	ID           int         `json:"id"`
+	Name         string      `json:"name"`
+	Status       TopicStatus `json:"status"`
+	MetatopicIds []int       `json:"metatopicIds"`
+}
+
+type TopicMetatopics struct {
+	Topic      *Topic       `json:"topic"`
+	Metatopics []*Metatopic `json:"metatopics"`
 }
 
 type UpdateEmailInput struct {
@@ -124,6 +167,15 @@ type UpdatePasswordInput struct {
 
 type UpdatePasswordOutput struct {
 	Error *Error `json:"error,omitempty"`
+}
+
+type UpdateTopicInput struct {
+	Topics []*TopicInput `json:"topics"`
+}
+
+type UpdateTopicOutput struct {
+	TopicMetatopics []*TopicMetatopics `json:"topicMetatopics,omitempty"`
+	Error           *Error             `json:"error,omitempty"`
 }
 
 type UpdateUserInput struct {
@@ -242,5 +294,48 @@ func (e *Role) UnmarshalGQL(v interface{}) error {
 }
 
 func (e Role) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type TopicStatus string
+
+const (
+	TopicStatusPending  TopicStatus = "PENDING"
+	TopicStatusApproved TopicStatus = "APPROVED"
+	TopicStatusDeclined TopicStatus = "DECLINED"
+)
+
+var AllTopicStatus = []TopicStatus{
+	TopicStatusPending,
+	TopicStatusApproved,
+	TopicStatusDeclined,
+}
+
+func (e TopicStatus) IsValid() bool {
+	switch e {
+	case TopicStatusPending, TopicStatusApproved, TopicStatusDeclined:
+		return true
+	}
+	return false
+}
+
+func (e TopicStatus) String() string {
+	return string(e)
+}
+
+func (e *TopicStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TopicStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TopicStatus", str)
+	}
+	return nil
+}
+
+func (e TopicStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

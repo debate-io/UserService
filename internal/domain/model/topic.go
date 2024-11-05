@@ -11,10 +11,10 @@ const (
 )
 
 type Metatopic struct {
-	tableName struct{}            `pg:"public.metatopic"`
+	tableName struct{}            `pg:"public.metatopics"`
 	ID        int                 `pg:"id,pk`
 	Name      string              `pg:"name"`
-	Status    ApprovingStatusEnum `pg:"is_approved"` // always use approved
+	Status    ApprovingStatusEnum `pg:"status, type:approving_status_enum"` // always use approved
 	CreatedAt time.Time           `pg:"created_at"`
 }
 
@@ -22,7 +22,7 @@ type Topic struct {
 	tableName struct{}            `pg:"public.topics"`
 	ID        int                 `pg:"id,pk"`
 	Name      string              `pg:"name"`
-	Status    ApprovingStatusEnum `pg:"is_approved"`
+	Status    ApprovingStatusEnum `pg:"status, type:approving_status_enum"`
 	CreatedAt time.Time           `pg:"created_at"`
 }
 

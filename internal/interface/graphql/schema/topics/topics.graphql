@@ -1,6 +1,23 @@
+enum TopicStatus {
+    PENDING
+    APPROVED
+    DECLINED
+}
+
 type Topic {
     id: Int!
     name: String!
-    status: String!
+    status: TopicStatus!
     createdAt: Time!
+}
+
+type Metatopic {
+    id: Int!
+    name: String!
+    createdAt: Time!
+}
+
+type TopicMetatopics {
+    topic: Topic!
+    metatopics: [Metatopic!]!
 }
