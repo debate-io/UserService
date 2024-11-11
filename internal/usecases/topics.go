@@ -26,11 +26,12 @@ func (t *Topic) SuggestTopic(
 
 func (t *Topic) UpdateTopics(
 	ctx context.Context,
-	input map[*model.Topic][]int,
-) (map[*model.Topic][]*model.Metatopic, error) {
-	for topic, ids := range input {
-		if (topic.Status == model.StatusDeclined && len(ids) != 0) ||
-			(topic.Status == model.StatusApproved && len(ids) == 0) {
+	input []model.TopicMetatopicIds,
+) ([]model.TopicMetatopics, error) {
+	for _, v := range input {
+		ids := v.MetatopicIds
+		if (v.Topic.Status == model.StatusDeclined && len(ids) != 0) ||
+			(v.Topic.Status == model.StatusApproved && len(ids) == 0) {
 			return nil, repo.ErrValidation
 		}
 	}
@@ -42,7 +43,7 @@ func (t *Topic) GetTopics(
 	ctx context.Context,
 	topicStatuses []model.ApprovingStatusEnum,
 	pageSize, pageNumber int,
-) (map[*model.Topic][]*model.Metatopic, int, error) {
+) ([]model.TopicMetatopics, int, error) {
 	if len(topicStatuses) == 0 || pageSize <= 0 || pageNumber < 0 {
 		return nil, 0, repo.ErrValidation
 	}

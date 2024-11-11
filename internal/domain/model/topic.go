@@ -37,3 +37,13 @@ type UserMetatopic struct {
 	UserID      int      `pg:"user_id"`
 	MetatopicID int      `pg:"metatopic_id"`
 }
+
+type TopicMetatopicIds struct {
+	Topic        Topic
+	MetatopicIds []int
+}
+
+type TopicMetatopics struct {
+	Topic      Topic
+	Metatopics []Metatopic
+}

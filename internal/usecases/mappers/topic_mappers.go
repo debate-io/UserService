@@ -16,29 +16,30 @@ func MapSuggestInputToTopic(input *gen.SuggestTopicInput) *model.Topic {
 	}
 }
 
-func MapUpdateTopicInputToTopicMetatopicIds(input *gen.UpdateTopicInput) map[*model.Topic][]int {
-	output := make((map[*model.Topic][]int))
+func MapUpdateTopicInputToTopicMetatopicIds(input *gen.UpdateTopicInput) (output []model.TopicMetatopicIds) {
 	for _, topicInput := range input.Topics {
-		topic := &model.Topic{
-			ID:     topicInput.ID,
-			Name:   cleanString(topicInput.Name),
-			Status: MapTopicStatusesToApprovingStatus(topicInput.Status)[0],
-		}
-		output[topic] = topicInput.MetatopicIds
+		output = append(output, model.TopicMetatopicIds{
+			Topic: model.Topic{
+				ID:     topicInput.ID,
+				Name:   cleanString(topicInput.Name),
+				Status: MapTopicStatusesToApprovingStatus(topicInput.Status)[0],
+			},
+			MetatopicIds: topicInput.MetatopicIds,
+		})
 	}
 
 	return output
 }
 
-func MapTopicMetatopicToTopicMetatopicsDTO(topicMetatopics map[*model.Topic][]*model.Metatopic) (output []*gen.TopicMetatopics) {
-	for topic, metatopics := range topicMetatopics {
+func MapTopicMetatopicToTopicMetatopicsDTO(topicMetatopics []model.TopicMetatopics) (output []*gen.TopicMetatopics) {
+	for _, v := range topicMetatopics {
 		var metatopicsDto []*gen.Metatopic
-		for _, metatopic := range metatopics {
-			metatopicsDto = append(metatopicsDto, MapMetatopicToMetatopicDTO(metatopic))
+		for _, metatopic := range v.Metatopics {
+			metatopicsDto = append(metatopicsDto, MapMetatopicToMetatopicDTO(&metatopic))
 		}
 
 		output = append(output, &gen.TopicMetatopics{
-			Topic:      MapTopicToTopicDTO(topic),
+			Topic:      MapTopicToTopicDTO(&v.Topic),
 			Metatopics: metatopicsDto,
 		})
 	}
