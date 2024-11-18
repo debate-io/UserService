@@ -1,4 +1,4 @@
-package types
+package model
 
 import (
 	"time"
@@ -11,10 +11,14 @@ const (
 	hoursInDay = 24
 )
 
+var (
+	_ jwt.Claims = (*Claims)(nil)
+)
+
 type Claims struct {
 	UserID    int              `json:"userId"`
 	ExpiredAt *jwt.NumericDate `json:"expiresAt"`
-	Role      string           `json:"role"`
+	Role      RoleEnum         `json:"role"`
 	Email     string           `json:"email"`
 }
 
@@ -26,18 +30,11 @@ func (c Claims) Valid() error {
 	return nil
 }
 
-func NewAuthClaims(userID int, email string, roleKey string, daysAuthExpires int) (*Claims, error) {
+func NewAuthClaims(userID int, email string, role RoleEnum, daysAuthExpires int) (*Claims, error) {
 	return &Claims{
 		UserID:    userID,
 		ExpiredAt: jwt.NewNumericDate(time.Now().Add(time.Duration(daysAuthExpires*hoursInDay) * time.Hour)),
-		Role:      roleKey,
+		Role:      role,
 		Email:     email,
-	}, nil
-}
-
-func NewRecoveryClaims(userID int, daysRecoveryExpires int) (*Claims, error) {
-	return &Claims{
-		UserID:    userID,
-		ExpiredAt: jwt.NewNumericDate(time.Now().Add(time.Duration(daysRecoveryExpires*hoursInDay) * time.Hour)),
 	}, nil
 }

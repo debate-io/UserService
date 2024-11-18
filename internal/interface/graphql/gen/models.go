@@ -216,6 +216,7 @@ const (
 	ErrorValidation         Error = "VALIDATION"
 	ErrorInvalidCredentials Error = "INVALID_CREDENTIALS"
 	ErrorAlreadyExist       Error = "ALREADY_EXIST"
+	ErrorUnauthorized       Error = "UNAUTHORIZED"
 )
 
 var AllError = []Error{
@@ -223,11 +224,12 @@ var AllError = []Error{
 	ErrorValidation,
 	ErrorInvalidCredentials,
 	ErrorAlreadyExist,
+	ErrorUnauthorized,
 }
 
 func (e Error) IsValid() bool {
 	switch e {
-	case ErrorNotFound, ErrorValidation, ErrorInvalidCredentials, ErrorAlreadyExist:
+	case ErrorNotFound, ErrorValidation, ErrorInvalidCredentials, ErrorAlreadyExist, ErrorUnauthorized:
 		return true
 	}
 	return false

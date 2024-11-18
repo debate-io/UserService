@@ -1,16 +1,20 @@
 package server
 
 import (
-	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"net/http"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+
+	"github.com/debate-io/service-auth/internal/infrastructure/auth"
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
 	"github.com/debate-io/service-auth/internal/interface/graphql/resolvers"
 	"github.com/debate-io/service-auth/internal/interface/handlers"
+	"github.com/debate-io/service-auth/internal/interface/server/middleware"
 	"github.com/debate-io/service-auth/internal/registry"
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+
+	chiMiddleware "github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 	"go.uber.org/zap"
@@ -39,13 +43,15 @@ func NewServer(logger *zap.Logger) *Server {
 	}
 }
 
-func (s *Server) InitMiddlewares(isDebug bool) {
+func (s *Server) InitMiddlewares(isDebug bool, auth *auth.AuthService) {
 	s.router.Use(render.SetContentType(render.ContentTypeJSON))
-	s.router.Use(middleware.Recoverer)
+	s.router.Use(chiMiddleware.Recoverer)
 
 	if isDebug {
-		s.router.Use(middleware.Logger)
+		s.router.Use(chiMiddleware.Logger)
 	}
+
+	s.router.Use(middleware.AuthMiddleware(auth))
 
 	options := cors.Options{
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},

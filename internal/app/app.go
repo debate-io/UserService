@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/debate-io/service-auth/internal/infrastructure/auth"
 	"github.com/debate-io/service-auth/internal/infrastructure/smtp"
 
 	pg "github.com/go-pg/pg/v9"
@@ -86,8 +87,17 @@ func (app *App) RunApp() {
 }
 
 func (app *App) Initialize() {
-	container := app.NewContainer()
-	app.Server.InitMiddlewares(app.Config.IsDebug)
+	authService := auth.NewAuthService(
+		auth.Config{
+			JwtSecretAuth:       app.Config.Jwt.JwtSecretAuth,
+			JwtSecretMessages:   app.Config.Jwt.JwtSecretMessages,
+			DaysAuthExpires:     app.Config.Jwt.DaysAuthExpires,
+			DaysRecoveryExpires: app.Config.Jwt.DaysRecoveryExpires,
+		},
+	)
+
+	container := app.NewContainer(authService)
+	app.Server.InitMiddlewares(app.Config.IsDebug, authService)
 	app.Server.InitRoutes(container, app.Config.IsDebug)
 }
 
@@ -102,17 +112,16 @@ func (app *App) beforeShutdown() {
 	app.CloseConnections()
 }
 
-func (app *App) NewContainer() *registry.Container {
+func (app *App) NewContainer(authService *auth.AuthService) *registry.Container {
 	userRepo := postgres.NewUserRepository(app.DB)
 	recoveryCodeRepo := postgres.NewRecoveryCodeRepository(app.DB)
 	gameStatsRepository := postgres.NewGameStatsRepository(app.DB)
 	achievementRepository := postgres.NewAchievementRepository(app.DB)
 
-	JwtConfigs := usecases.NewJwtConfigsUseCases(app.Config.JwtSecretAuth, app.Config.JwtSecretMessages, app.Config.DaysAuthExpires, app.Config.DaysRecoveryExpires)
 	topicRepo := postgres.NewTopicRepository(app.DB)
 
 	useCases := &registry.UseCases{
-		Users:  usecases.NewUserUseCases(userRepo, recoveryCodeRepo, gameStatsRepository, achievementRepository, app.SmtpSender, *JwtConfigs),
+		Users:  usecases.NewUserUseCases(userRepo, recoveryCodeRepo, gameStatsRepository, achievementRepository, app.SmtpSender, authService),
 		Topics: usecases.NewTopicUseCase(topicRepo),
 	}
 

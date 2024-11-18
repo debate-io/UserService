@@ -9,11 +9,11 @@ import (
 
 	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
+	"github.com/debate-io/service-auth/internal/infrastructure/auth"
 	"github.com/debate-io/service-auth/internal/infrastructure/smtp"
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
+	"github.com/debate-io/service-auth/internal/interface/server/middleware"
 	"github.com/debate-io/service-auth/internal/usecases/mappers"
-	"github.com/debate-io/service-auth/internal/usecases/types"
-	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -28,33 +28,17 @@ type User struct {
 	gameStatsRepo    repo.GameStatsRepository
 	achievementRepo  repo.AchievmentsRepository
 	smtpSender       *smtp.Sender
-	jwtConfigs       JwtConfigs
+	authService      *auth.AuthService
 }
 
-type JwtConfigs struct {
-	jwtSecretAuth       string
-	jwtSecretMessages   string
-	daysAuthExpires     int
-	daysRecoveryExpires int
-}
-
-func NewUserUseCases(userRepo repo.UserRepository, recoveryCodeRepo repo.RecoveryCodeRepository, gameStatsRepo repo.GameStatsRepository, achievementRepo repo.AchievmentsRepository, smtpClient *smtp.Sender, jwtConfigs JwtConfigs) *User {
+func NewUserUseCases(userRepo repo.UserRepository, recoveryCodeRepo repo.RecoveryCodeRepository, gameStatsRepo repo.GameStatsRepository, achievementRepo repo.AchievmentsRepository, smtpClient *smtp.Sender, authService *auth.AuthService) *User {
 	return &User{
 		userRepo:         userRepo,
 		recoveryCodeRepo: recoveryCodeRepo,
 		gameStatsRepo:    gameStatsRepo,
 		achievementRepo:  achievementRepo,
 		smtpSender:       smtpClient,
-		jwtConfigs:       jwtConfigs,
-	}
-}
-
-func NewJwtConfigsUseCases(jwtSecretAuth string, jwtSecretMessage string, daysAuthExpires int, daysRecoveryExpires int) *JwtConfigs {
-	return &JwtConfigs{
-		jwtSecretAuth:       jwtSecretAuth,
-		jwtSecretMessages:   jwtSecretMessage,
-		daysAuthExpires:     daysAuthExpires,
-		daysRecoveryExpires: daysRecoveryExpires,
+		authService:      authService,
 	}
 }
 
@@ -94,12 +78,12 @@ func (u *User) CreateUser(
 		return nil, err
 	}
 
-	claims, err := types.NewAuthClaims(user.ID, user.Email, string(user.Role), u.jwtConfigs.daysAuthExpires)
+	claims, err := model.NewAuthClaims(user.ID, user.Email, user.Role, u.authService.GetDaysAuthExpires())
 	if err != nil {
 		return nil, err
 	}
 
-	jwt, err := generateTokenByClaims(claims, u.jwtConfigs.jwtSecretAuth)
+	jwt, err := u.authService.GenerateTokenByClaims(claims)
 	if err != nil {
 		return nil, err
 	}
@@ -127,23 +111,37 @@ func (u *User) AuthenticateUser(
 			Error: mappers.NewDTOError(gen.ErrorInvalidCredentials)}, nil
 	}
 
-	claims, err := types.NewAuthClaims(user.ID, user.Email, string(user.Role), u.jwtConfigs.daysAuthExpires)
+	claims, err := model.NewAuthClaims(user.ID, user.Email, user.Role, u.authService.GetDaysAuthExpires())
 	if err != nil {
 		return nil, err
 	}
 
-	token, err := generateTokenByClaims(claims, u.jwtConfigs.jwtSecretAuth)
+	jwt, err := u.authService.GenerateTokenByClaims(claims)
 	if err != nil {
 		return nil, err
 	}
 
-	return &gen.AuthenticateUserOutput{Jwt: &token}, nil
+	return &gen.AuthenticateUserOutput{Jwt: &jwt}, nil
 }
 
 func (u *User) GetUser(
 	ctx context.Context,
 	input gen.GetUserInput,
 ) (*gen.GetUserOutput, error) {
+	claims := ctx.Value(middleware.JwtClaimsKey).(*model.Claims)
+	if claims == nil {
+		return &gen.GetUserOutput{
+			Error: mappers.NewDTOError(gen.ErrorUnauthorized),
+		}, nil
+	}
+
+	role := claims.Role
+	if role != model.RoleAdmin && role != model.RoleContentManager && role != model.RoleDefaultUser {
+		return &gen.GetUserOutput{
+			Error: mappers.NewDTOError(gen.ErrorUnauthorized),
+		}, nil
+	}
+
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, repo.ErrNotFound) {
@@ -162,6 +160,20 @@ func (u *User) GetGamesStats(
 	ctx context.Context,
 	input gen.GetGamesStatsInput,
 ) (*gen.GetGamesStatsOutput, error) {
+	claims := ctx.Value(middleware.JwtClaimsKey).(*model.Claims)
+	if claims == nil {
+		return &gen.GetGamesStatsOutput{
+			Error: mappers.NewDTOError(gen.ErrorUnauthorized),
+		}, nil
+	}
+
+	role := claims.Role
+	if role != model.RoleAdmin && role != model.RoleContentManager && role != model.RoleDefaultUser {
+		return &gen.GetGamesStatsOutput{
+			Error: mappers.NewDTOError(gen.ErrorUnauthorized),
+		}, nil
+	}
+
 	stat, err := u.gameStatsRepo.GetTotalGamesStatsByUserId(ctx, input.UserID)
 	if err != nil {
 		return nil, err
@@ -192,83 +204,17 @@ func (u *User) GetGamesStats(
 	return result, nil
 }
 
-/*
-func (u *User) UpdateUserCredentials(
-	ctx context.Context,
-	input gen.UpdateUserCredentialsInput,
-) (*gen.UpdateUserCredentialsOutput, error) {
-	token, err := jwt.ParseWithClaims(input.Jwt, &types.Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(u.jwtConfigs.jwtSecretMessages), nil
-	})
-	if err != nil {
-		return &gen.UpdateUserCredentialsOutput{Error: mappers.NewDTOError(gen.ErrorValidation)}, nil
-	}
-
-	claims, ok := token.Claims.(*types.Claims)
-	if err := claims.Valid(); err != nil || !ok {
-		return &gen.UpdateUserCredentialsOutput{
-			Error: mappers.NewDTOError(gen.ErrorValidation)}, nil
-	}
-
-	user, err := u.userRepo.FindUserByID(ctx, claims.UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-
-	user.Password = string(hashedPassword)
-
-	_, err = u.userRepo.UpdateUser(ctx, user)
-	if err != nil {
-		return nil, err
-	}
-
-	return &gen.UpdateUserCredentialsOutput{Ok: true}, nil
-}
-*/
-/*
-func (u *User) ConfirmUser(
-	ctx context.Context,
-	input gen.ConfirmUserInput,
-) (*gen.ConfirmUserOutput, error) {
-	token, err := jwt.ParseWithClaims(input.Jwt, &types.Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(u.jwtConfigs.jwtSecretMessages), nil
-	})
-	if err != nil {
-		return &gen.ConfirmUserOutput{
-			Error: mappers.NewDTOError(gen.ErrorValidation)}, nil
-	}
-
-	claims, ok := token.Claims.(*types.Claims)
-	if err := claims.Valid(); err != nil || !ok {
-		return &gen.ConfirmUserOutput{
-			Error: mappers.NewDTOError(gen.ErrorValidation)}, nil
-	}
-
-	user, err := u.userRepo.FindUserByID(ctx, claims.UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	user.Status = gen.StatusConfirmed
-
-	_, err = u.userRepo.UpdateUser(ctx, user)
-	if err != nil {
-		return nil, err
-	}
-
-	return &gen.ConfirmUserOutput{Ok: true}, nil
-}
-*/
-
 func (u *User) UpdateUser(
 	ctx context.Context,
 	input gen.UpdateUserInput,
 ) (output *gen.UpdateUserOutput, err error) {
+	claims := ctx.Value(middleware.JwtClaimsKey).(*model.Claims)
+	if claims == nil || claims.Role != model.RoleAdmin && claims.UserID != input.ID {
+		return &gen.UpdateUserOutput{
+			Error: mappers.NewDTOError(gen.ErrorUnauthorized),
+		}, nil
+	}
+
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, repo.ErrNotFound) {
@@ -297,36 +243,6 @@ func (u *User) UpdateUser(
 
 	return &gen.UpdateUserOutput{User: mappers.MapUserToDTO(user)}, nil
 }
-
-/*
-func (u *User) DeleteUser(
-	ctx context.Context,
-	input gen.DeleteUserInput,
-) (output *gen.DeleteUserOutput, err error) {
-	user, err := u.userRepo.FindUserByID(ctx, input.ID)
-	if err != nil {
-		if errors.Is(err, repo.ErrNotFound) {
-			return &gen.DeleteUserOutput{
-				Error: mappers.NewDTOError(gen.ErrorNotFound)}, nil
-		}
-
-		return nil, err
-	}
-
-	if user.Status != gen.StatusConfirmed {
-		return &gen.DeleteUserOutput{
-			Error: mappers.NewDTOError(gen.ErrorValidation)}, nil
-	}
-
-	user.Status = gen.StatusDeleted
-
-	if _, err = u.userRepo.UpdateUser(ctx, user); err != nil {
-		return nil, err
-	}
-
-	return &gen.DeleteUserOutput{Ok: true}, nil
-}
-*/
 
 func (u *User) RecoveryPassword(ctx context.Context, input gen.RecoveryPasswordInput) (*gen.RecoveryPasswordOutput, error) {
 	user, err := u.userRepo.FindUserByEmail(ctx, input.Email)
@@ -374,6 +290,13 @@ func (u *User) VerifyRecoveryCode(ctx context.Context, input gen.VerifyRecoveryC
 }
 
 func (u *User) UpdatePassword(ctx context.Context, input gen.UpdatePasswordInput) (*gen.UpdatePasswordOutput, error) {
+	claims := ctx.Value(middleware.JwtClaimsKey).(*model.Claims)
+	if claims == nil || claims.Role != model.RoleAdmin && claims.UserID != input.ID {
+		return &gen.UpdatePasswordOutput{
+			Error: mappers.NewDTOError(gen.ErrorUnauthorized),
+		}, nil
+	}
+
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, repo.ErrNotFound) {
@@ -408,6 +331,13 @@ func (u *User) UpdatePassword(ctx context.Context, input gen.UpdatePasswordInput
 }
 
 func (u *User) UpdateEmail(ctx context.Context, input gen.UpdateEmailInput) (*gen.UpdateEmailOutput, error) {
+	claims := ctx.Value(middleware.JwtClaimsKey).(*model.Claims)
+	if claims == nil || claims.Role != model.RoleAdmin && claims.UserID != input.ID {
+		return &gen.UpdateEmailOutput{
+			Error: mappers.NewDTOError(gen.ErrorUnauthorized),
+		}, nil
+	}
+
 	user, err := u.userRepo.FindUserByID(ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, repo.ErrNotFound) {
@@ -481,18 +411,6 @@ func (u *User) ResetPassword(ctx context.Context, input gen.ResetPasswordInput) 
 	}
 
 	return &gen.ResetPasswordOutput{}, nil
-}
-
-func generateTokenByClaims(claims *types.Claims, secret string) (string, error) {
-	signBytes := []byte(secret)
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	ss, err := token.SignedString(signBytes)
-	if err != nil {
-		return "", err
-	}
-
-	return ss, nil
 }
 
 func generateCode(length int) string {
