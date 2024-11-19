@@ -49,14 +49,14 @@ func (a *AuthService) GenerateTokenByClaims(claims *model.Claims) (string, error
 }
 
 func (a *AuthService) ParseToken(jwtStr string) (*model.Claims, error) {
-	token, err := jwt.ParseWithClaims(jwtStr, &model.Claims{}, func(token *jwt.Token) (interface{}, error) {
+	var claims model.Claims
+	_, err := jwt.ParseWithClaims(jwtStr, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(a.cfg.JwtSecretAuth), nil
 	})
 	if err != nil {
 		return nil, tracerr.Wrap(err)
 	}
 
-	claims := token.Claims.(model.Claims)
 	if claims.Valid() != nil {
 		return nil, tracerr.Wrap(err)
 	}
