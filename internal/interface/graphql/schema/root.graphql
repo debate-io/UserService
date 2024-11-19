@@ -8,13 +8,13 @@ type Mutation {
         """ Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION """
         registerUser(input: RegisterUserInput!): RegisterUserOutput!
 
-        """ Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR """
+        """ Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND """
         updateUser(input: UpdateUserInput!): UpdateUserOutput!
 
-        """ Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS """
+        """ Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND, , INVALID_CREDENTIALS """
         updatePassword(input: UpdatePasswordInput!): UpdatePasswordOutput!
 
-        """ Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS """
+        """ Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND, , INVALID_CREDENTIALS """
         updateEmail(input: UpdateEmailInput!): UpdateEmailOutput!
 
         """ Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
@@ -26,6 +26,9 @@ type Mutation {
     ##### Topics #####
         """ Предложение создания новой темы. Может вернуть ошибки: ALREADY_EXIST """
         suggestTopic(input: SuggestTopicInput!): SuggestTopicOutput!
+
+        """ Обновление текущих тем. Может вернуть ошибки: NOT_FOUND, VALIDATION """
+        updateTopics(input: UpdateTopicInput!): UpdateTopicOutput!
 }
 
 type Query {
@@ -44,4 +47,11 @@ type Query {
         
         """ Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
         verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
+
+    ##### Topics #####
+        """ Получение списка тем. Может вернуть ошибки: NOT_FOUND"""
+        getTopics(input: GetTopicsInput!): GetTopicsOutput!
+
+        """ Получение списка метатем. Может вернуть ошибки: NOT_FOUND"""
+        getMetatopics(input: GetMetatopicsInput!): GetMetatopicsOutput!
 }

@@ -66,9 +66,29 @@ type ComplexityRoot struct {
 		WinsPercents    func(childComplexity int) int
 	}
 
+	GetMetatopicsOutput struct {
+		Metatopics func(childComplexity int) int
+		PageCount  func(childComplexity int) int
+		PageNumber func(childComplexity int) int
+		PageSize   func(childComplexity int) int
+	}
+
+	GetTopicsOutput struct {
+		PageCount  func(childComplexity int) int
+		PageNumber func(childComplexity int) int
+		PageSize   func(childComplexity int) int
+		Topics     func(childComplexity int) int
+	}
+
 	GetUserOutput struct {
 		Error func(childComplexity int) int
 		User  func(childComplexity int) int
+	}
+
+	Metatopic struct {
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
 	}
 
 	MetatopicsStats struct {
@@ -85,12 +105,15 @@ type ComplexityRoot struct {
 		SuggestTopic     func(childComplexity int, input SuggestTopicInput) int
 		UpdateEmail      func(childComplexity int, input UpdateEmailInput) int
 		UpdatePassword   func(childComplexity int, input UpdatePasswordInput) int
+		UpdateTopics     func(childComplexity int, input UpdateTopicInput) int
 		UpdateUser       func(childComplexity int, input UpdateUserInput) int
 	}
 
 	Query struct {
 		AuthenticateUser    func(childComplexity int, input AuthenticateUserInput) int
 		GetGamesStats       func(childComplexity int, input GetGamesStatsInput) int
+		GetMetatopics       func(childComplexity int, input GetMetatopicsInput) int
+		GetTopics           func(childComplexity int, input GetTopicsInput) int
 		GetUser             func(childComplexity int, input GetUserInput) int
 		GetUserAchievements func(childComplexity int, userID int, limit int, offset int) int
 		VerifyRecoveryCode  func(childComplexity int, input VerifyRecoveryCodeInput) int
@@ -122,12 +145,22 @@ type ComplexityRoot struct {
 		Status    func(childComplexity int) int
 	}
 
+	TopicMetatopics struct {
+		Metatopics func(childComplexity int) int
+		Topic      func(childComplexity int) int
+	}
+
 	UpdateEmailOutput struct {
 		Error func(childComplexity int) int
 	}
 
 	UpdatePasswordOutput struct {
 		Error func(childComplexity int) int
+	}
+
+	UpdateTopicOutput struct {
+		Error           func(childComplexity int) int
+		TopicMetatopics func(childComplexity int) int
 	}
 
 	UpdateUserOutput struct {
@@ -158,6 +191,7 @@ type MutationResolver interface {
 	RecoveryPassword(ctx context.Context, input RecoveryPasswordInput) (*RecoveryPasswordOutput, error)
 	ResetPassword(ctx context.Context, input ResetPasswordInput) (*ResetPasswordOutput, error)
 	SuggestTopic(ctx context.Context, input SuggestTopicInput) (*SuggestTopicOutput, error)
+	UpdateTopics(ctx context.Context, input UpdateTopicInput) (*UpdateTopicOutput, error)
 }
 type QueryResolver interface {
 	AuthenticateUser(ctx context.Context, input AuthenticateUserInput) (*AuthenticateUserOutput, error)
@@ -165,6 +199,8 @@ type QueryResolver interface {
 	GetGamesStats(ctx context.Context, input GetGamesStatsInput) (*GetGamesStatsOutput, error)
 	GetUserAchievements(ctx context.Context, userID int, limit int, offset int) ([]*Achievement, error)
 	VerifyRecoveryCode(ctx context.Context, input VerifyRecoveryCodeInput) (*VerifyRecoveryCodeOutput, error)
+	GetTopics(ctx context.Context, input GetTopicsInput) (*GetTopicsOutput, error)
+	GetMetatopics(ctx context.Context, input GetMetatopicsInput) (*GetMetatopicsOutput, error)
 }
 
 type executableSchema struct {
@@ -263,6 +299,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GetGamesStatsOutput.WinsPercents(childComplexity), true
 
+	case "GetMetatopicsOutput.metatopics":
+		if e.complexity.GetMetatopicsOutput.Metatopics == nil {
+			break
+		}
+
+		return e.complexity.GetMetatopicsOutput.Metatopics(childComplexity), true
+
+	case "GetMetatopicsOutput.pageCount":
+		if e.complexity.GetMetatopicsOutput.PageCount == nil {
+			break
+		}
+
+		return e.complexity.GetMetatopicsOutput.PageCount(childComplexity), true
+
+	case "GetMetatopicsOutput.pageNumber":
+		if e.complexity.GetMetatopicsOutput.PageNumber == nil {
+			break
+		}
+
+		return e.complexity.GetMetatopicsOutput.PageNumber(childComplexity), true
+
+	case "GetMetatopicsOutput.pageSize":
+		if e.complexity.GetMetatopicsOutput.PageSize == nil {
+			break
+		}
+
+		return e.complexity.GetMetatopicsOutput.PageSize(childComplexity), true
+
+	case "GetTopicsOutput.pageCount":
+		if e.complexity.GetTopicsOutput.PageCount == nil {
+			break
+		}
+
+		return e.complexity.GetTopicsOutput.PageCount(childComplexity), true
+
+	case "GetTopicsOutput.pageNumber":
+		if e.complexity.GetTopicsOutput.PageNumber == nil {
+			break
+		}
+
+		return e.complexity.GetTopicsOutput.PageNumber(childComplexity), true
+
+	case "GetTopicsOutput.pageSize":
+		if e.complexity.GetTopicsOutput.PageSize == nil {
+			break
+		}
+
+		return e.complexity.GetTopicsOutput.PageSize(childComplexity), true
+
+	case "GetTopicsOutput.topics":
+		if e.complexity.GetTopicsOutput.Topics == nil {
+			break
+		}
+
+		return e.complexity.GetTopicsOutput.Topics(childComplexity), true
+
 	case "GetUserOutput.error":
 		if e.complexity.GetUserOutput.Error == nil {
 			break
@@ -276,6 +368,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.GetUserOutput.User(childComplexity), true
+
+	case "Metatopic.createdAt":
+		if e.complexity.Metatopic.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Metatopic.CreatedAt(childComplexity), true
+
+	case "Metatopic.id":
+		if e.complexity.Metatopic.ID == nil {
+			break
+		}
+
+		return e.complexity.Metatopic.ID(childComplexity), true
+
+	case "Metatopic.name":
+		if e.complexity.Metatopic.Name == nil {
+			break
+		}
+
+		return e.complexity.Metatopic.Name(childComplexity), true
 
 	case "MetatopicsStats.gamesAmount":
 		if e.complexity.MetatopicsStats.GamesAmount == nil {
@@ -377,6 +490,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdatePassword(childComplexity, args["input"].(UpdatePasswordInput)), true
 
+	case "Mutation.updateTopics":
+		if e.complexity.Mutation.UpdateTopics == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTopics_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateTopics(childComplexity, args["input"].(UpdateTopicInput)), true
+
 	case "Mutation.updateUser":
 		if e.complexity.Mutation.UpdateUser == nil {
 			break
@@ -412,6 +537,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetGamesStats(childComplexity, args["input"].(GetGamesStatsInput)), true
+
+	case "Query.getMetatopics":
+		if e.complexity.Query.GetMetatopics == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getMetatopics_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetMetatopics(childComplexity, args["input"].(GetMetatopicsInput)), true
+
+	case "Query.getTopics":
+		if e.complexity.Query.GetTopics == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getTopics_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTopics(childComplexity, args["input"].(GetTopicsInput)), true
 
 	case "Query.getUser":
 		if e.complexity.Query.GetUser == nil {
@@ -526,6 +675,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Topic.Status(childComplexity), true
 
+	case "TopicMetatopics.metatopics":
+		if e.complexity.TopicMetatopics.Metatopics == nil {
+			break
+		}
+
+		return e.complexity.TopicMetatopics.Metatopics(childComplexity), true
+
+	case "TopicMetatopics.topic":
+		if e.complexity.TopicMetatopics.Topic == nil {
+			break
+		}
+
+		return e.complexity.TopicMetatopics.Topic(childComplexity), true
+
 	case "UpdateEmailOutput.error":
 		if e.complexity.UpdateEmailOutput.Error == nil {
 			break
@@ -539,6 +702,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UpdatePasswordOutput.Error(childComplexity), true
+
+	case "UpdateTopicOutput.error":
+		if e.complexity.UpdateTopicOutput.Error == nil {
+			break
+		}
+
+		return e.complexity.UpdateTopicOutput.Error(childComplexity), true
+
+	case "UpdateTopicOutput.topicMetatopics":
+		if e.complexity.UpdateTopicOutput.TopicMetatopics == nil {
+			break
+		}
+
+		return e.complexity.UpdateTopicOutput.TopicMetatopics(childComplexity), true
 
 	case "UpdateUserOutput.error":
 		if e.complexity.UpdateUserOutput.Error == nil {
@@ -615,24 +792,28 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 }
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
-	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
+	opCtx := graphql.GetOperationContext(ctx)
+	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAuthenticateUserInput,
 		ec.unmarshalInputGetGamesStatsInput,
+		ec.unmarshalInputGetMetatopicsInput,
+		ec.unmarshalInputGetTopicsInput,
 		ec.unmarshalInputGetUserInput,
 		ec.unmarshalInputRecoveryPasswordInput,
 		ec.unmarshalInputRegisterUserInput,
 		ec.unmarshalInputResetPasswordInput,
 		ec.unmarshalInputSuggestTopicInput,
+		ec.unmarshalInputTopicInput,
 		ec.unmarshalInputUpdateEmailInput,
 		ec.unmarshalInputUpdatePasswordInput,
+		ec.unmarshalInputUpdateTopicInput,
 		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputVerifyRecoveryCodeInput,
 	)
 	first := true
 
-	switch rc.Operation.Operation {
+	switch opCtx.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
 			var response graphql.Response
@@ -640,7 +821,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, rc.Operation.SelectionSet)
+				data = ec._Query(ctx, opCtx.Operation.SelectionSet)
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -670,7 +851,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 			first = false
 			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
 
@@ -734,6 +915,7 @@ enum Error {
     VALIDATION
     INVALID_CREDENTIALS
     ALREADY_EXIST
+    UNAUTHORIZED
 }
 `, BuiltIn: false},
 	{Name: "../schema/root.graphql", Input: `schema {
@@ -746,13 +928,13 @@ type Mutation {
         """ Создание пользователя. Может вернуть ошибки: ALREADY_EXIST, VALIDATION """
         registerUser(input: RegisterUserInput!): RegisterUserOutput!
 
-        """ Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR """
+        """ Обновление пользователя. Может вернуть ошибки: VALIDATION, NOT_FOUND """
         updateUser(input: UpdateUserInput!): UpdateUserOutput!
 
-        """ Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS """
+        """ Обновление пароля. Может вернуть ошибки: VALIDATION, NOT_FOUND, , INVALID_CREDENTIALS """
         updatePassword(input: UpdatePasswordInput!): UpdatePasswordOutput!
 
-        """ Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND_ERROR, , INVALID_CREDENTIALS """
+        """ Обновление почты. Может вернуть ошибки: VALIDATION, NOT_FOUND, , INVALID_CREDENTIALS """
         updateEmail(input: UpdateEmailInput!): UpdateEmailOutput!
 
         """ Восстановление пароля - генерация и отправка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
@@ -764,6 +946,9 @@ type Mutation {
     ##### Topics #####
         """ Предложение создания новой темы. Может вернуть ошибки: ALREADY_EXIST """
         suggestTopic(input: SuggestTopicInput!): SuggestTopicOutput!
+
+        """ Обновление текущих тем. Может вернуть ошибки: NOT_FOUND, VALIDATION """
+        updateTopics(input: UpdateTopicInput!): UpdateTopicOutput!
 }
 
 type Query {
@@ -782,6 +967,13 @@ type Query {
         
         """ Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
         verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
+
+    ##### Topics #####
+        """ Получение списка тем. Может вернуть ошибки: NOT_FOUND"""
+        getTopics(input: GetTopicsInput!): GetTopicsOutput!
+
+        """ Получение списка метатем. Может вернуть ошибки: NOT_FOUND"""
+        getMetatopics(input: GetMetatopicsInput!): GetMetatopicsOutput!
 }
 `, BuiltIn: false},
 	{Name: "../schema/scalars.graphql", Input: `scalar Time
@@ -943,12 +1135,74 @@ type SuggestTopicOutput {
     topic: Topic
     error: Error
 }
-`, BuiltIn: false},
-	{Name: "../schema/topics/topics.graphql", Input: `type Topic {
+
+##################################################
+
+input TopicInput {
     id: Int!
     name: String!
-    status: String!
+    status: TopicStatus!
+    metatopicIds: [Int!]!
+}
+
+input UpdateTopicInput {
+    topics: [TopicInput!]!
+}
+
+type UpdateTopicOutput {
+    topicMetatopics: [TopicMetatopics!]
+    error: Error
+}
+`, BuiltIn: false},
+	{Name: "../schema/topics/query_topics.graphql", Input: `input GetTopicsInput {
+    pageSize: Int!
+    pageNumber: Int!
+    topicStatus: [TopicStatus!]!
+}
+
+type GetTopicsOutput {
+    pageSize: Int!
+    pageNumber: Int!
+    pageCount: Int!
+    topics: [TopicMetatopics!]!
+}
+
+#########################################3
+
+input GetMetatopicsInput {
+    pageSize: Int!
+    pageNumber: Int!
+}
+
+type GetMetatopicsOutput {
+    pageSize: Int!
+    pageNumber: Int!
+    pageCount: Int!
+    metatopics: [Metatopic!]!
+}
+`, BuiltIn: false},
+	{Name: "../schema/topics/topics.graphql", Input: `enum TopicStatus {
+    PENDING
+    APPROVED
+    DECLINED
+}
+
+type Topic {
+    id: Int!
+    name: String!
+    status: TopicStatus!
     createdAt: Time!
+}
+
+type Metatopic {
+    id: Int!
+    name: String!
+    createdAt: Time!
+}
+
+type TopicMetatopics {
+    topic: Topic!
+    metatopics: [Metatopic!]!
 }
 `, BuiltIn: false},
 }
@@ -1150,6 +1404,38 @@ func (ec *executionContext) field_Mutation_updatePassword_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_updateTopics_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Mutation_updateTopics_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateTopics_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (UpdateTopicInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal UpdateTopicInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateTopicInput(ctx, tmp)
+	}
+
+	var zeroVal UpdateTopicInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1275,6 +1561,70 @@ func (ec *executionContext) field_Query_getGamesStats_argsInput(
 	}
 
 	var zeroVal GetGamesStatsInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getMetatopics_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Query_getMetatopics_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getMetatopics_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (GetMetatopicsInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal GetMetatopicsInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGetMetatopicsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetMetatopicsInput(ctx, tmp)
+	}
+
+	var zeroVal GetMetatopicsInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getTopics_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Query_getTopics_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getTopics_argsInput(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (GetTopicsInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal GetTopicsInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGetTopicsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicsInput(ctx, tmp)
+	}
+
+	var zeroVal GetTopicsInput
 	return zeroVal, nil
 }
 
@@ -1982,6 +2332,372 @@ func (ec *executionContext) fieldContext_GetGamesStatsOutput_error(_ context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _GetMetatopicsOutput_pageSize(ctx context.Context, field graphql.CollectedField, obj *GetMetatopicsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetMetatopicsOutput_pageSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetMetatopicsOutput_pageSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetMetatopicsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetMetatopicsOutput_pageNumber(ctx context.Context, field graphql.CollectedField, obj *GetMetatopicsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetMetatopicsOutput_pageNumber(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetMetatopicsOutput_pageNumber(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetMetatopicsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetMetatopicsOutput_pageCount(ctx context.Context, field graphql.CollectedField, obj *GetMetatopicsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetMetatopicsOutput_pageCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetMetatopicsOutput_pageCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetMetatopicsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetMetatopicsOutput_metatopics(ctx context.Context, field graphql.CollectedField, obj *GetMetatopicsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetMetatopicsOutput_metatopics(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Metatopics, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Metatopic)
+	fc.Result = res
+	return ec.marshalNMetatopic2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopicᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetMetatopicsOutput_metatopics(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetMetatopicsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Metatopic_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Metatopic_name(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Metatopic_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Metatopic", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetTopicsOutput_pageSize(ctx context.Context, field graphql.CollectedField, obj *GetTopicsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetTopicsOutput_pageSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetTopicsOutput_pageSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetTopicsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetTopicsOutput_pageNumber(ctx context.Context, field graphql.CollectedField, obj *GetTopicsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetTopicsOutput_pageNumber(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageNumber, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetTopicsOutput_pageNumber(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetTopicsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetTopicsOutput_pageCount(ctx context.Context, field graphql.CollectedField, obj *GetTopicsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetTopicsOutput_pageCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetTopicsOutput_pageCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetTopicsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GetTopicsOutput_topics(ctx context.Context, field graphql.CollectedField, obj *GetTopicsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetTopicsOutput_topics(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Topics, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*TopicMetatopics)
+	fc.Result = res
+	return ec.marshalNTopicMetatopics2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicMetatopicsᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GetTopicsOutput_topics(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GetTopicsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "topic":
+				return ec.fieldContext_TopicMetatopics_topic(ctx, field)
+			case "metatopics":
+				return ec.fieldContext_TopicMetatopics_metatopics(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TopicMetatopics", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _GetUserOutput_user(ctx context.Context, field graphql.CollectedField, obj *GetUserOutput) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_GetUserOutput_user(ctx, field)
 	if err != nil {
@@ -2075,6 +2791,138 @@ func (ec *executionContext) fieldContext_GetUserOutput_error(_ context.Context, 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Metatopic_id(ctx context.Context, field graphql.CollectedField, obj *Metatopic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Metatopic_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Metatopic_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Metatopic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Metatopic_name(ctx context.Context, field graphql.CollectedField, obj *Metatopic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Metatopic_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Metatopic_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Metatopic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Metatopic_createdAt(ctx context.Context, field graphql.CollectedField, obj *Metatopic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Metatopic_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Metatopic_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Metatopic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2677,6 +3525,67 @@ func (ec *executionContext) fieldContext_Mutation_suggestTopic(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateTopics(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateTopics(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateTopics(rctx, fc.Args["input"].(UpdateTopicInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*UpdateTopicOutput)
+	fc.Result = res
+	return ec.marshalNUpdateTopicOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateTopicOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateTopics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "topicMetatopics":
+				return ec.fieldContext_UpdateTopicOutput_topicMetatopics(ctx, field)
+			case "error":
+				return ec.fieldContext_UpdateTopicOutput_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UpdateTopicOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateTopics_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_authenticateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_authenticateUser(ctx, field)
 	if err != nil {
@@ -2984,6 +3893,136 @@ func (ec *executionContext) fieldContext_Query_verifyRecoveryCode(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_verifyRecoveryCode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getTopics(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTopics(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetTopics(rctx, fc.Args["input"].(GetTopicsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GetTopicsOutput)
+	fc.Result = res
+	return ec.marshalNGetTopicsOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicsOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getTopics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "pageSize":
+				return ec.fieldContext_GetTopicsOutput_pageSize(ctx, field)
+			case "pageNumber":
+				return ec.fieldContext_GetTopicsOutput_pageNumber(ctx, field)
+			case "pageCount":
+				return ec.fieldContext_GetTopicsOutput_pageCount(ctx, field)
+			case "topics":
+				return ec.fieldContext_GetTopicsOutput_topics(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GetTopicsOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getTopics_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getMetatopics(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getMetatopics(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetMetatopics(rctx, fc.Args["input"].(GetMetatopicsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GetMetatopicsOutput)
+	fc.Result = res
+	return ec.marshalNGetMetatopicsOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetMetatopicsOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getMetatopics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "pageSize":
+				return ec.fieldContext_GetMetatopicsOutput_pageSize(ctx, field)
+			case "pageNumber":
+				return ec.fieldContext_GetMetatopicsOutput_pageNumber(ctx, field)
+			case "pageCount":
+				return ec.fieldContext_GetMetatopicsOutput_pageCount(ctx, field)
+			case "metatopics":
+				return ec.fieldContext_GetMetatopicsOutput_metatopics(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GetMetatopicsOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getMetatopics_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3546,9 +4585,9 @@ func (ec *executionContext) _Topic_status(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(TopicStatus)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Topic_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3558,7 +4597,7 @@ func (ec *executionContext) fieldContext_Topic_status(_ context.Context, field g
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type TopicStatus does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3603,6 +4642,112 @@ func (ec *executionContext) fieldContext_Topic_createdAt(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TopicMetatopics_topic(ctx context.Context, field graphql.CollectedField, obj *TopicMetatopics) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TopicMetatopics_topic(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Topic, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Topic)
+	fc.Result = res
+	return ec.marshalNTopic2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopic(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TopicMetatopics_topic(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TopicMetatopics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Topic_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Topic_name(ctx, field)
+			case "status":
+				return ec.fieldContext_Topic_status(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Topic_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Topic", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TopicMetatopics_metatopics(ctx context.Context, field graphql.CollectedField, obj *TopicMetatopics) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TopicMetatopics_metatopics(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Metatopics, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Metatopic)
+	fc.Result = res
+	return ec.marshalNMetatopic2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopicᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TopicMetatopics_metatopics(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TopicMetatopics",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Metatopic_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Metatopic_name(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Metatopic_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Metatopic", field.Name)
 		},
 	}
 	return fc, nil
@@ -3680,6 +4825,94 @@ func (ec *executionContext) _UpdatePasswordOutput_error(ctx context.Context, fie
 func (ec *executionContext) fieldContext_UpdatePasswordOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UpdatePasswordOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Error does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateTopicOutput_topicMetatopics(ctx context.Context, field graphql.CollectedField, obj *UpdateTopicOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateTopicOutput_topicMetatopics(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TopicMetatopics, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*TopicMetatopics)
+	fc.Result = res
+	return ec.marshalOTopicMetatopics2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicMetatopicsᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateTopicOutput_topicMetatopics(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTopicOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "topic":
+				return ec.fieldContext_TopicMetatopics_topic(ctx, field)
+			case "metatopics":
+				return ec.fieldContext_TopicMetatopics_metatopics(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TopicMetatopics", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateTopicOutput_error(ctx context.Context, field graphql.CollectedField, obj *UpdateTopicOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateTopicOutput_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateTopicOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateTopicOutput",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -5974,6 +7207,81 @@ func (ec *executionContext) unmarshalInputGetGamesStatsInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGetMetatopicsInput(ctx context.Context, obj interface{}) (GetMetatopicsInput, error) {
+	var it GetMetatopicsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"pageSize", "pageNumber"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "pageSize":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageSize"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PageSize = data
+		case "pageNumber":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageNumber"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PageNumber = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGetTopicsInput(ctx context.Context, obj interface{}) (GetTopicsInput, error) {
+	var it GetTopicsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"pageSize", "pageNumber", "topicStatus"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "pageSize":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageSize"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PageSize = data
+		case "pageNumber":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageNumber"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.PageNumber = data
+		case "topicStatus":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("topicStatus"))
+			data, err := ec.unmarshalNTopicStatus2ᚕgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatusᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TopicStatus = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputGetUserInput(ctx context.Context, obj interface{}) (GetUserInput, error) {
 	var it GetUserInput
 	asMap := map[string]interface{}{}
@@ -6137,6 +7445,54 @@ func (ec *executionContext) unmarshalInputSuggestTopicInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputTopicInput(ctx context.Context, obj interface{}) (TopicInput, error) {
+	var it TopicInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name", "status", "metatopicIds"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "status":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			data, err := ec.unmarshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatus(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Status = data
+		case "metatopicIds":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("metatopicIds"))
+			data, err := ec.unmarshalNInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MetatopicIds = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, obj interface{}) (UpdateEmailInput, error) {
 	var it UpdateEmailInput
 	asMap := map[string]interface{}{}
@@ -6213,6 +7569,33 @@ func (ec *executionContext) unmarshalInputUpdatePasswordInput(ctx context.Contex
 				return it, err
 			}
 			it.NewPassword = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateTopicInput(ctx context.Context, obj interface{}) (UpdateTopicInput, error) {
+	var it UpdateTopicInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"topics"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "topics":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("topics"))
+			data, err := ec.unmarshalNTopicInput2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Topics = data
 		}
 	}
 
@@ -6447,6 +7830,114 @@ func (ec *executionContext) _GetGamesStatsOutput(ctx context.Context, sel ast.Se
 	return out
 }
 
+var getMetatopicsOutputImplementors = []string{"GetMetatopicsOutput"}
+
+func (ec *executionContext) _GetMetatopicsOutput(ctx context.Context, sel ast.SelectionSet, obj *GetMetatopicsOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getMetatopicsOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GetMetatopicsOutput")
+		case "pageSize":
+			out.Values[i] = ec._GetMetatopicsOutput_pageSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageNumber":
+			out.Values[i] = ec._GetMetatopicsOutput_pageNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageCount":
+			out.Values[i] = ec._GetMetatopicsOutput_pageCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "metatopics":
+			out.Values[i] = ec._GetMetatopicsOutput_metatopics(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var getTopicsOutputImplementors = []string{"GetTopicsOutput"}
+
+func (ec *executionContext) _GetTopicsOutput(ctx context.Context, sel ast.SelectionSet, obj *GetTopicsOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, getTopicsOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GetTopicsOutput")
+		case "pageSize":
+			out.Values[i] = ec._GetTopicsOutput_pageSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageNumber":
+			out.Values[i] = ec._GetTopicsOutput_pageNumber(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "pageCount":
+			out.Values[i] = ec._GetTopicsOutput_pageCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "topics":
+			out.Values[i] = ec._GetTopicsOutput_topics(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var getUserOutputImplementors = []string{"GetUserOutput"}
 
 func (ec *executionContext) _GetUserOutput(ctx context.Context, sel ast.SelectionSet, obj *GetUserOutput) graphql.Marshaler {
@@ -6462,6 +7953,55 @@ func (ec *executionContext) _GetUserOutput(ctx context.Context, sel ast.Selectio
 			out.Values[i] = ec._GetUserOutput_user(ctx, field, obj)
 		case "error":
 			out.Values[i] = ec._GetUserOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var metatopicImplementors = []string{"Metatopic"}
+
+func (ec *executionContext) _Metatopic(ctx context.Context, sel ast.SelectionSet, obj *Metatopic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, metatopicImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Metatopic")
+		case "id":
+			out.Values[i] = ec._Metatopic_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Metatopic_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Metatopic_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6607,6 +8147,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateTopics":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateTopics(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6747,6 +8294,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_verifyRecoveryCode(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getTopics":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getTopics(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getMetatopics":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getMetatopics(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -6994,6 +8585,50 @@ func (ec *executionContext) _Topic(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var topicMetatopicsImplementors = []string{"TopicMetatopics"}
+
+func (ec *executionContext) _TopicMetatopics(ctx context.Context, sel ast.SelectionSet, obj *TopicMetatopics) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, topicMetatopicsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TopicMetatopics")
+		case "topic":
+			out.Values[i] = ec._TopicMetatopics_topic(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "metatopics":
+			out.Values[i] = ec._TopicMetatopics_metatopics(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var updateEmailOutputImplementors = []string{"UpdateEmailOutput"}
 
 func (ec *executionContext) _UpdateEmailOutput(ctx context.Context, sel ast.SelectionSet, obj *UpdateEmailOutput) graphql.Marshaler {
@@ -7043,6 +8678,44 @@ func (ec *executionContext) _UpdatePasswordOutput(ctx context.Context, sel ast.S
 			out.Values[i] = graphql.MarshalString("UpdatePasswordOutput")
 		case "error":
 			out.Values[i] = ec._UpdatePasswordOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var updateTopicOutputImplementors = []string{"UpdateTopicOutput"}
+
+func (ec *executionContext) _UpdateTopicOutput(ctx context.Context, sel ast.SelectionSet, obj *UpdateTopicOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateTopicOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateTopicOutput")
+		case "topicMetatopics":
+			out.Values[i] = ec._UpdateTopicOutput_topicMetatopics(ctx, field, obj)
+		case "error":
+			out.Values[i] = ec._UpdateTopicOutput_error(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7660,6 +9333,44 @@ func (ec *executionContext) marshalNGetGamesStatsOutput2ᚖgithubᚗcomᚋdebate
 	return ec._GetGamesStatsOutput(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNGetMetatopicsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetMetatopicsInput(ctx context.Context, v interface{}) (GetMetatopicsInput, error) {
+	res, err := ec.unmarshalInputGetMetatopicsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGetMetatopicsOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetMetatopicsOutput(ctx context.Context, sel ast.SelectionSet, v GetMetatopicsOutput) graphql.Marshaler {
+	return ec._GetMetatopicsOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGetMetatopicsOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetMetatopicsOutput(ctx context.Context, sel ast.SelectionSet, v *GetMetatopicsOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GetMetatopicsOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGetTopicsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicsInput(ctx context.Context, v interface{}) (GetTopicsInput, error) {
+	res, err := ec.unmarshalInputGetTopicsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGetTopicsOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicsOutput(ctx context.Context, sel ast.SelectionSet, v GetTopicsOutput) graphql.Marshaler {
+	return ec._GetTopicsOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGetTopicsOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicsOutput(ctx context.Context, sel ast.SelectionSet, v *GetTopicsOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GetTopicsOutput(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNGetUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetUserInput(ctx context.Context, v interface{}) (GetUserInput, error) {
 	res, err := ec.unmarshalInputGetUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7692,6 +9403,92 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]int, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNInt2int(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNInt2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt2int(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMetatopic2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopicᚄ(ctx context.Context, sel ast.SelectionSet, v []*Metatopic) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMetatopic2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopic(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNMetatopic2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopic(ctx context.Context, sel ast.SelectionSet, v *Metatopic) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Metatopic(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNRecoveryPasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐRecoveryPasswordInput(ctx context.Context, v interface{}) (RecoveryPasswordInput, error) {
@@ -7810,6 +9607,163 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
+func (ec *executionContext) marshalNTopic2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopic(ctx context.Context, sel ast.SelectionSet, v *Topic) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Topic(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNTopicInput2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicInputᚄ(ctx context.Context, v interface{}) ([]*TopicInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*TopicInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNTopicInput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNTopicInput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicInput(ctx context.Context, v interface{}) (*TopicInput, error) {
+	res, err := ec.unmarshalInputTopicInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTopicMetatopics2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicMetatopicsᚄ(ctx context.Context, sel ast.SelectionSet, v []*TopicMetatopics) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTopicMetatopics2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicMetatopics(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTopicMetatopics2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicMetatopics(ctx context.Context, sel ast.SelectionSet, v *TopicMetatopics) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TopicMetatopics(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatus(ctx context.Context, v interface{}) (TopicStatus, error) {
+	var res TopicStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatus(ctx context.Context, sel ast.SelectionSet, v TopicStatus) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNTopicStatus2ᚕgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatusᚄ(ctx context.Context, v interface{}) ([]TopicStatus, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]TopicStatus, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatus(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNTopicStatus2ᚕgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []TopicStatus) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatus(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNUpdateEmailInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateEmailInput(ctx context.Context, v interface{}) (UpdateEmailInput, error) {
 	res, err := ec.unmarshalInputUpdateEmailInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -7846,6 +9800,25 @@ func (ec *executionContext) marshalNUpdatePasswordOutput2ᚖgithubᚗcomᚋdebat
 		return graphql.Null
 	}
 	return ec._UpdatePasswordOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateTopicInput(ctx context.Context, v interface{}) (UpdateTopicInput, error) {
+	res, err := ec.unmarshalInputUpdateTopicInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateTopicOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateTopicOutput(ctx context.Context, sel ast.SelectionSet, v UpdateTopicOutput) graphql.Marshaler {
+	return ec._UpdateTopicOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateTopicOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateTopicOutput(ctx context.Context, sel ast.SelectionSet, v *UpdateTopicOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateTopicOutput(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateUserInput(ctx context.Context, v interface{}) (UpdateUserInput, error) {
@@ -8276,6 +10249,53 @@ func (ec *executionContext) marshalOTopic2ᚖgithubᚗcomᚋdebateᚑioᚋservic
 		return graphql.Null
 	}
 	return ec._Topic(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOTopicMetatopics2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicMetatopicsᚄ(ctx context.Context, sel ast.SelectionSet, v []*TopicMetatopics) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTopicMetatopics2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicMetatopics(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {

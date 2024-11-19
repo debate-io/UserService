@@ -6,3 +6,21 @@ type SuggestTopicOutput {
     topic: Topic
     error: Error
 }
+
+##################################################
+
+input TopicInput {
+    id: Int!
+    name: String!
+    status: TopicStatus!
+    metatopicIds: [Int!]!
+}
+
+input UpdateTopicInput {
+    topics: [TopicInput!]!
+}
+
+type UpdateTopicOutput {
+    topicMetatopics: [TopicMetatopics!]
+    error: Error
+}

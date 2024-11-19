@@ -29,4 +29,7 @@ type AchievmentsRepository interface {
 
 type TopicRepository interface {
 	SuggestTopic(ctx context.Context, topic model.Topic) (*model.Topic, error)
+	UpdateTopics(ctx context.Context, topicMetatopics []model.TopicMetatopicIds) ([]model.TopicMetatopics, error)
+	GetTopics(ctx context.Context, topicStatuses []model.ApprovingStatusEnum, pageSize, pageNumber int) ([]model.TopicMetatopics, int, error)
+	GetMetatopics(ctx context.Context, pageSize, pageNumber int) ([]*model.Metatopic, int, error)
 }
