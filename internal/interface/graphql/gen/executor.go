@@ -115,7 +115,7 @@ type ComplexityRoot struct {
 		GetMetatopics       func(childComplexity int, input GetMetatopicsInput) int
 		GetTopics           func(childComplexity int, input GetTopicsInput) int
 		GetUser             func(childComplexity int, input GetUserInput) int
-		GetUserAchievements func(childComplexity int, userID int, limit int, offset int) int
+		GetUserAchievements func(childComplexity int, input UserAchievmentsInput) int
 		VerifyRecoveryCode  func(childComplexity int, input VerifyRecoveryCodeInput) int
 	}
 
@@ -178,6 +178,11 @@ type ComplexityRoot struct {
 		Username  func(childComplexity int) int
 	}
 
+	UserAchievmentsOutput struct {
+		Achievements func(childComplexity int) int
+		Error        func(childComplexity int) int
+	}
+
 	VerifyRecoveryCodeOutput struct {
 		Error func(childComplexity int) int
 	}
@@ -197,8 +202,8 @@ type QueryResolver interface {
 	AuthenticateUser(ctx context.Context, input AuthenticateUserInput) (*AuthenticateUserOutput, error)
 	GetUser(ctx context.Context, input GetUserInput) (*GetUserOutput, error)
 	GetGamesStats(ctx context.Context, input GetGamesStatsInput) (*GetGamesStatsOutput, error)
-	GetUserAchievements(ctx context.Context, userID int, limit int, offset int) ([]*Achievement, error)
 	VerifyRecoveryCode(ctx context.Context, input VerifyRecoveryCodeInput) (*VerifyRecoveryCodeOutput, error)
+	GetUserAchievements(ctx context.Context, input UserAchievmentsInput) (*UserAchievmentsOutput, error)
 	GetTopics(ctx context.Context, input GetTopicsInput) (*GetTopicsOutput, error)
 	GetMetatopics(ctx context.Context, input GetMetatopicsInput) (*GetMetatopicsOutput, error)
 }
@@ -584,7 +589,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetUserAchievements(childComplexity, args["userId"].(int), args["limit"].(int), args["offset"].(int)), true
+		return e.complexity.Query.GetUserAchievements(childComplexity, args["input"].(UserAchievmentsInput)), true
 
 	case "Query.verifyRecoveryCode":
 		if e.complexity.Query.VerifyRecoveryCode == nil {
@@ -780,6 +785,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Username(childComplexity), true
 
+	case "UserAchievmentsOutput.achievements":
+		if e.complexity.UserAchievmentsOutput.Achievements == nil {
+			break
+		}
+
+		return e.complexity.UserAchievmentsOutput.Achievements(childComplexity), true
+
+	case "UserAchievmentsOutput.error":
+		if e.complexity.UserAchievmentsOutput.Error == nil {
+			break
+		}
+
+		return e.complexity.UserAchievmentsOutput.Error(childComplexity), true
+
 	case "VerifyRecoveryCodeOutput.error":
 		if e.complexity.VerifyRecoveryCodeOutput.Error == nil {
 			break
@@ -809,6 +828,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdatePasswordInput,
 		ec.unmarshalInputUpdateTopicInput,
 		ec.unmarshalInputUpdateUserInput,
+		ec.unmarshalInputUserAchievmentsInput,
 		ec.unmarshalInputVerifyRecoveryCodeInput,
 	)
 	first := true
@@ -962,11 +982,13 @@ type Query {
         """ Получение статистики пользователя по играм и метатемам. Может вернуть ошибки: NOT_FOUND """
         getGamesStats(input: GetGamesStatsInput!): GetGamesStatsOutput!
 
-        """ Получение ачивок пользователя. """
-        getUserAchievements(userId: Int!, limit: Int!, offset: Int!): [Achievement!]!
-        
         """ Восстановление пароля - проверка кода восстановления. Может вернуть ошибки: VALIDATION, NOT_FOUND """
         verifyRecoveryCode(input: VerifyRecoveryCodeInput!): VerifyRecoveryCodeOutput!
+
+    """
+    Получение ачивок пользователя.
+    """
+    getUserAchievements(input: UserAchievmentsInput!): UserAchievmentsOutput!
 
     ##### Topics #####
         """ Получение списка тем. Может вернуть ошибки: NOT_FOUND"""
@@ -1115,6 +1137,18 @@ type Achievement {
   name: String!
   description: String!
   created_at: Time!
+}
+
+
+input UserAchievmentsInput {
+    userId: Int!
+    limit: Int!
+    offset: Int!
+}
+
+type UserAchievmentsOutput {
+    achievements: [Achievement!]!    
+    error: Error
 }
 `, BuiltIn: false},
 	{Name: "../schema/users/users.graphql", Input: `type User {
@@ -1631,86 +1665,32 @@ func (ec *executionContext) field_Query_getTopics_argsInput(
 func (ec *executionContext) field_Query_getUserAchievements_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	arg0, err := ec.field_Query_getUserAchievements_argsUserID(ctx, rawArgs)
+	arg0, err := ec.field_Query_getUserAchievements_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["userId"] = arg0
-	arg1, err := ec.field_Query_getUserAchievements_argsLimit(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["limit"] = arg1
-	arg2, err := ec.field_Query_getUserAchievements_argsOffset(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["offset"] = arg2
+	args["input"] = arg0
 	return args, nil
 }
-func (ec *executionContext) field_Query_getUserAchievements_argsUserID(
+func (ec *executionContext) field_Query_getUserAchievements_argsInput(
 	ctx context.Context,
 	rawArgs map[string]interface{},
-) (int, error) {
+) (UserAchievmentsInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
 	// even if the argument is null.
-	_, ok := rawArgs["userId"]
+	_, ok := rawArgs["input"]
 	if !ok {
-		var zeroVal int
+		var zeroVal UserAchievmentsInput
 		return zeroVal, nil
 	}
 
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-	if tmp, ok := rawArgs["userId"]; ok {
-		return ec.unmarshalNInt2int(ctx, tmp)
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUserAchievmentsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUserAchievmentsInput(ctx, tmp)
 	}
 
-	var zeroVal int
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Query_getUserAchievements_argsLimit(
-	ctx context.Context,
-	rawArgs map[string]interface{},
-) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["limit"]
-	if !ok {
-		var zeroVal int
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-	if tmp, ok := rawArgs["limit"]; ok {
-		return ec.unmarshalNInt2int(ctx, tmp)
-	}
-
-	var zeroVal int
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Query_getUserAchievements_argsOffset(
-	ctx context.Context,
-	rawArgs map[string]interface{},
-) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["offset"]
-	if !ok {
-		var zeroVal int
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-	if tmp, ok := rawArgs["offset"]; ok {
-		return ec.unmarshalNInt2int(ctx, tmp)
-	}
-
-	var zeroVal int
+	var zeroVal UserAchievmentsInput
 	return zeroVal, nil
 }
 
@@ -3775,71 +3755,6 @@ func (ec *executionContext) fieldContext_Query_getGamesStats(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getUserAchievements(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getUserAchievements(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetUserAchievements(rctx, fc.Args["userId"].(int), fc.Args["limit"].(int), fc.Args["offset"].(int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*Achievement)
-	fc.Result = res
-	return ec.marshalNAchievement2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAchievementᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_getUserAchievements(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Achievement_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Achievement_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Achievement_description(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Achievement_created_at(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Achievement", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getUserAchievements_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Query_verifyRecoveryCode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_verifyRecoveryCode(ctx, field)
 	if err != nil {
@@ -3893,6 +3808,67 @@ func (ec *executionContext) fieldContext_Query_verifyRecoveryCode(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_verifyRecoveryCode_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getUserAchievements(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUserAchievements(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUserAchievements(rctx, fc.Args["input"].(UserAchievmentsInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*UserAchievmentsOutput)
+	fc.Result = res
+	return ec.marshalNUserAchievmentsOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUserAchievmentsOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUserAchievements(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "achievements":
+				return ec.fieldContext_UserAchievmentsOutput_achievements(ctx, field)
+			case "error":
+				return ec.fieldContext_UserAchievmentsOutput_error(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserAchievmentsOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getUserAchievements_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5327,6 +5303,101 @@ func (ec *executionContext) fieldContext_User_imageUrl(_ context.Context, field 
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserAchievmentsOutput_achievements(ctx context.Context, field graphql.CollectedField, obj *UserAchievmentsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserAchievmentsOutput_achievements(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Achievements, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Achievement)
+	fc.Result = res
+	return ec.marshalNAchievement2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAchievementᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserAchievmentsOutput_achievements(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserAchievmentsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Achievement_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Achievement_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Achievement_description(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Achievement_created_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Achievement", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserAchievmentsOutput_error(ctx context.Context, field graphql.CollectedField, obj *UserAchievmentsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserAchievmentsOutput_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserAchievmentsOutput_error(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserAchievmentsOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Error does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7643,6 +7714,47 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUserAchievmentsInput(ctx context.Context, obj interface{}) (UserAchievmentsInput, error) {
+	var it UserAchievmentsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"userId", "limit", "offset"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "userId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "limit":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Limit = data
+		case "offset":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Offset = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputVerifyRecoveryCodeInput(ctx context.Context, obj interface{}) (VerifyRecoveryCodeInput, error) {
 	var it VerifyRecoveryCodeInput
 	asMap := map[string]interface{}{}
@@ -8262,7 +8374,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "getUserAchievements":
+		case "verifyRecoveryCode":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -8271,7 +8383,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getUserAchievements(ctx, field)
+				res = ec._Query_verifyRecoveryCode(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -8284,7 +8396,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "verifyRecoveryCode":
+		case "getUserAchievements":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -8293,7 +8405,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_verifyRecoveryCode(ctx, field)
+				res = ec._Query_getUserAchievements(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -8826,6 +8938,47 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var userAchievmentsOutputImplementors = []string{"UserAchievmentsOutput"}
+
+func (ec *executionContext) _UserAchievmentsOutput(ctx context.Context, sel ast.SelectionSet, obj *UserAchievmentsOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userAchievmentsOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserAchievmentsOutput")
+		case "achievements":
+			out.Values[i] = ec._UserAchievmentsOutput_achievements(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._UserAchievmentsOutput_error(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9848,6 +10001,25 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋdebateᚑioᚋservice
 		return graphql.Null
 	}
 	return ec._User(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUserAchievmentsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUserAchievmentsInput(ctx context.Context, v interface{}) (UserAchievmentsInput, error) {
+	res, err := ec.unmarshalInputUserAchievmentsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUserAchievmentsOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUserAchievmentsOutput(ctx context.Context, sel ast.SelectionSet, v UserAchievmentsOutput) graphql.Marshaler {
+	return ec._UserAchievmentsOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserAchievmentsOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUserAchievmentsOutput(ctx context.Context, sel ast.SelectionSet, v *UserAchievmentsOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserAchievmentsOutput(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNVerifyRecoveryCodeInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐVerifyRecoveryCodeInput(ctx context.Context, v interface{}) (VerifyRecoveryCodeInput, error) {

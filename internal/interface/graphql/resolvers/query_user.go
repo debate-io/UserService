@@ -50,11 +50,13 @@ func (q queryResolver) GetGamesStats(ctx context.Context, input gen.GetGamesStat
 	return output, nil
 }
 
-func (q queryResolver) GetUserAchievements(ctx context.Context, userId int, limit int, offset int) ([]*gen.Achievement, error) {
-	output, err := q.useCases.Users.GetAchievmentsByUserId(ctx, userId, limit, offset)
+func (q queryResolver) GetUserAchievements(ctx context.Context, input gen.UserAchievmentsInput) (*gen.UserAchievmentsOutput, error) {
+	output, err := q.useCases.Users.GetAchievmentsByUserId(ctx, input.UserID, input.Limit, input.Offset)
 	if err != nil {
 		return nil, NewResolverError("can't get user's achievs", err)
 	}
 
-	return output, nil
+	return &gen.UserAchievmentsOutput{
+		Achievements: output,
+	}, nil
 }
