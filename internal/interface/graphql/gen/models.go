@@ -199,6 +199,17 @@ type User struct {
 	ImageURL  string    `json:"imageUrl"`
 }
 
+type UserAchievmentsInput struct {
+	UserID int `json:"userId"`
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+}
+
+type UserAchievmentsOutput struct {
+	Achievements []*Achievement `json:"achievements"`
+	Error        *Error         `json:"error,omitempty"`
+}
+
 type VerifyRecoveryCodeInput struct {
 	Code  string `json:"code"`
 	Email string `json:"email"`

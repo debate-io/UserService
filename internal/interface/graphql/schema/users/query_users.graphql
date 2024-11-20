@@ -59,3 +59,15 @@ type Achievement {
   description: String!
   created_at: Time!
 }
+
+
+input UserAchievmentsInput {
+    userId: Int!
+    limit: Int!
+    offset: Int!
+}
+
+type UserAchievmentsOutput {
+    achievements: [Achievement!]!    
+    error: Error
+}
