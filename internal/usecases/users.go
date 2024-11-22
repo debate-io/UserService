@@ -189,7 +189,7 @@ func (u *User) GetGamesStats(
 
 	for metatopic, stat := range stat.MetaTopicStats {
 		element := &gen.MetatopicsStats{
-			Matatpoic:   metatopic,
+			MataTopic:   metatopic,
 			GamesAmount: stat.GamesAmount,
 			WinsAmout:   stat.WinsAmount,
 		}
@@ -198,7 +198,7 @@ func (u *User) GetGamesStats(
 			element.WinsPercents = 100. * float64(stat.WinsAmount) / float64(stat.GamesAmount)
 		}
 
-		result.MetatopicsStats = append(result.MetatopicsStats, element)
+		result.MetaTopicsStats = append(result.MetaTopicsStats, element)
 	}
 
 	return result, nil

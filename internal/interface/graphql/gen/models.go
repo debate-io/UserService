@@ -13,7 +13,7 @@ type Achievement struct {
 	ID          int       `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"created_at"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 type AuthenticateUserInput struct {
@@ -33,8 +33,8 @@ type GetGamesStatsInput struct {
 type GetGamesStatsOutput struct {
 	GamesAmount     int                `json:"gamesAmount"`
 	WinsAmout       int                `json:"winsAmout"`
-	WinsPercents    float64            `json:"WinsPercents"`
-	MetatopicsStats []*MetatopicsStats `json:"metatopicsStats,omitempty"`
+	WinsPercents    float64            `json:"winsPercents"`
+	MetaTopicsStats []*MetatopicsStats `json:"metaTopicsStats,omitempty"`
 	Error           *Error             `json:"error,omitempty"`
 }
 
@@ -79,10 +79,10 @@ type Metatopic struct {
 }
 
 type MetatopicsStats struct {
-	Matatpoic    string  `json:"matatpoic"`
+	MataTopic    string  `json:"mataTopic"`
 	GamesAmount  int     `json:"gamesAmount"`
 	WinsAmout    int     `json:"winsAmout"`
-	WinsPercents float64 `json:"WinsPercents"`
+	WinsPercents float64 `json:"winsPercents"`
 }
 
 type Mutation struct {
