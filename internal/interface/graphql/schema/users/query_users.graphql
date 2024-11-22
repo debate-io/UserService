@@ -37,17 +37,17 @@ input GetGamesStatsInput {
 }
 
 type MetatopicsStats {
-    matatpoic: String!
+    mataTopic: String!
     gamesAmount: Int!
     winsAmout: Int!
-    WinsPercents: Float!    
+    winsPercents: Float!    
 }
 
 type GetGamesStatsOutput {
     gamesAmount: Int!
     winsAmout: Int!
-    WinsPercents: Float!
-    metatopicsStats: [MetatopicsStats]
+    winsPercents: Float!
+    metaTopicsStats: [MetatopicsStats]
     error: Error
 }
 
@@ -57,7 +57,7 @@ type Achievement {
   id: Int!
   name: String!
   description: String!
-  created_at: Time!
+  createdAt: Time!
 }
 
 

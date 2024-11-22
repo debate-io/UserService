@@ -61,7 +61,7 @@ type ComplexityRoot struct {
 	GetGamesStatsOutput struct {
 		Error           func(childComplexity int) int
 		GamesAmount     func(childComplexity int) int
-		MetatopicsStats func(childComplexity int) int
+		MetaTopicsStats func(childComplexity int) int
 		WinsAmout       func(childComplexity int) int
 		WinsPercents    func(childComplexity int) int
 	}
@@ -93,7 +93,7 @@ type ComplexityRoot struct {
 
 	MetatopicsStats struct {
 		GamesAmount  func(childComplexity int) int
-		Matatpoic    func(childComplexity int) int
+		MataTopic    func(childComplexity int) int
 		WinsAmout    func(childComplexity int) int
 		WinsPercents func(childComplexity int) int
 	}
@@ -227,7 +227,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Achievement.created_at":
+	case "Achievement.createdAt":
 		if e.complexity.Achievement.CreatedAt == nil {
 			break
 		}
@@ -283,12 +283,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GetGamesStatsOutput.GamesAmount(childComplexity), true
 
-	case "GetGamesStatsOutput.metatopicsStats":
-		if e.complexity.GetGamesStatsOutput.MetatopicsStats == nil {
+	case "GetGamesStatsOutput.metaTopicsStats":
+		if e.complexity.GetGamesStatsOutput.MetaTopicsStats == nil {
 			break
 		}
 
-		return e.complexity.GetGamesStatsOutput.MetatopicsStats(childComplexity), true
+		return e.complexity.GetGamesStatsOutput.MetaTopicsStats(childComplexity), true
 
 	case "GetGamesStatsOutput.winsAmout":
 		if e.complexity.GetGamesStatsOutput.WinsAmout == nil {
@@ -297,7 +297,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GetGamesStatsOutput.WinsAmout(childComplexity), true
 
-	case "GetGamesStatsOutput.WinsPercents":
+	case "GetGamesStatsOutput.winsPercents":
 		if e.complexity.GetGamesStatsOutput.WinsPercents == nil {
 			break
 		}
@@ -402,12 +402,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MetatopicsStats.GamesAmount(childComplexity), true
 
-	case "MetatopicsStats.matatpoic":
-		if e.complexity.MetatopicsStats.Matatpoic == nil {
+	case "MetatopicsStats.mataTopic":
+		if e.complexity.MetatopicsStats.MataTopic == nil {
 			break
 		}
 
-		return e.complexity.MetatopicsStats.Matatpoic(childComplexity), true
+		return e.complexity.MetatopicsStats.MataTopic(childComplexity), true
 
 	case "MetatopicsStats.winsAmout":
 		if e.complexity.MetatopicsStats.WinsAmout == nil {
@@ -416,7 +416,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MetatopicsStats.WinsAmout(childComplexity), true
 
-	case "MetatopicsStats.WinsPercents":
+	case "MetatopicsStats.winsPercents":
 		if e.complexity.MetatopicsStats.WinsPercents == nil {
 			break
 		}
@@ -1116,17 +1116,17 @@ input GetGamesStatsInput {
 }
 
 type MetatopicsStats {
-    matatpoic: String!
+    mataTopic: String!
     gamesAmount: Int!
     winsAmout: Int!
-    WinsPercents: Float!    
+    winsPercents: Float!    
 }
 
 type GetGamesStatsOutput {
     gamesAmount: Int!
     winsAmout: Int!
-    WinsPercents: Float!
-    metatopicsStats: [MetatopicsStats]
+    winsPercents: Float!
+    metaTopicsStats: [MetatopicsStats]
     error: Error
 }
 
@@ -1136,7 +1136,7 @@ type Achievement {
   id: Int!
   name: String!
   description: String!
-  created_at: Time!
+  createdAt: Time!
 }
 
 
@@ -1962,8 +1962,8 @@ func (ec *executionContext) fieldContext_Achievement_description(_ context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Achievement_created_at(ctx context.Context, field graphql.CollectedField, obj *Achievement) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Achievement_created_at(ctx, field)
+func (ec *executionContext) _Achievement_createdAt(ctx context.Context, field graphql.CollectedField, obj *Achievement) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Achievement_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1993,7 +1993,7 @@ func (ec *executionContext) _Achievement_created_at(ctx context.Context, field g
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Achievement_created_at(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Achievement_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Achievement",
 		Field:      field,
@@ -2176,8 +2176,8 @@ func (ec *executionContext) fieldContext_GetGamesStatsOutput_winsAmout(_ context
 	return fc, nil
 }
 
-func (ec *executionContext) _GetGamesStatsOutput_WinsPercents(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GetGamesStatsOutput_WinsPercents(ctx, field)
+func (ec *executionContext) _GetGamesStatsOutput_winsPercents(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetGamesStatsOutput_winsPercents(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2207,7 +2207,7 @@ func (ec *executionContext) _GetGamesStatsOutput_WinsPercents(ctx context.Contex
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_GetGamesStatsOutput_WinsPercents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_GetGamesStatsOutput_winsPercents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "GetGamesStatsOutput",
 		Field:      field,
@@ -2220,8 +2220,8 @@ func (ec *executionContext) fieldContext_GetGamesStatsOutput_WinsPercents(_ cont
 	return fc, nil
 }
 
-func (ec *executionContext) _GetGamesStatsOutput_metatopicsStats(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GetGamesStatsOutput_metatopicsStats(ctx, field)
+func (ec *executionContext) _GetGamesStatsOutput_metaTopicsStats(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GetGamesStatsOutput_metaTopicsStats(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2234,7 +2234,7 @@ func (ec *executionContext) _GetGamesStatsOutput_metatopicsStats(ctx context.Con
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.MetatopicsStats, nil
+		return obj.MetaTopicsStats, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2248,7 +2248,7 @@ func (ec *executionContext) _GetGamesStatsOutput_metatopicsStats(ctx context.Con
 	return ec.marshalOMetatopicsStats2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐMetatopicsStats(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_GetGamesStatsOutput_metatopicsStats(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_GetGamesStatsOutput_metaTopicsStats(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "GetGamesStatsOutput",
 		Field:      field,
@@ -2256,14 +2256,14 @@ func (ec *executionContext) fieldContext_GetGamesStatsOutput_metatopicsStats(_ c
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "matatpoic":
-				return ec.fieldContext_MetatopicsStats_matatpoic(ctx, field)
+			case "mataTopic":
+				return ec.fieldContext_MetatopicsStats_mataTopic(ctx, field)
 			case "gamesAmount":
 				return ec.fieldContext_MetatopicsStats_gamesAmount(ctx, field)
 			case "winsAmout":
 				return ec.fieldContext_MetatopicsStats_winsAmout(ctx, field)
-			case "WinsPercents":
-				return ec.fieldContext_MetatopicsStats_WinsPercents(ctx, field)
+			case "winsPercents":
+				return ec.fieldContext_MetatopicsStats_winsPercents(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MetatopicsStats", field.Name)
 		},
@@ -2908,8 +2908,8 @@ func (ec *executionContext) fieldContext_Metatopic_createdAt(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _MetatopicsStats_matatpoic(ctx context.Context, field graphql.CollectedField, obj *MetatopicsStats) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MetatopicsStats_matatpoic(ctx, field)
+func (ec *executionContext) _MetatopicsStats_mataTopic(ctx context.Context, field graphql.CollectedField, obj *MetatopicsStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetatopicsStats_mataTopic(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2922,7 +2922,7 @@ func (ec *executionContext) _MetatopicsStats_matatpoic(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Matatpoic, nil
+		return obj.MataTopic, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2939,7 +2939,7 @@ func (ec *executionContext) _MetatopicsStats_matatpoic(ctx context.Context, fiel
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_MetatopicsStats_matatpoic(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MetatopicsStats_mataTopic(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MetatopicsStats",
 		Field:      field,
@@ -3040,8 +3040,8 @@ func (ec *executionContext) fieldContext_MetatopicsStats_winsAmout(_ context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _MetatopicsStats_WinsPercents(ctx context.Context, field graphql.CollectedField, obj *MetatopicsStats) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MetatopicsStats_WinsPercents(ctx, field)
+func (ec *executionContext) _MetatopicsStats_winsPercents(ctx context.Context, field graphql.CollectedField, obj *MetatopicsStats) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MetatopicsStats_winsPercents(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3071,7 +3071,7 @@ func (ec *executionContext) _MetatopicsStats_WinsPercents(ctx context.Context, f
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_MetatopicsStats_WinsPercents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MetatopicsStats_winsPercents(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MetatopicsStats",
 		Field:      field,
@@ -3731,10 +3731,10 @@ func (ec *executionContext) fieldContext_Query_getGamesStats(ctx context.Context
 				return ec.fieldContext_GetGamesStatsOutput_gamesAmount(ctx, field)
 			case "winsAmout":
 				return ec.fieldContext_GetGamesStatsOutput_winsAmout(ctx, field)
-			case "WinsPercents":
-				return ec.fieldContext_GetGamesStatsOutput_WinsPercents(ctx, field)
-			case "metatopicsStats":
-				return ec.fieldContext_GetGamesStatsOutput_metatopicsStats(ctx, field)
+			case "winsPercents":
+				return ec.fieldContext_GetGamesStatsOutput_winsPercents(ctx, field)
+			case "metaTopicsStats":
+				return ec.fieldContext_GetGamesStatsOutput_metaTopicsStats(ctx, field)
 			case "error":
 				return ec.fieldContext_GetGamesStatsOutput_error(ctx, field)
 			}
@@ -5353,8 +5353,8 @@ func (ec *executionContext) fieldContext_UserAchievmentsOutput_achievements(_ co
 				return ec.fieldContext_Achievement_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Achievement_description(ctx, field)
-			case "created_at":
-				return ec.fieldContext_Achievement_created_at(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Achievement_createdAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Achievement", field.Name)
 		},
@@ -7823,8 +7823,8 @@ func (ec *executionContext) _Achievement(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "created_at":
-			out.Values[i] = ec._Achievement_created_at(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._Achievement_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -7910,13 +7910,13 @@ func (ec *executionContext) _GetGamesStatsOutput(ctx context.Context, sel ast.Se
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "WinsPercents":
-			out.Values[i] = ec._GetGamesStatsOutput_WinsPercents(ctx, field, obj)
+		case "winsPercents":
+			out.Values[i] = ec._GetGamesStatsOutput_winsPercents(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "metatopicsStats":
-			out.Values[i] = ec._GetGamesStatsOutput_metatopicsStats(ctx, field, obj)
+		case "metaTopicsStats":
+			out.Values[i] = ec._GetGamesStatsOutput_metaTopicsStats(ctx, field, obj)
 		case "error":
 			out.Values[i] = ec._GetGamesStatsOutput_error(ctx, field, obj)
 		default:
@@ -8148,8 +8148,8 @@ func (ec *executionContext) _MetatopicsStats(ctx context.Context, sel ast.Select
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MetatopicsStats")
-		case "matatpoic":
-			out.Values[i] = ec._MetatopicsStats_matatpoic(ctx, field, obj)
+		case "mataTopic":
+			out.Values[i] = ec._MetatopicsStats_mataTopic(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -8163,8 +8163,8 @@ func (ec *executionContext) _MetatopicsStats(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "WinsPercents":
-			out.Values[i] = ec._MetatopicsStats_WinsPercents(ctx, field, obj)
+		case "winsPercents":
+			out.Values[i] = ec._MetatopicsStats_winsPercents(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
