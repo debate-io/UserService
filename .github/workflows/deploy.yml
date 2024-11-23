@@ -47,4 +47,4 @@ jobs:
           
           echo "Building and restarting Docker Compose..."
           cd /var/www/deploy/
-          docker compose -f docker-compose-services.yml restart
+          docker compose -f docker-compose-services.yml up user_service -d --build
