@@ -1,4 +1,4 @@
-name: Deploy Go App
+name: Deploy User Service
 
 on:
   push:
@@ -9,29 +9,24 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Шаг 1: Пул репозитория
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # Шаг 2: Установка Go
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.23'
 
-    # Шаг 3: Линтинг
     - name: Run Go linter
       run: |
         go install golang.org/x/lint/golint@latest
         golint ./...
 
-    # Шаг 4: Запуск тестов
     - name: Run Go tests
       run: |
         go test ./... -v
         
-    # Шаг 5: Подключение по SSH и деплой
     - name: Deploy application via SSH
       uses: appleboy/ssh-action@v0.1.3
       with:
@@ -44,6 +39,8 @@ jobs:
           echo "Cloning the repository..."
           cd /var/www/deploy/code/UserService/ || (mkdir /var/www/deploy/code/UserService/ && cd /var/www/deploy/code/UserService/)
           git fetch --all
+          echo "Checkout to ${{ github.sha }}"
+          git checkout ${{ github.sha }}
           
           echo "Building and restarting Docker Compose..."
           cd /var/www/deploy/
