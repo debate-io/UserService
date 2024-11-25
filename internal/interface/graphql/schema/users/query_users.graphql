@@ -36,18 +36,18 @@ input GetGamesStatsInput {
     userId: Int!
 }
 
-type MetatopicsStats {
-    mataTopic: String!
+type MetaTopicsStats {
+    metaTopic: String!
     gamesAmount: Int!
-    winsAmout: Int!
+    winsAmount: Int!
     winsPercents: Float!    
 }
 
 type GetGamesStatsOutput {
     gamesAmount: Int!
-    winsAmout: Int!
+    winsAmount: Int!
     winsPercents: Float!
-    metaTopicsStats: [MetatopicsStats]
+    metaTopicsStats: [MetaTopicsStats]
     error: Error
 }
 
@@ -61,13 +61,13 @@ type Achievement {
 }
 
 
-input UserAchievmentsInput {
+input UserAchievementsInput {
     userId: Int!
     limit: Int!
     offset: Int!
 }
 
-type UserAchievmentsOutput {
+type UserAchievementsOutput {
     achievements: [Achievement!]!    
     error: Error
 }
