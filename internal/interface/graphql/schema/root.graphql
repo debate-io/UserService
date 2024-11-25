@@ -48,7 +48,7 @@ type Query {
     """
     Получение ачивок пользователя.
     """
-    getUserAchievements(input: UserAchievmentsInput!): UserAchievmentsOutput!
+    getUserAchievements(input: UserAchievementsInput!): UserAchievementsOutput!
 
     ##### Topics #####
         """ Получение списка тем. Может вернуть ошибки: NOT_FOUND"""

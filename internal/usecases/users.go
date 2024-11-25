@@ -181,17 +181,17 @@ func (u *User) GetGamesStats(
 
 	result := &gen.GetGamesStatsOutput{
 		GamesAmount: stat.TotalGamesStats.GamesAmount,
-		WinsAmout:   stat.TotalGamesStats.WinsAmount,
+		WinsAmount:  stat.TotalGamesStats.WinsAmount,
 	}
 	if stat.TotalGamesStats.GamesAmount != 0 {
 		result.WinsPercents = 100. * float64(stat.TotalGamesStats.WinsAmount) / float64(stat.TotalGamesStats.GamesAmount)
 	}
 
 	for metatopic, stat := range stat.MetaTopicStats {
-		element := &gen.MetatopicsStats{
-			MataTopic:   metatopic,
+		element := &gen.MetaTopicsStats{
+			MetaTopic:   metatopic,
 			GamesAmount: stat.GamesAmount,
-			WinsAmout:   stat.WinsAmount,
+			WinsAmount:  stat.WinsAmount,
 		}
 
 		if stat.GamesAmount != 0 {

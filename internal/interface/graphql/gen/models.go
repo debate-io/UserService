@@ -32,9 +32,9 @@ type GetGamesStatsInput struct {
 
 type GetGamesStatsOutput struct {
 	GamesAmount     int                `json:"gamesAmount"`
-	WinsAmout       int                `json:"winsAmout"`
+	WinsAmount      int                `json:"winsAmount"`
 	WinsPercents    float64            `json:"winsPercents"`
-	MetaTopicsStats []*MetatopicsStats `json:"metaTopicsStats,omitempty"`
+	MetaTopicsStats []*MetaTopicsStats `json:"metaTopicsStats,omitempty"`
 	Error           *Error             `json:"error,omitempty"`
 }
 
@@ -72,17 +72,17 @@ type GetUserOutput struct {
 	Error *Error `json:"error,omitempty"`
 }
 
+type MetaTopicsStats struct {
+	MetaTopic    string  `json:"metaTopic"`
+	GamesAmount  int     `json:"gamesAmount"`
+	WinsAmount   int     `json:"winsAmount"`
+	WinsPercents float64 `json:"winsPercents"`
+}
+
 type Metatopic struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"createdAt"`
-}
-
-type MetatopicsStats struct {
-	MataTopic    string  `json:"mataTopic"`
-	GamesAmount  int     `json:"gamesAmount"`
-	WinsAmout    int     `json:"winsAmout"`
-	WinsPercents float64 `json:"winsPercents"`
 }
 
 type Mutation struct {
@@ -199,13 +199,13 @@ type User struct {
 	ImageURL  string    `json:"imageUrl"`
 }
 
-type UserAchievmentsInput struct {
+type UserAchievementsInput struct {
 	UserID int `json:"userId"`
 	Limit  int `json:"limit"`
 	Offset int `json:"offset"`
 }
 
-type UserAchievmentsOutput struct {
+type UserAchievementsOutput struct {
 	Achievements []*Achievement `json:"achievements"`
 	Error        *Error         `json:"error,omitempty"`
 }
