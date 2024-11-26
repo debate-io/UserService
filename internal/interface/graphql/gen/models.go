@@ -182,6 +182,8 @@ type UpdateUserInput struct {
 	ID       int     `json:"id"`
 	Username *string `json:"username,omitempty"`
 	ImageID  *int    `json:"imageId,omitempty"`
+	Password *string `json:"password,omitempty"`
+	Email    *string `json:"email,omitempty"`
 }
 
 type UpdateUserOutput struct {
