@@ -38,6 +38,8 @@ input UpdateUserInput {
     id: Int!
     username: String
     imageId: Int
+    password: String
+    email: String
 }
 
 type UpdateUserOutput {

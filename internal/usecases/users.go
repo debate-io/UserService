@@ -231,6 +231,16 @@ func (u *User) UpdateUser(
 	if input.ImageID != nil {
 		user.Image.ID = *input.ImageID
 	}
+	if input.Password != nil {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*input.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return nil, err
+		}
+		user.Password = string(hashedPassword)
+	}
+	if input.Email != nil {
+		user.Email = *input.Email
+	}
 
 	if err := user.Validate(); err != nil {
 		return &gen.UpdateUserOutput{
