@@ -82,6 +82,27 @@ func (t *Topic) GetTopics(
 	return t.topicRepo.GetTopics(ctx, topicStatuses, pageSize, pageNumber)
 }
 
+func (t *Topic) GetTopic(
+	ctx context.Context,
+	topicId int,
+) (*model.TopicMetatopics, error) {
+	claims := ctx.Value(middleware.JwtClaimsKey).(*model.Claims)
+	if claims == nil {
+		return nil, repo.ErrUnauthorized
+	}
+
+	role := claims.Role
+	if role != model.RoleAdmin && role != model.RoleContentManager && role != model.RoleDefaultUser {
+		return nil, repo.ErrUnauthorized
+	}
+
+	if topicId <= 0 {
+		return nil, repo.ErrValidation
+	}
+
+	return t.topicRepo.GetTopic(ctx, topicId)
+}
+
 func (t *Topic) GetMetatopics(
 	ctx context.Context,
 	pageSize, pageNumber int,

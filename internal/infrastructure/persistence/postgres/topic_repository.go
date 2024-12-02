@@ -111,6 +111,35 @@ func (t *TopicRepository) GetTopics(ctx context.Context, topicStatuses []model.A
 	return result, rows, nil
 }
 
+func (t *TopicRepository) GetTopic(ctx context.Context, topicId int) (*model.TopicMetatopics, error) {
+	topic := model.Topic{
+		ID: topicId,
+	}
+
+	err := t.db.ModelContext(ctx).
+		Select(&topic)
+	if err != nil {
+		if isNoRowsError(err) {
+			return nil, repo.ErrAlreadyExist
+		}
+		return nil, tracerr.New("failed get topics")
+	}
+
+	var metatopics []model.Metatopic
+	err = t.db.ModelContext(ctx, &metatopics).
+		Join("JOIN metatopics_topics mt ON mt.metatopics_id = metatopic.id").
+		Where("mt.topics_id = ?", topic.ID).
+		Select()
+	if err != nil {
+		return nil, tracerr.New("failed get topics")
+	}
+
+	return &model.TopicMetatopics{
+		Topic:      topic,
+		Metatopics: metatopics,
+	}, nil
+}
+
 func (t *TopicRepository) GetMetatopics(ctx context.Context, pageSize, pageNumber int) ([]*model.Metatopic, int, error) {
 	var metatopics []*model.Metatopic
 
