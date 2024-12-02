@@ -51,8 +51,11 @@ type Query {
     getUserAchievements(input: UserAchievementsInput!): UserAchievementsOutput!
 
     ##### Topics #####
-        """ Получение списка тем. Может вернуть ошибки: NOT_FOUND"""
+        """ Получение списка тем. Может вернуть ошибки: NOT_FOUND, VALIDATION"""
         getTopics(input: GetTopicsInput!): GetTopicsOutput!
+
+        """ Получение темы по идентификатору. Может вернуть ошибки: NOT_FOUND, UNAUTHORIZED, VALIDATION"""
+        getTopic(input: GetTopicInput!): GetTopicOutput!
 
         """ Получение списка метатем. Может вернуть ошибки: NOT_FOUND"""
         getMetatopics(input: GetMetatopicsInput!): GetMetatopicsOutput!

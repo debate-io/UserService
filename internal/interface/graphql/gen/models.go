@@ -50,6 +50,15 @@ type GetMetatopicsOutput struct {
 	Metatopics []*Metatopic `json:"metatopics"`
 }
 
+type GetTopicInput struct {
+	ID int `json:"id"`
+}
+
+type GetTopicOutput struct {
+	Topic *TopicMetatopics `json:"topic,omitempty"`
+	Error *Error           `json:"error,omitempty"`
+}
+
 type GetTopicsInput struct {
 	PageSize    int           `json:"pageSize"`
 	PageNumber  int           `json:"pageNumber"`

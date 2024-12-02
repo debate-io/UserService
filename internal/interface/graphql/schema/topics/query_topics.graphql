@@ -11,7 +11,18 @@ type GetTopicsOutput {
     topics: [TopicMetatopics!]!
 }
 
-#########################################3
+#########################################
+
+input GetTopicInput {
+    id: Int!
+}
+
+type GetTopicOutput {
+    topic: TopicMetatopics
+    error: Error
+}
+
+#########################################
 
 input GetMetatopicsInput {
     pageSize: Int!
