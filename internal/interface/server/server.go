@@ -80,8 +80,13 @@ func (s *Server) InitRoutes(container *registry.Container, isDebug bool) {
 	)
 
 	graphqlHandler.Use(extension.Introspection{})
+	restHandler := handlers.NewRestHandler(s.logger, container.UseCases, isDebug)
 
 	s.router.Handle("/*", graphqlHandler)
+	s.router.Route(string(handlers.ImageUrl), func(r chi.Router) {
+		r.Put("/", restHandler.PutImageHandler)
+		r.Get("/", restHandler.GetImageHandler)
+	})
 }
 
 func (s *Server) ListenAndServe(address string, shutdownInitiated func()) error {

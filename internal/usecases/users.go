@@ -1,8 +1,10 @@
 package usecases
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
 
 	"math/rand"
 	"time"
@@ -14,7 +16,14 @@ import (
 	"github.com/debate-io/service-auth/internal/interface/graphql/gen"
 	"github.com/debate-io/service-auth/internal/interface/server/middleware"
 	"github.com/debate-io/service-auth/internal/usecases/mappers"
+	murmur "github.com/whadron/go-murmurhash3"
+	"github.com/ztrue/tracerr"
 	"golang.org/x/crypto/bcrypt"
+
+	"image"
+	_ "image/gif"  // Подключаем пакеты для поддерживаемых форматов
+	_ "image/jpeg" // JPEG
+	_ "image/png"  // PNG
 )
 
 const (
@@ -423,6 +432,23 @@ func (u *User) ResetPassword(ctx context.Context, input gen.ResetPasswordInput) 
 	return &gen.ResetPasswordOutput{}, nil
 }
 
+func (u *User) UploadImage(ctx context.Context, userId int, image []byte) error {
+	contentType, err := getContentType(image)
+	if err != nil {
+		return tracerr.Wrap(err)
+	}
+
+	return u.userRepo.UploadImage(ctx, userId, image, getHash(image), contentType)
+}
+
+func (u *User) DownloadImage(ctx context.Context, userId int) ([]byte, error) {
+	image, err := u.userRepo.DownloadImage(ctx, userId)
+	if err != nil {
+		return nil, tracerr.Wrap(err)
+	}
+	return image, nil
+}
+
 func generateCode(length int) string {
 	code := make([]byte, length)
 
@@ -431,4 +457,17 @@ func generateCode(length int) string {
 	}
 
 	return string(code)
+}
+
+func getHash(file []byte) string {
+	mur := murmur.NewX64_128(1)
+	return string(mur.Sum(file))
+}
+func getContentType(file []byte) (string, error) {
+	reader := bytes.NewReader(file)
+	_, format, err := image.DecodeConfig(reader) // Определяем конфигурацию изображения
+	if err != nil {
+		return "", fmt.Errorf("не удалось определить формат изображения: %w", err)
+	}
+	return format, nil
 }

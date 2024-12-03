@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"time"
 
 	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
@@ -84,4 +85,40 @@ func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User,
 	}
 
 	return result, nil
+}
+
+func (u *UserRepository) UploadImage(
+	ctx context.Context,
+	userId int,
+	image []byte,
+	hash, contentType string,
+) error {
+	newImage := model.Image{
+		Hash:        hash,
+		ContentType: contentType,
+		File:        []byte{},
+		CreatedAt:   time.Time{},
+		UpdatedAt:   time.Time{},
+	}
+
+	_, err := u.db.ModelContext(ctx, &model.User{
+		ID:    userId,
+		Image: &newImage,
+	}).
+		Column("image_id").
+		WherePK().
+		Update()
+
+	return err
+}
+func (u *UserRepository) DownloadImage(ctx context.Context, userId int) ([]byte, error) {
+	user := model.User{
+		ID: userId,
+	}
+
+	err := u.db.ModelContext(ctx).Select(&user)
+	if err != nil {
+		return nil, tracerr.Wrap(err)
+	}
+	return user.Image.File, nil
 }
