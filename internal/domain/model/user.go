@@ -18,6 +18,7 @@ const (
 type Image struct {
 	tableName   struct{}  `pg:"images"`
 	ID          int       `pg:"id,pk"`
+	Hash        string    `pg:"hash"`
 	ContentType string    `pg:"content_type"`
 	File        []byte    `pg:"file"`
 	CreatedAt   time.Time `pg:"created_at"`
