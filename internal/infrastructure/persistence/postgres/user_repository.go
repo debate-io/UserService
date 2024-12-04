@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/debate-io/service-auth/internal/domain/model"
@@ -90,35 +91,52 @@ func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User,
 func (u *UserRepository) UploadImage(
 	ctx context.Context,
 	userId int,
-	image []byte,
-	hash, contentType string,
+	image, hash []byte,
+	contentType string,
 ) error {
 	newImage := model.Image{
 		Hash:        hash,
 		ContentType: contentType,
-		File:        []byte{},
+		File:        image,
 		CreatedAt:   time.Time{},
 		UpdatedAt:   time.Time{},
 	}
 
-	_, err := u.db.ModelContext(ctx, &model.User{
-		ID:    userId,
-		Image: &newImage,
-	}).
-		Column("image_id").
-		WherePK().
-		Update()
-
-	return err
-}
-func (u *UserRepository) DownloadImage(ctx context.Context, userId int) ([]byte, error) {
-	user := model.User{
-		ID: userId,
-	}
-
-	err := u.db.ModelContext(ctx).Select(&user)
+	tx, err := u.db.Begin()
 	if err != nil {
-		return nil, tracerr.Wrap(err)
+		tx.Rollback()
+		return tracerr.Wrap(err)
 	}
-	return user.Image.File, nil
+
+	_, err = tx.ModelContext(ctx, &newImage).Insert()
+	if err != nil {
+		tx.Rollback()
+		return tracerr.Wrap(err)
+	}
+
+	_, err = tx.ModelContext(ctx, &model.User{}).
+		Set("image_id = ?", newImage.ID).
+		Where("id = ?", userId).
+		Update()
+	fmt.Println(err)
+
+	if err != nil {
+		tx.Rollback()
+		return tracerr.Wrap(err)
+	}
+
+	tx.Commit()
+	return nil
+}
+func (u *UserRepository) DownloadImage(ctx context.Context, userId int) ([]byte, string, error) {
+	user := model.User{}
+
+	err := u.db.ModelContext(ctx, &user).
+		Relation("Image").
+		Where("\"user\".\"id\" = ?", userId).
+		Select()
+	if err != nil {
+		return nil, "", tracerr.Wrap(err)
+	}
+	return user.Image.File, user.Image.ContentType, nil
 }

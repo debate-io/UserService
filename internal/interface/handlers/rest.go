@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -55,13 +56,14 @@ func (h *RestHandler) GetImageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	image, err := h.usecases.Users.DownloadImage(r.Context(), int(id))
+	image, contentType, err := h.usecases.Users.DownloadImage(r.Context(), int(id))
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, tracerr.Unwrap(err).Error(), http.StatusNoContent)
 		return
 	}
 
-	w.Header().Add("Content-Type", "multipart/form-data")
+	w.Header().Add("Content-Type", fmt.Sprintf("image/%s", contentType))
 	w.WriteHeader(http.StatusOK)
 	w.Write(image)
 }
