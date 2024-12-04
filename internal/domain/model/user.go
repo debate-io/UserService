@@ -18,7 +18,7 @@ const (
 type Image struct {
 	tableName   struct{}  `pg:"images"`
 	ID          int       `pg:"id,pk"`
-	Hash        string    `pg:"hash"`
+	Hash        []byte    `pg:"hash"`
 	ContentType string    `pg:"content_type"`
 	File        []byte    `pg:"file"`
 	CreatedAt   time.Time `pg:"created_at"`
@@ -34,7 +34,8 @@ type User struct {
 	Password  string    `pg:"password"`
 	CreatedAt time.Time `pg:"created_at"`
 	UpdatedAt time.Time `pg:"updated_at"`
-	Image     *Image    `pg:"image_id, rel:has-one"`
+	ImageId   int       `pg:"image_id"`
+	Image     *Image    `pg:"fk:image_id,rel:has-one"`
 }
 
 // Валидация полей структуры User

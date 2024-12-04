@@ -438,15 +438,19 @@ func (u *User) UploadImage(ctx context.Context, userId int, image []byte) error 
 		return tracerr.Wrap(err)
 	}
 
-	return u.userRepo.UploadImage(ctx, userId, image, getHash(image), contentType)
+	err = u.userRepo.UploadImage(ctx, userId, image, getHash(image), contentType)
+	if err != nil {
+		return tracerr.Wrap(err)
+	}
+	return nil
 }
 
-func (u *User) DownloadImage(ctx context.Context, userId int) ([]byte, error) {
-	image, err := u.userRepo.DownloadImage(ctx, userId)
+func (u *User) DownloadImage(ctx context.Context, userId int) ([]byte, string, error) {
+	image, contentType, err := u.userRepo.DownloadImage(ctx, userId)
 	if err != nil {
-		return nil, tracerr.Wrap(err)
+		return nil, "", tracerr.Wrap(err)
 	}
-	return image, nil
+	return image, contentType, nil
 }
 
 func generateCode(length int) string {
@@ -459,9 +463,8 @@ func generateCode(length int) string {
 	return string(code)
 }
 
-func getHash(file []byte) string {
-	mur := murmur.NewX64_128(1)
-	return string(mur.Sum(file))
+func getHash(file []byte) []byte {
+	return murmur.NewX64_128(1).Sum(file)
 }
 func getContentType(file []byte) (string, error) {
 	reader := bytes.NewReader(file)
