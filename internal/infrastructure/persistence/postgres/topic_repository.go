@@ -116,8 +116,8 @@ func (t *TopicRepository) GetTopic(ctx context.Context, topicId int) (*model.Top
 		ID: topicId,
 	}
 
-	err := t.db.ModelContext(ctx).
-		Select(&topic)
+	err := t.db.ModelContext(ctx, &topic).
+		Select()
 	if err != nil {
 		if isNoRowsError(err) {
 			return nil, repo.ErrAlreadyExist
