@@ -54,7 +54,7 @@ func (s *Server) InitMiddlewares(isDebug bool, auth *auth.AuthService) {
 	s.router.Use(middleware.AuthMiddleware(auth))
 
 	options := cors.Options{
-		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "PUT", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
