@@ -60,7 +60,8 @@ func (u *UserRepository) UpdateUser(ctx context.Context, user *model.User) (*mod
 func (u *UserRepository) FindUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	result := &model.User{}
 	q := u.db.ModelContext(ctx, result).
-		Where("email = ?", email)
+		Relation("Image").
+		Where("\"user\".\"email\" = ?", email)
 
 	if err := q.Select(); err != nil {
 		if isNoRowsError(err) {
@@ -75,7 +76,9 @@ func (u *UserRepository) FindUserByEmail(ctx context.Context, email string) (*mo
 
 func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User, error) {
 	result := &model.User{}
-	q := u.db.ModelContext(ctx, result).Where("id = ?", id)
+	q := u.db.ModelContext(ctx, result).
+		Relation("Image").
+		Where("\"user\".\"id\" = ?", id)
 
 	if err := q.Select(); err != nil {
 		if isNoRowsError(err) {
