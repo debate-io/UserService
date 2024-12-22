@@ -29,6 +29,12 @@ type Mutation {
 
         """ Обновление текущих тем. Может вернуть ошибки: NOT_FOUND, VALIDATION """
         updateTopics(input: UpdateTopicInput!): UpdateTopicOutput!
+    ##### Games #####
+        """ Запрос на начало игры. """
+        startGame(input: StartGameInput!): StartGameOutput!
+
+        """ Оповещение об окончании игры. """
+        finishGame(input: FinishGameInput!): FinishGameOutput!
 }
 
 type Query {
@@ -59,4 +65,9 @@ type Query {
 
         """ Получение списка метатем. Может вернуть ошибки: NOT_FOUND"""
         getMetatopics(input: GetMetatopicsInput!): GetMetatopicsOutput!
+
+    ##### Games #####
+        """ Получение статуса игры. """
+        GetGameStatus(input: GameStatusInput!): GameStatusOutput!
+
 }

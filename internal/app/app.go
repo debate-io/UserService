@@ -117,12 +117,14 @@ func (app *App) NewContainer(authService *auth.AuthService) *registry.Container 
 	recoveryCodeRepo := postgres.NewRecoveryCodeRepository(app.DB)
 	gameStatsRepository := postgres.NewGameStatsRepository(app.DB)
 	achievementRepository := postgres.NewAchievementRepository(app.DB)
+	gameRepository := postgres.NewGameRepository()
 
 	topicRepo := postgres.NewTopicRepository(app.DB)
 
 	useCases := &registry.UseCases{
 		Users:  usecases.NewUserUseCases(userRepo, recoveryCodeRepo, gameStatsRepository, achievementRepository, app.SmtpSender, authService),
 		Topics: usecases.NewTopicUseCase(topicRepo),
+		Games:  usecases.NewGameUseCase(gameRepository),
 	}
 
 	return &registry.Container{UseCases: useCases, Logger: app.Logger}

@@ -3,7 +3,7 @@ module github.com/debate-io/service-auth
 go 1.23
 
 require (
-	github.com/99designs/gqlgen v0.17.57
+	github.com/99designs/gqlgen v0.17.61
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/cors v1.2.0
 	github.com/go-chi/render v1.0.1
@@ -14,7 +14,8 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/inhies/go-bytesize v0.0.0-20210819104631-275770b98743
 	github.com/joho/godotenv v1.4.0
-	github.com/vektah/gqlparser/v2 v2.5.19
+	github.com/vektah/gqlparser/v2 v2.5.20
+	github.com/whadron/go-murmurhash3 v0.0.0-20160918122457-1e729dda1559
 	github.com/ztrue/tracerr v0.3.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.27.0
@@ -23,7 +24,7 @@ require (
 )
 
 require (
-	github.com/agnivade/levenshtein v1.1.1 // indirect
+	github.com/agnivade/levenshtein v1.2.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
 	github.com/codemodus/kace v0.5.1 // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
@@ -47,11 +48,10 @@ require (
 	github.com/vmihailenco/bufpool v0.1.11 // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
 	github.com/vmihailenco/tagparser v0.1.1 // indirect
-	github.com/whadron/go-murmurhash3 v0.0.0-20160918122457-1e729dda1559 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect

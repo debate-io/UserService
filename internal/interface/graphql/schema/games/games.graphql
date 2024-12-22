@@ -1,0 +1,7 @@
+type GameStatus {
+    Id: Int!
+    Status: String!
+    WinnerId: Int
+    StartAt: Time!
+    FinishAt: Time!
+}

@@ -58,6 +58,24 @@ type ComplexityRoot struct {
 		Jwt   func(childComplexity int) int
 	}
 
+	FinishGameOutput struct {
+		ID         func(childComplexity int) int
+		ResultText func(childComplexity int) int
+		WinnerID   func(childComplexity int) int
+	}
+
+	GameStatus struct {
+		FinishAt func(childComplexity int) int
+		ID       func(childComplexity int) int
+		StartAt  func(childComplexity int) int
+		Status   func(childComplexity int) int
+		WinnerID func(childComplexity int) int
+	}
+
+	GameStatusOutput struct {
+		GameStatus func(childComplexity int) int
+	}
+
 	GetGamesStatsOutput struct {
 		Error           func(childComplexity int) int
 		GamesAmount     func(childComplexity int) int
@@ -104,9 +122,11 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		FinishGame       func(childComplexity int, input FinishGameInput) int
 		RecoveryPassword func(childComplexity int, input RecoveryPasswordInput) int
 		RegisterUser     func(childComplexity int, input RegisterUserInput) int
 		ResetPassword    func(childComplexity int, input ResetPasswordInput) int
+		StartGame        func(childComplexity int, input StartGameInput) int
 		SuggestTopic     func(childComplexity int, input SuggestTopicInput) int
 		UpdateEmail      func(childComplexity int, input UpdateEmailInput) int
 		UpdatePassword   func(childComplexity int, input UpdatePasswordInput) int
@@ -116,6 +136,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		AuthenticateUser    func(childComplexity int, input AuthenticateUserInput) int
+		GetGameStatus       func(childComplexity int, input GameStatusInput) int
 		GetGamesStats       func(childComplexity int, input GetGamesStatsInput) int
 		GetMetatopics       func(childComplexity int, input GetMetatopicsInput) int
 		GetTopic            func(childComplexity int, input GetTopicInput) int
@@ -137,6 +158,10 @@ type ComplexityRoot struct {
 
 	ResetPasswordOutput struct {
 		Error func(childComplexity int) int
+	}
+
+	StartGameOutput struct {
+		GameStatus func(childComplexity int) int
 	}
 
 	SuggestTopicOutput struct {
@@ -203,6 +228,8 @@ type MutationResolver interface {
 	ResetPassword(ctx context.Context, input ResetPasswordInput) (*ResetPasswordOutput, error)
 	SuggestTopic(ctx context.Context, input SuggestTopicInput) (*SuggestTopicOutput, error)
 	UpdateTopics(ctx context.Context, input UpdateTopicInput) (*UpdateTopicOutput, error)
+	StartGame(ctx context.Context, input StartGameInput) (*StartGameOutput, error)
+	FinishGame(ctx context.Context, input FinishGameInput) (*FinishGameOutput, error)
 }
 type QueryResolver interface {
 	AuthenticateUser(ctx context.Context, input AuthenticateUserInput) (*AuthenticateUserOutput, error)
@@ -213,6 +240,7 @@ type QueryResolver interface {
 	GetTopics(ctx context.Context, input GetTopicsInput) (*GetTopicsOutput, error)
 	GetTopic(ctx context.Context, input GetTopicInput) (*GetTopicOutput, error)
 	GetMetatopics(ctx context.Context, input GetMetatopicsInput) (*GetMetatopicsOutput, error)
+	GetGameStatus(ctx context.Context, input GameStatusInput) (*GameStatusOutput, error)
 }
 
 type executableSchema struct {
@@ -229,7 +257,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 	return parsedSchema
 }
 
-func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
+func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
@@ -275,6 +303,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AuthenticateUserOutput.Jwt(childComplexity), true
+
+	case "FinishGameOutput.Id":
+		if e.complexity.FinishGameOutput.ID == nil {
+			break
+		}
+
+		return e.complexity.FinishGameOutput.ID(childComplexity), true
+
+	case "FinishGameOutput.ResultText":
+		if e.complexity.FinishGameOutput.ResultText == nil {
+			break
+		}
+
+		return e.complexity.FinishGameOutput.ResultText(childComplexity), true
+
+	case "FinishGameOutput.WinnerId":
+		if e.complexity.FinishGameOutput.WinnerID == nil {
+			break
+		}
+
+		return e.complexity.FinishGameOutput.WinnerID(childComplexity), true
+
+	case "GameStatus.FinishAt":
+		if e.complexity.GameStatus.FinishAt == nil {
+			break
+		}
+
+		return e.complexity.GameStatus.FinishAt(childComplexity), true
+
+	case "GameStatus.Id":
+		if e.complexity.GameStatus.ID == nil {
+			break
+		}
+
+		return e.complexity.GameStatus.ID(childComplexity), true
+
+	case "GameStatus.StartAt":
+		if e.complexity.GameStatus.StartAt == nil {
+			break
+		}
+
+		return e.complexity.GameStatus.StartAt(childComplexity), true
+
+	case "GameStatus.Status":
+		if e.complexity.GameStatus.Status == nil {
+			break
+		}
+
+		return e.complexity.GameStatus.Status(childComplexity), true
+
+	case "GameStatus.WinnerId":
+		if e.complexity.GameStatus.WinnerID == nil {
+			break
+		}
+
+		return e.complexity.GameStatus.WinnerID(childComplexity), true
+
+	case "GameStatusOutput.GameStatus":
+		if e.complexity.GameStatusOutput.GameStatus == nil {
+			break
+		}
+
+		return e.complexity.GameStatusOutput.GameStatus(childComplexity), true
 
 	case "GetGamesStatsOutput.error":
 		if e.complexity.GetGamesStatsOutput.Error == nil {
@@ -444,6 +535,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Metatopic.Name(childComplexity), true
 
+	case "Mutation.finishGame":
+		if e.complexity.Mutation.FinishGame == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_finishGame_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.FinishGame(childComplexity, args["input"].(FinishGameInput)), true
+
 	case "Mutation.recoveryPassword":
 		if e.complexity.Mutation.RecoveryPassword == nil {
 			break
@@ -479,6 +582,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ResetPassword(childComplexity, args["input"].(ResetPasswordInput)), true
+
+	case "Mutation.startGame":
+		if e.complexity.Mutation.StartGame == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_startGame_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.StartGame(childComplexity, args["input"].(StartGameInput)), true
 
 	case "Mutation.suggestTopic":
 		if e.complexity.Mutation.SuggestTopic == nil {
@@ -551,6 +666,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AuthenticateUser(childComplexity, args["input"].(AuthenticateUserInput)), true
+
+	case "Query.GetGameStatus":
+		if e.complexity.Query.GetGameStatus == nil {
+			break
+		}
+
+		args, err := ec.field_Query_GetGameStatus_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetGameStatus(childComplexity, args["input"].(GameStatusInput)), true
 
 	case "Query.getGamesStats":
 		if e.complexity.Query.GetGamesStats == nil {
@@ -670,6 +797,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ResetPasswordOutput.Error(childComplexity), true
+
+	case "StartGameOutput.GameStatus":
+		if e.complexity.StartGameOutput.GameStatus == nil {
+			break
+		}
+
+		return e.complexity.StartGameOutput.GameStatus(childComplexity), true
 
 	case "SuggestTopicOutput.error":
 		if e.complexity.SuggestTopicOutput.Error == nil {
@@ -848,6 +982,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAuthenticateUserInput,
+		ec.unmarshalInputFinishGameInput,
+		ec.unmarshalInputGameStatusInput,
 		ec.unmarshalInputGetGamesStatsInput,
 		ec.unmarshalInputGetMetatopicsInput,
 		ec.unmarshalInputGetTopicInput,
@@ -856,6 +992,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputRecoveryPasswordInput,
 		ec.unmarshalInputRegisterUserInput,
 		ec.unmarshalInputResetPasswordInput,
+		ec.unmarshalInputStartGameInput,
 		ec.unmarshalInputSuggestTopicInput,
 		ec.unmarshalInputTopicInput,
 		ec.unmarshalInputUpdateEmailInput,
@@ -1003,6 +1140,12 @@ type Mutation {
 
         """ Обновление текущих тем. Может вернуть ошибки: NOT_FOUND, VALIDATION """
         updateTopics(input: UpdateTopicInput!): UpdateTopicOutput!
+    ##### Games #####
+        """ Запрос на начало игры. """
+        startGame(input: StartGameInput!): StartGameOutput!
+
+        """ Оповещение об окончании игры. """
+        finishGame(input: FinishGameInput!): FinishGameOutput!
 }
 
 type Query {
@@ -1033,6 +1176,11 @@ type Query {
 
         """ Получение списка метатем. Может вернуть ошибки: NOT_FOUND"""
         getMetatopics(input: GetMetatopicsInput!): GetMetatopicsOutput!
+
+    ##### Games #####
+        """ Получение статуса игры. """
+        GetGameStatus(input: GameStatusInput!): GameStatusOutput!
+
 }
 `, BuiltIn: false},
 	{Name: "../schema/scalars.graphql", Input: `scalar Time
@@ -1289,6 +1437,46 @@ type TopicMetatopics {
     metatopics: [Metatopic!]!
 }
 `, BuiltIn: false},
+	{Name: "../schema/games/games.graphql", Input: `type GameStatus {
+    Id: Int!
+    Status: String!
+    WinnerId: Int
+    StartAt: Time!
+    FinishAt: Time!
+}
+`, BuiltIn: false},
+	{Name: "../schema/games/mutation_games.graphql", Input: `input StartGameInput {
+    Id: Int!
+    FromUserId: Int!
+}
+
+type StartGameOutput {
+    GameStatus: GameStatus!
+}
+
+##################################################
+
+input FinishGameInput {
+    Id: Int!
+    FromUserId: Int!
+}
+
+type FinishGameOutput {
+    Id: String!
+    WinnerId: Int!
+    ResultText: String!
+}
+`, BuiltIn: false},
+	{Name: "../schema/games/query_games.graphql", Input: `##################################################
+
+input GameStatusInput {
+    Id: Int!
+}
+
+type GameStatusOutput {
+    GameStatus: GameStatus!
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -1296,9 +1484,41 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_recoveryPassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_finishGame_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_finishGame_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_finishGame_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (FinishGameInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal FinishGameInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNFinishGameInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐFinishGameInput(ctx, tmp)
+	}
+
+	var zeroVal FinishGameInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_recoveryPassword_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_recoveryPassword_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1308,7 +1528,7 @@ func (ec *executionContext) field_Mutation_recoveryPassword_args(ctx context.Con
 }
 func (ec *executionContext) field_Mutation_recoveryPassword_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (RecoveryPasswordInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1328,9 +1548,9 @@ func (ec *executionContext) field_Mutation_recoveryPassword_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_registerUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_registerUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_registerUser_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1340,7 +1560,7 @@ func (ec *executionContext) field_Mutation_registerUser_args(ctx context.Context
 }
 func (ec *executionContext) field_Mutation_registerUser_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (RegisterUserInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1360,9 +1580,9 @@ func (ec *executionContext) field_Mutation_registerUser_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_resetPassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_resetPassword_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_resetPassword_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1372,7 +1592,7 @@ func (ec *executionContext) field_Mutation_resetPassword_args(ctx context.Contex
 }
 func (ec *executionContext) field_Mutation_resetPassword_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ResetPasswordInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1392,9 +1612,41 @@ func (ec *executionContext) field_Mutation_resetPassword_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_suggestTopic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_startGame_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_startGame_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_startGame_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (StartGameInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal StartGameInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNStartGameInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐStartGameInput(ctx, tmp)
+	}
+
+	var zeroVal StartGameInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_suggestTopic_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_suggestTopic_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1404,7 +1656,7 @@ func (ec *executionContext) field_Mutation_suggestTopic_args(ctx context.Context
 }
 func (ec *executionContext) field_Mutation_suggestTopic_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (SuggestTopicInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1424,9 +1676,9 @@ func (ec *executionContext) field_Mutation_suggestTopic_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateEmail_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updateEmail_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1436,7 +1688,7 @@ func (ec *executionContext) field_Mutation_updateEmail_args(ctx context.Context,
 }
 func (ec *executionContext) field_Mutation_updateEmail_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (UpdateEmailInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1456,9 +1708,9 @@ func (ec *executionContext) field_Mutation_updateEmail_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updatePassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updatePassword_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updatePassword_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1468,7 +1720,7 @@ func (ec *executionContext) field_Mutation_updatePassword_args(ctx context.Conte
 }
 func (ec *executionContext) field_Mutation_updatePassword_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (UpdatePasswordInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1488,9 +1740,9 @@ func (ec *executionContext) field_Mutation_updatePassword_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateTopics_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateTopics_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updateTopics_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1500,7 +1752,7 @@ func (ec *executionContext) field_Mutation_updateTopics_args(ctx context.Context
 }
 func (ec *executionContext) field_Mutation_updateTopics_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (UpdateTopicInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1520,9 +1772,9 @@ func (ec *executionContext) field_Mutation_updateTopics_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updateUser_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1532,7 +1784,7 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 }
 func (ec *executionContext) field_Mutation_updateUser_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (UpdateUserInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1552,9 +1804,41 @@ func (ec *executionContext) field_Mutation_updateUser_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_GetGameStatus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
+	arg0, err := ec.field_Query_GetGameStatus_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_GetGameStatus_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (GameStatusInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal GameStatusInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGameStatusInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatusInput(ctx, tmp)
+	}
+
+	var zeroVal GameStatusInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
 	arg0, err := ec.field_Query___type_argsName(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1564,7 +1848,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 }
 func (ec *executionContext) field_Query___type_argsName(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (string, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1584,9 +1868,9 @@ func (ec *executionContext) field_Query___type_argsName(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_authenticateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_authenticateUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Query_authenticateUser_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1596,7 +1880,7 @@ func (ec *executionContext) field_Query_authenticateUser_args(ctx context.Contex
 }
 func (ec *executionContext) field_Query_authenticateUser_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (AuthenticateUserInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1616,9 +1900,9 @@ func (ec *executionContext) field_Query_authenticateUser_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_getGamesStats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getGamesStats_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Query_getGamesStats_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1628,7 +1912,7 @@ func (ec *executionContext) field_Query_getGamesStats_args(ctx context.Context, 
 }
 func (ec *executionContext) field_Query_getGamesStats_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (GetGamesStatsInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1648,9 +1932,9 @@ func (ec *executionContext) field_Query_getGamesStats_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_getMetatopics_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getMetatopics_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Query_getMetatopics_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1660,7 +1944,7 @@ func (ec *executionContext) field_Query_getMetatopics_args(ctx context.Context, 
 }
 func (ec *executionContext) field_Query_getMetatopics_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (GetMetatopicsInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1680,9 +1964,9 @@ func (ec *executionContext) field_Query_getMetatopics_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_getTopic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getTopic_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Query_getTopic_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1692,7 +1976,7 @@ func (ec *executionContext) field_Query_getTopic_args(ctx context.Context, rawAr
 }
 func (ec *executionContext) field_Query_getTopic_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (GetTopicInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1712,9 +1996,9 @@ func (ec *executionContext) field_Query_getTopic_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_getTopics_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getTopics_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Query_getTopics_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1724,7 +2008,7 @@ func (ec *executionContext) field_Query_getTopics_args(ctx context.Context, rawA
 }
 func (ec *executionContext) field_Query_getTopics_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (GetTopicsInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1744,9 +2028,9 @@ func (ec *executionContext) field_Query_getTopics_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_getUserAchievements_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getUserAchievements_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Query_getUserAchievements_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1756,7 +2040,7 @@ func (ec *executionContext) field_Query_getUserAchievements_args(ctx context.Con
 }
 func (ec *executionContext) field_Query_getUserAchievements_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (UserAchievementsInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1776,9 +2060,9 @@ func (ec *executionContext) field_Query_getUserAchievements_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Query_getUser_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1788,7 +2072,7 @@ func (ec *executionContext) field_Query_getUser_args(ctx context.Context, rawArg
 }
 func (ec *executionContext) field_Query_getUser_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (GetUserInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1808,9 +2092,9 @@ func (ec *executionContext) field_Query_getUser_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_verifyRecoveryCode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_verifyRecoveryCode_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Query_verifyRecoveryCode_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1820,7 +2104,7 @@ func (ec *executionContext) field_Query_verifyRecoveryCode_args(ctx context.Cont
 }
 func (ec *executionContext) field_Query_verifyRecoveryCode_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (VerifyRecoveryCodeInput, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1840,9 +2124,9 @@ func (ec *executionContext) field_Query_verifyRecoveryCode_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field___Type_enumValues_argsIncludeDeprecated(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1852,7 +2136,7 @@ func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, ra
 }
 func (ec *executionContext) field___Type_enumValues_argsIncludeDeprecated(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (bool, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1872,9 +2156,9 @@ func (ec *executionContext) field___Type_enumValues_argsIncludeDeprecated(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field___Type_fields_argsIncludeDeprecated(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1884,7 +2168,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 }
 func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (bool, error) {
 	// We won't call the directive if the argument is null.
 	// Set call_argument_directives_with_null to true to call directives
@@ -1924,7 +2208,7 @@ func (ec *executionContext) _Achievement_id(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -1968,7 +2252,7 @@ func (ec *executionContext) _Achievement_name(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -2012,7 +2296,7 @@ func (ec *executionContext) _Achievement_description(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description, nil
 	})
@@ -2056,7 +2340,7 @@ func (ec *executionContext) _Achievement_createdAt(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -2100,7 +2384,7 @@ func (ec *executionContext) _AuthenticateUserOutput_jwt(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Jwt, nil
 	})
@@ -2141,7 +2425,7 @@ func (ec *executionContext) _AuthenticateUserOutput_error(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -2170,6 +2454,411 @@ func (ec *executionContext) fieldContext_AuthenticateUserOutput_error(_ context.
 	return fc, nil
 }
 
+func (ec *executionContext) _FinishGameOutput_Id(ctx context.Context, field graphql.CollectedField, obj *FinishGameOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FinishGameOutput_Id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FinishGameOutput_Id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FinishGameOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FinishGameOutput_WinnerId(ctx context.Context, field graphql.CollectedField, obj *FinishGameOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FinishGameOutput_WinnerId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WinnerID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FinishGameOutput_WinnerId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FinishGameOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FinishGameOutput_ResultText(ctx context.Context, field graphql.CollectedField, obj *FinishGameOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FinishGameOutput_ResultText(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ResultText, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FinishGameOutput_ResultText(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FinishGameOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GameStatus_Id(ctx context.Context, field graphql.CollectedField, obj *GameStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GameStatus_Id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GameStatus_Id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GameStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GameStatus_Status(ctx context.Context, field graphql.CollectedField, obj *GameStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GameStatus_Status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GameStatus_Status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GameStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GameStatus_WinnerId(ctx context.Context, field graphql.CollectedField, obj *GameStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GameStatus_WinnerId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WinnerID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GameStatus_WinnerId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GameStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GameStatus_StartAt(ctx context.Context, field graphql.CollectedField, obj *GameStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GameStatus_StartAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GameStatus_StartAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GameStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GameStatus_FinishAt(ctx context.Context, field graphql.CollectedField, obj *GameStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GameStatus_FinishAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FinishAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GameStatus_FinishAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GameStatus",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _GameStatusOutput_GameStatus(ctx context.Context, field graphql.CollectedField, obj *GameStatusOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GameStatusOutput_GameStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GameStatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GameStatus)
+	fc.Result = res
+	return ec.marshalNGameStatus2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_GameStatusOutput_GameStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "GameStatusOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "Id":
+				return ec.fieldContext_GameStatus_Id(ctx, field)
+			case "Status":
+				return ec.fieldContext_GameStatus_Status(ctx, field)
+			case "WinnerId":
+				return ec.fieldContext_GameStatus_WinnerId(ctx, field)
+			case "StartAt":
+				return ec.fieldContext_GameStatus_StartAt(ctx, field)
+			case "FinishAt":
+				return ec.fieldContext_GameStatus_FinishAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GameStatus", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _GetGamesStatsOutput_gamesAmount(ctx context.Context, field graphql.CollectedField, obj *GetGamesStatsOutput) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_GetGamesStatsOutput_gamesAmount(ctx, field)
 	if err != nil {
@@ -2182,7 +2871,7 @@ func (ec *executionContext) _GetGamesStatsOutput_gamesAmount(ctx context.Context
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.GamesAmount, nil
 	})
@@ -2226,7 +2915,7 @@ func (ec *executionContext) _GetGamesStatsOutput_winsAmount(ctx context.Context,
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.WinsAmount, nil
 	})
@@ -2270,7 +2959,7 @@ func (ec *executionContext) _GetGamesStatsOutput_winsPercents(ctx context.Contex
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.WinsPercents, nil
 	})
@@ -2314,7 +3003,7 @@ func (ec *executionContext) _GetGamesStatsOutput_metaTopicsStats(ctx context.Con
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MetaTopicsStats, nil
 	})
@@ -2365,7 +3054,7 @@ func (ec *executionContext) _GetGamesStatsOutput_error(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -2406,7 +3095,7 @@ func (ec *executionContext) _GetMetatopicsOutput_pageSize(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageSize, nil
 	})
@@ -2450,7 +3139,7 @@ func (ec *executionContext) _GetMetatopicsOutput_pageNumber(ctx context.Context,
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageNumber, nil
 	})
@@ -2494,7 +3183,7 @@ func (ec *executionContext) _GetMetatopicsOutput_pageCount(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageCount, nil
 	})
@@ -2538,7 +3227,7 @@ func (ec *executionContext) _GetMetatopicsOutput_metatopics(ctx context.Context,
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Metatopics, nil
 	})
@@ -2590,7 +3279,7 @@ func (ec *executionContext) _GetTopicOutput_topic(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Topic, nil
 	})
@@ -2637,7 +3326,7 @@ func (ec *executionContext) _GetTopicOutput_error(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -2678,7 +3367,7 @@ func (ec *executionContext) _GetTopicsOutput_pageSize(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageSize, nil
 	})
@@ -2722,7 +3411,7 @@ func (ec *executionContext) _GetTopicsOutput_pageNumber(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageNumber, nil
 	})
@@ -2766,7 +3455,7 @@ func (ec *executionContext) _GetTopicsOutput_pageCount(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageCount, nil
 	})
@@ -2810,7 +3499,7 @@ func (ec *executionContext) _GetTopicsOutput_topics(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Topics, nil
 	})
@@ -2860,7 +3549,7 @@ func (ec *executionContext) _GetUserOutput_user(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.User, nil
 	})
@@ -2917,7 +3606,7 @@ func (ec *executionContext) _GetUserOutput_error(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -2958,7 +3647,7 @@ func (ec *executionContext) _MetaTopicsStats_metaTopic(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MetaTopic, nil
 	})
@@ -3002,7 +3691,7 @@ func (ec *executionContext) _MetaTopicsStats_gamesAmount(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.GamesAmount, nil
 	})
@@ -3046,7 +3735,7 @@ func (ec *executionContext) _MetaTopicsStats_winsAmount(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.WinsAmount, nil
 	})
@@ -3090,7 +3779,7 @@ func (ec *executionContext) _MetaTopicsStats_winsPercents(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.WinsPercents, nil
 	})
@@ -3134,7 +3823,7 @@ func (ec *executionContext) _Metatopic_id(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -3178,7 +3867,7 @@ func (ec *executionContext) _Metatopic_name(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -3222,7 +3911,7 @@ func (ec *executionContext) _Metatopic_createdAt(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -3266,7 +3955,7 @@ func (ec *executionContext) _Mutation_registerUser(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().RegisterUser(rctx, fc.Args["input"].(RegisterUserInput))
 	})
@@ -3329,7 +4018,7 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["input"].(UpdateUserInput))
 	})
@@ -3390,7 +4079,7 @@ func (ec *executionContext) _Mutation_updatePassword(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdatePassword(rctx, fc.Args["input"].(UpdatePasswordInput))
 	})
@@ -3449,7 +4138,7 @@ func (ec *executionContext) _Mutation_updateEmail(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateEmail(rctx, fc.Args["input"].(UpdateEmailInput))
 	})
@@ -3508,7 +4197,7 @@ func (ec *executionContext) _Mutation_recoveryPassword(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().RecoveryPassword(rctx, fc.Args["input"].(RecoveryPasswordInput))
 	})
@@ -3567,7 +4256,7 @@ func (ec *executionContext) _Mutation_resetPassword(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().ResetPassword(rctx, fc.Args["input"].(ResetPasswordInput))
 	})
@@ -3626,7 +4315,7 @@ func (ec *executionContext) _Mutation_suggestTopic(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().SuggestTopic(rctx, fc.Args["input"].(SuggestTopicInput))
 	})
@@ -3687,7 +4376,7 @@ func (ec *executionContext) _Mutation_updateTopics(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateTopics(rctx, fc.Args["input"].(UpdateTopicInput))
 	})
@@ -3736,6 +4425,128 @@ func (ec *executionContext) fieldContext_Mutation_updateTopics(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_startGame(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_startGame(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().StartGame(rctx, fc.Args["input"].(StartGameInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*StartGameOutput)
+	fc.Result = res
+	return ec.marshalNStartGameOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐStartGameOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_startGame(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "GameStatus":
+				return ec.fieldContext_StartGameOutput_GameStatus(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type StartGameOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_startGame_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_finishGame(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_finishGame(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().FinishGame(rctx, fc.Args["input"].(FinishGameInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*FinishGameOutput)
+	fc.Result = res
+	return ec.marshalNFinishGameOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐFinishGameOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_finishGame(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "Id":
+				return ec.fieldContext_FinishGameOutput_Id(ctx, field)
+			case "WinnerId":
+				return ec.fieldContext_FinishGameOutput_WinnerId(ctx, field)
+			case "ResultText":
+				return ec.fieldContext_FinishGameOutput_ResultText(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type FinishGameOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_finishGame_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_authenticateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_authenticateUser(ctx, field)
 	if err != nil {
@@ -3748,7 +4559,7 @@ func (ec *executionContext) _Query_authenticateUser(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().AuthenticateUser(rctx, fc.Args["input"].(AuthenticateUserInput))
 	})
@@ -3809,7 +4620,7 @@ func (ec *executionContext) _Query_getUser(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().GetUser(rctx, fc.Args["input"].(GetUserInput))
 	})
@@ -3870,7 +4681,7 @@ func (ec *executionContext) _Query_getGamesStats(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().GetGamesStats(rctx, fc.Args["input"].(GetGamesStatsInput))
 	})
@@ -3937,7 +4748,7 @@ func (ec *executionContext) _Query_verifyRecoveryCode(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().VerifyRecoveryCode(rctx, fc.Args["input"].(VerifyRecoveryCodeInput))
 	})
@@ -3996,7 +4807,7 @@ func (ec *executionContext) _Query_getUserAchievements(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().GetUserAchievements(rctx, fc.Args["input"].(UserAchievementsInput))
 	})
@@ -4057,7 +4868,7 @@ func (ec *executionContext) _Query_getTopics(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().GetTopics(rctx, fc.Args["input"].(GetTopicsInput))
 	})
@@ -4122,7 +4933,7 @@ func (ec *executionContext) _Query_getTopic(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().GetTopic(rctx, fc.Args["input"].(GetTopicInput))
 	})
@@ -4183,7 +4994,7 @@ func (ec *executionContext) _Query_getMetatopics(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().GetMetatopics(rctx, fc.Args["input"].(GetMetatopicsInput))
 	})
@@ -4236,6 +5047,65 @@ func (ec *executionContext) fieldContext_Query_getMetatopics(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_GetGameStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_GetGameStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetGameStatus(rctx, fc.Args["input"].(GameStatusInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GameStatusOutput)
+	fc.Result = res
+	return ec.marshalNGameStatusOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatusOutput(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_GetGameStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "GameStatus":
+				return ec.fieldContext_GameStatusOutput_GameStatus(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GameStatusOutput", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetGameStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -4248,7 +5118,7 @@ func (ec *executionContext) _Query___type(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.introspectType(fc.Args["name"].(string))
 	})
@@ -4322,7 +5192,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.introspectSchema()
 	})
@@ -4377,7 +5247,7 @@ func (ec *executionContext) _RecoveryPasswordOutput_error(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -4418,7 +5288,7 @@ func (ec *executionContext) _RegisterUserOutput_user(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.User, nil
 	})
@@ -4475,7 +5345,7 @@ func (ec *executionContext) _RegisterUserOutput_jwt(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Jwt, nil
 	})
@@ -4516,7 +5386,7 @@ func (ec *executionContext) _RegisterUserOutput_error(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -4557,7 +5427,7 @@ func (ec *executionContext) _ResetPasswordOutput_error(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -4586,6 +5456,62 @@ func (ec *executionContext) fieldContext_ResetPasswordOutput_error(_ context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _StartGameOutput_GameStatus(ctx context.Context, field graphql.CollectedField, obj *StartGameOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_StartGameOutput_GameStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GameStatus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*GameStatus)
+	fc.Result = res
+	return ec.marshalNGameStatus2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_StartGameOutput_GameStatus(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "StartGameOutput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "Id":
+				return ec.fieldContext_GameStatus_Id(ctx, field)
+			case "Status":
+				return ec.fieldContext_GameStatus_Status(ctx, field)
+			case "WinnerId":
+				return ec.fieldContext_GameStatus_WinnerId(ctx, field)
+			case "StartAt":
+				return ec.fieldContext_GameStatus_StartAt(ctx, field)
+			case "FinishAt":
+				return ec.fieldContext_GameStatus_FinishAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type GameStatus", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _SuggestTopicOutput_topic(ctx context.Context, field graphql.CollectedField, obj *SuggestTopicOutput) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_SuggestTopicOutput_topic(ctx, field)
 	if err != nil {
@@ -4598,7 +5524,7 @@ func (ec *executionContext) _SuggestTopicOutput_topic(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Topic, nil
 	})
@@ -4649,7 +5575,7 @@ func (ec *executionContext) _SuggestTopicOutput_error(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -4690,7 +5616,7 @@ func (ec *executionContext) _Topic_id(ctx context.Context, field graphql.Collect
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -4734,7 +5660,7 @@ func (ec *executionContext) _Topic_name(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -4778,7 +5704,7 @@ func (ec *executionContext) _Topic_status(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Status, nil
 	})
@@ -4822,7 +5748,7 @@ func (ec *executionContext) _Topic_createdAt(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -4866,7 +5792,7 @@ func (ec *executionContext) _TopicMetatopics_topic(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Topic, nil
 	})
@@ -4920,7 +5846,7 @@ func (ec *executionContext) _TopicMetatopics_metatopics(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Metatopics, nil
 	})
@@ -4972,7 +5898,7 @@ func (ec *executionContext) _UpdateEmailOutput_error(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -5013,7 +5939,7 @@ func (ec *executionContext) _UpdatePasswordOutput_error(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -5054,7 +5980,7 @@ func (ec *executionContext) _UpdateTopicOutput_topicMetatopics(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.TopicMetatopics, nil
 	})
@@ -5101,7 +6027,7 @@ func (ec *executionContext) _UpdateTopicOutput_error(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -5142,7 +6068,7 @@ func (ec *executionContext) _UpdateUserOutput_user(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.User, nil
 	})
@@ -5202,7 +6128,7 @@ func (ec *executionContext) _UpdateUserOutput_error(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -5243,7 +6169,7 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -5287,7 +6213,7 @@ func (ec *executionContext) _User_role(ctx context.Context, field graphql.Collec
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Role, nil
 	})
@@ -5331,7 +6257,7 @@ func (ec *executionContext) _User_username(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Username, nil
 	})
@@ -5375,7 +6301,7 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Email, nil
 	})
@@ -5419,7 +6345,7 @@ func (ec *executionContext) _User_createdAt(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -5463,7 +6389,7 @@ func (ec *executionContext) _User_updatedAt(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.UpdatedAt, nil
 	})
@@ -5507,7 +6433,7 @@ func (ec *executionContext) _User_imageUrl(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ImageURL, nil
 	})
@@ -5551,7 +6477,7 @@ func (ec *executionContext) _UserAchievementsOutput_achievements(ctx context.Con
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Achievements, nil
 	})
@@ -5605,7 +6531,7 @@ func (ec *executionContext) _UserAchievementsOutput_error(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -5646,7 +6572,7 @@ func (ec *executionContext) _VerifyRecoveryCodeOutput_error(ctx context.Context,
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Error, nil
 	})
@@ -5687,7 +6613,7 @@ func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -5731,7 +6657,7 @@ func (ec *executionContext) ___Directive_description(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -5772,7 +6698,7 @@ func (ec *executionContext) ___Directive_locations(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Locations, nil
 	})
@@ -5816,7 +6742,7 @@ func (ec *executionContext) ___Directive_args(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Args, nil
 	})
@@ -5870,7 +6796,7 @@ func (ec *executionContext) ___Directive_isRepeatable(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.IsRepeatable, nil
 	})
@@ -5914,7 +6840,7 @@ func (ec *executionContext) ___EnumValue_name(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -5958,7 +6884,7 @@ func (ec *executionContext) ___EnumValue_description(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -5999,7 +6925,7 @@ func (ec *executionContext) ___EnumValue_isDeprecated(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.IsDeprecated(), nil
 	})
@@ -6043,7 +6969,7 @@ func (ec *executionContext) ___EnumValue_deprecationReason(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.DeprecationReason(), nil
 	})
@@ -6084,7 +7010,7 @@ func (ec *executionContext) ___Field_name(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -6128,7 +7054,7 @@ func (ec *executionContext) ___Field_description(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -6169,7 +7095,7 @@ func (ec *executionContext) ___Field_args(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Args, nil
 	})
@@ -6223,7 +7149,7 @@ func (ec *executionContext) ___Field_type(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Type, nil
 	})
@@ -6289,7 +7215,7 @@ func (ec *executionContext) ___Field_isDeprecated(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.IsDeprecated(), nil
 	})
@@ -6333,7 +7259,7 @@ func (ec *executionContext) ___Field_deprecationReason(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.DeprecationReason(), nil
 	})
@@ -6374,7 +7300,7 @@ func (ec *executionContext) ___InputValue_name(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -6418,7 +7344,7 @@ func (ec *executionContext) ___InputValue_description(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -6459,7 +7385,7 @@ func (ec *executionContext) ___InputValue_type(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Type, nil
 	})
@@ -6525,7 +7451,7 @@ func (ec *executionContext) ___InputValue_defaultValue(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.DefaultValue, nil
 	})
@@ -6566,7 +7492,7 @@ func (ec *executionContext) ___Schema_description(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -6607,7 +7533,7 @@ func (ec *executionContext) ___Schema_types(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Types(), nil
 	})
@@ -6673,7 +7599,7 @@ func (ec *executionContext) ___Schema_queryType(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.QueryType(), nil
 	})
@@ -6739,7 +7665,7 @@ func (ec *executionContext) ___Schema_mutationType(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MutationType(), nil
 	})
@@ -6802,7 +7728,7 @@ func (ec *executionContext) ___Schema_subscriptionType(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.SubscriptionType(), nil
 	})
@@ -6865,7 +7791,7 @@ func (ec *executionContext) ___Schema_directives(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Directives(), nil
 	})
@@ -6921,7 +7847,7 @@ func (ec *executionContext) ___Type_kind(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Kind(), nil
 	})
@@ -6965,7 +7891,7 @@ func (ec *executionContext) ___Type_name(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name(), nil
 	})
@@ -7006,7 +7932,7 @@ func (ec *executionContext) ___Type_description(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -7047,7 +7973,7 @@ func (ec *executionContext) ___Type_fields(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Fields(fc.Args["includeDeprecated"].(bool)), nil
 	})
@@ -7113,7 +8039,7 @@ func (ec *executionContext) ___Type_interfaces(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Interfaces(), nil
 	})
@@ -7176,7 +8102,7 @@ func (ec *executionContext) ___Type_possibleTypes(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PossibleTypes(), nil
 	})
@@ -7239,7 +8165,7 @@ func (ec *executionContext) ___Type_enumValues(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.EnumValues(fc.Args["includeDeprecated"].(bool)), nil
 	})
@@ -7301,7 +8227,7 @@ func (ec *executionContext) ___Type_inputFields(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.InputFields(), nil
 	})
@@ -7352,7 +8278,7 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.OfType(), nil
 	})
@@ -7415,7 +8341,7 @@ func (ec *executionContext) ___Type_specifiedByURL(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.SpecifiedByURL(), nil
 	})
@@ -7448,10 +8374,10 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputAuthenticateUserInput(ctx context.Context, obj interface{}) (AuthenticateUserInput, error) {
+func (ec *executionContext) unmarshalInputAuthenticateUserInput(ctx context.Context, obj any) (AuthenticateUserInput, error) {
 	var it AuthenticateUserInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7482,10 +8408,71 @@ func (ec *executionContext) unmarshalInputAuthenticateUserInput(ctx context.Cont
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputGetGamesStatsInput(ctx context.Context, obj interface{}) (GetGamesStatsInput, error) {
+func (ec *executionContext) unmarshalInputFinishGameInput(ctx context.Context, obj any) (FinishGameInput, error) {
+	var it FinishGameInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"Id", "FromUserId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "Id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "FromUserId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("FromUserId"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FromUserID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGameStatusInput(ctx context.Context, obj any) (GameStatusInput, error) {
+	var it GameStatusInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"Id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "Id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGetGamesStatsInput(ctx context.Context, obj any) (GetGamesStatsInput, error) {
 	var it GetGamesStatsInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7509,10 +8496,10 @@ func (ec *executionContext) unmarshalInputGetGamesStatsInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputGetMetatopicsInput(ctx context.Context, obj interface{}) (GetMetatopicsInput, error) {
+func (ec *executionContext) unmarshalInputGetMetatopicsInput(ctx context.Context, obj any) (GetMetatopicsInput, error) {
 	var it GetMetatopicsInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7543,10 +8530,10 @@ func (ec *executionContext) unmarshalInputGetMetatopicsInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputGetTopicInput(ctx context.Context, obj interface{}) (GetTopicInput, error) {
+func (ec *executionContext) unmarshalInputGetTopicInput(ctx context.Context, obj any) (GetTopicInput, error) {
 	var it GetTopicInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7570,10 +8557,10 @@ func (ec *executionContext) unmarshalInputGetTopicInput(ctx context.Context, obj
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputGetTopicsInput(ctx context.Context, obj interface{}) (GetTopicsInput, error) {
+func (ec *executionContext) unmarshalInputGetTopicsInput(ctx context.Context, obj any) (GetTopicsInput, error) {
 	var it GetTopicsInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7611,10 +8598,10 @@ func (ec *executionContext) unmarshalInputGetTopicsInput(ctx context.Context, ob
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputGetUserInput(ctx context.Context, obj interface{}) (GetUserInput, error) {
+func (ec *executionContext) unmarshalInputGetUserInput(ctx context.Context, obj any) (GetUserInput, error) {
 	var it GetUserInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7638,10 +8625,10 @@ func (ec *executionContext) unmarshalInputGetUserInput(ctx context.Context, obj 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputRecoveryPasswordInput(ctx context.Context, obj interface{}) (RecoveryPasswordInput, error) {
+func (ec *executionContext) unmarshalInputRecoveryPasswordInput(ctx context.Context, obj any) (RecoveryPasswordInput, error) {
 	var it RecoveryPasswordInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7665,10 +8652,10 @@ func (ec *executionContext) unmarshalInputRecoveryPasswordInput(ctx context.Cont
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputRegisterUserInput(ctx context.Context, obj interface{}) (RegisterUserInput, error) {
+func (ec *executionContext) unmarshalInputRegisterUserInput(ctx context.Context, obj any) (RegisterUserInput, error) {
 	var it RegisterUserInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7706,10 +8693,10 @@ func (ec *executionContext) unmarshalInputRegisterUserInput(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputResetPasswordInput(ctx context.Context, obj interface{}) (ResetPasswordInput, error) {
+func (ec *executionContext) unmarshalInputResetPasswordInput(ctx context.Context, obj any) (ResetPasswordInput, error) {
 	var it ResetPasswordInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7747,10 +8734,44 @@ func (ec *executionContext) unmarshalInputResetPasswordInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputSuggestTopicInput(ctx context.Context, obj interface{}) (SuggestTopicInput, error) {
+func (ec *executionContext) unmarshalInputStartGameInput(ctx context.Context, obj any) (StartGameInput, error) {
+	var it StartGameInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"Id", "FromUserId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "Id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Id"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "FromUserId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("FromUserId"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FromUserID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSuggestTopicInput(ctx context.Context, obj any) (SuggestTopicInput, error) {
 	var it SuggestTopicInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7774,10 +8795,10 @@ func (ec *executionContext) unmarshalInputSuggestTopicInput(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputTopicInput(ctx context.Context, obj interface{}) (TopicInput, error) {
+func (ec *executionContext) unmarshalInputTopicInput(ctx context.Context, obj any) (TopicInput, error) {
 	var it TopicInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7822,10 +8843,10 @@ func (ec *executionContext) unmarshalInputTopicInput(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, obj interface{}) (UpdateEmailInput, error) {
+func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, obj any) (UpdateEmailInput, error) {
 	var it UpdateEmailInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7863,10 +8884,10 @@ func (ec *executionContext) unmarshalInputUpdateEmailInput(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdatePasswordInput(ctx context.Context, obj interface{}) (UpdatePasswordInput, error) {
+func (ec *executionContext) unmarshalInputUpdatePasswordInput(ctx context.Context, obj any) (UpdatePasswordInput, error) {
 	var it UpdatePasswordInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7904,10 +8925,10 @@ func (ec *executionContext) unmarshalInputUpdatePasswordInput(ctx context.Contex
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateTopicInput(ctx context.Context, obj interface{}) (UpdateTopicInput, error) {
+func (ec *executionContext) unmarshalInputUpdateTopicInput(ctx context.Context, obj any) (UpdateTopicInput, error) {
 	var it UpdateTopicInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7931,10 +8952,10 @@ func (ec *executionContext) unmarshalInputUpdateTopicInput(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj interface{}) (UpdateUserInput, error) {
+func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj any) (UpdateUserInput, error) {
 	var it UpdateUserInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -7986,10 +9007,10 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUserAchievementsInput(ctx context.Context, obj interface{}) (UserAchievementsInput, error) {
+func (ec *executionContext) unmarshalInputUserAchievementsInput(ctx context.Context, obj any) (UserAchievementsInput, error) {
 	var it UserAchievementsInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -8027,10 +9048,10 @@ func (ec *executionContext) unmarshalInputUserAchievementsInput(ctx context.Cont
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputVerifyRecoveryCodeInput(ctx context.Context, obj interface{}) (VerifyRecoveryCodeInput, error) {
+func (ec *executionContext) unmarshalInputVerifyRecoveryCodeInput(ctx context.Context, obj any) (VerifyRecoveryCodeInput, error) {
 	var it VerifyRecoveryCodeInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -8138,6 +9159,150 @@ func (ec *executionContext) _AuthenticateUserOutput(ctx context.Context, sel ast
 			out.Values[i] = ec._AuthenticateUserOutput_jwt(ctx, field, obj)
 		case "error":
 			out.Values[i] = ec._AuthenticateUserOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var finishGameOutputImplementors = []string{"FinishGameOutput"}
+
+func (ec *executionContext) _FinishGameOutput(ctx context.Context, sel ast.SelectionSet, obj *FinishGameOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, finishGameOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FinishGameOutput")
+		case "Id":
+			out.Values[i] = ec._FinishGameOutput_Id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "WinnerId":
+			out.Values[i] = ec._FinishGameOutput_WinnerId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "ResultText":
+			out.Values[i] = ec._FinishGameOutput_ResultText(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var gameStatusImplementors = []string{"GameStatus"}
+
+func (ec *executionContext) _GameStatus(ctx context.Context, sel ast.SelectionSet, obj *GameStatus) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, gameStatusImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GameStatus")
+		case "Id":
+			out.Values[i] = ec._GameStatus_Id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "Status":
+			out.Values[i] = ec._GameStatus_Status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "WinnerId":
+			out.Values[i] = ec._GameStatus_WinnerId(ctx, field, obj)
+		case "StartAt":
+			out.Values[i] = ec._GameStatus_StartAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "FinishAt":
+			out.Values[i] = ec._GameStatus_FinishAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var gameStatusOutputImplementors = []string{"GameStatusOutput"}
+
+func (ec *executionContext) _GameStatusOutput(ctx context.Context, sel ast.SelectionSet, obj *GameStatusOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, gameStatusOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("GameStatusOutput")
+		case "GameStatus":
+			out.Values[i] = ec._GameStatusOutput_GameStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8576,6 +9741,20 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "startGame":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_startGame(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "finishGame":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_finishGame(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8794,6 +9973,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "GetGameStatus":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_GetGameStatus(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -8914,6 +10115,45 @@ func (ec *executionContext) _ResetPasswordOutput(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("ResetPasswordOutput")
 		case "error":
 			out.Values[i] = ec._ResetPasswordOutput_error(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var startGameOutputImplementors = []string{"StartGameOutput"}
+
+func (ec *executionContext) _StartGameOutput(ctx context.Context, sel ast.SelectionSet, obj *StartGameOutput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, startGameOutputImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("StartGameOutput")
+		case "GameStatus":
+			out.Values[i] = ec._StartGameOutput_GameStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9750,7 +10990,7 @@ func (ec *executionContext) marshalNAchievement2ᚖgithubᚗcomᚋdebateᚑioᚋ
 	return ec._Achievement(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAuthenticateUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAuthenticateUserInput(ctx context.Context, v interface{}) (AuthenticateUserInput, error) {
+func (ec *executionContext) unmarshalNAuthenticateUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐAuthenticateUserInput(ctx context.Context, v any) (AuthenticateUserInput, error) {
 	res, err := ec.unmarshalInputAuthenticateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9769,7 +11009,7 @@ func (ec *executionContext) marshalNAuthenticateUserOutput2ᚖgithubᚗcomᚋdeb
 	return ec._AuthenticateUserOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
+func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9784,7 +11024,26 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+func (ec *executionContext) unmarshalNFinishGameInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐFinishGameInput(ctx context.Context, v any) (FinishGameInput, error) {
+	res, err := ec.unmarshalInputFinishGameInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFinishGameOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐFinishGameOutput(ctx context.Context, sel ast.SelectionSet, v FinishGameOutput) graphql.Marshaler {
+	return ec._FinishGameOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNFinishGameOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐFinishGameOutput(ctx context.Context, sel ast.SelectionSet, v *FinishGameOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._FinishGameOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {
 	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9799,7 +11058,36 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
-func (ec *executionContext) unmarshalNGetGamesStatsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetGamesStatsInput(ctx context.Context, v interface{}) (GetGamesStatsInput, error) {
+func (ec *executionContext) marshalNGameStatus2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatus(ctx context.Context, sel ast.SelectionSet, v *GameStatus) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GameStatus(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGameStatusInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatusInput(ctx context.Context, v any) (GameStatusInput, error) {
+	res, err := ec.unmarshalInputGameStatusInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNGameStatusOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatusOutput(ctx context.Context, sel ast.SelectionSet, v GameStatusOutput) graphql.Marshaler {
+	return ec._GameStatusOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNGameStatusOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatusOutput(ctx context.Context, sel ast.SelectionSet, v *GameStatusOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._GameStatusOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNGetGamesStatsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetGamesStatsInput(ctx context.Context, v any) (GetGamesStatsInput, error) {
 	res, err := ec.unmarshalInputGetGamesStatsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9818,7 +11106,7 @@ func (ec *executionContext) marshalNGetGamesStatsOutput2ᚖgithubᚗcomᚋdebate
 	return ec._GetGamesStatsOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNGetMetatopicsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetMetatopicsInput(ctx context.Context, v interface{}) (GetMetatopicsInput, error) {
+func (ec *executionContext) unmarshalNGetMetatopicsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetMetatopicsInput(ctx context.Context, v any) (GetMetatopicsInput, error) {
 	res, err := ec.unmarshalInputGetMetatopicsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9837,7 +11125,7 @@ func (ec *executionContext) marshalNGetMetatopicsOutput2ᚖgithubᚗcomᚋdebate
 	return ec._GetMetatopicsOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNGetTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicInput(ctx context.Context, v interface{}) (GetTopicInput, error) {
+func (ec *executionContext) unmarshalNGetTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicInput(ctx context.Context, v any) (GetTopicInput, error) {
 	res, err := ec.unmarshalInputGetTopicInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9856,7 +11144,7 @@ func (ec *executionContext) marshalNGetTopicOutput2ᚖgithubᚗcomᚋdebateᚑio
 	return ec._GetTopicOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNGetTopicsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicsInput(ctx context.Context, v interface{}) (GetTopicsInput, error) {
+func (ec *executionContext) unmarshalNGetTopicsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetTopicsInput(ctx context.Context, v any) (GetTopicsInput, error) {
 	res, err := ec.unmarshalInputGetTopicsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9875,7 +11163,7 @@ func (ec *executionContext) marshalNGetTopicsOutput2ᚖgithubᚗcomᚋdebateᚑi
 	return ec._GetTopicsOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNGetUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetUserInput(ctx context.Context, v interface{}) (GetUserInput, error) {
+func (ec *executionContext) unmarshalNGetUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGetUserInput(ctx context.Context, v any) (GetUserInput, error) {
 	res, err := ec.unmarshalInputGetUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9894,7 +11182,7 @@ func (ec *executionContext) marshalNGetUserOutput2ᚖgithubᚗcomᚋdebateᚑio�
 	return ec._GetUserOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v any) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9909,8 +11197,8 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v interface{}) ([]int, error) {
-	var vSlice []interface{}
+func (ec *executionContext) unmarshalNInt2ᚕintᚄ(ctx context.Context, v any) ([]int, error) {
+	var vSlice []any
 	if v != nil {
 		vSlice = graphql.CoerceList(v)
 	}
@@ -9995,7 +11283,7 @@ func (ec *executionContext) marshalNMetatopic2ᚖgithubᚗcomᚋdebateᚑioᚋse
 	return ec._Metatopic(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNRecoveryPasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐRecoveryPasswordInput(ctx context.Context, v interface{}) (RecoveryPasswordInput, error) {
+func (ec *executionContext) unmarshalNRecoveryPasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐRecoveryPasswordInput(ctx context.Context, v any) (RecoveryPasswordInput, error) {
 	res, err := ec.unmarshalInputRecoveryPasswordInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10014,7 +11302,7 @@ func (ec *executionContext) marshalNRecoveryPasswordOutput2ᚖgithubᚗcomᚋdeb
 	return ec._RecoveryPasswordOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNRegisterUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐRegisterUserInput(ctx context.Context, v interface{}) (RegisterUserInput, error) {
+func (ec *executionContext) unmarshalNRegisterUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐRegisterUserInput(ctx context.Context, v any) (RegisterUserInput, error) {
 	res, err := ec.unmarshalInputRegisterUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10033,7 +11321,7 @@ func (ec *executionContext) marshalNRegisterUserOutput2ᚖgithubᚗcomᚋdebate�
 	return ec._RegisterUserOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNResetPasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐResetPasswordInput(ctx context.Context, v interface{}) (ResetPasswordInput, error) {
+func (ec *executionContext) unmarshalNResetPasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐResetPasswordInput(ctx context.Context, v any) (ResetPasswordInput, error) {
 	res, err := ec.unmarshalInputResetPasswordInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10052,7 +11340,7 @@ func (ec *executionContext) marshalNResetPasswordOutput2ᚖgithubᚗcomᚋdebate
 	return ec._ResetPasswordOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNRole2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐRole(ctx context.Context, v interface{}) (Role, error) {
+func (ec *executionContext) unmarshalNRole2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐRole(ctx context.Context, v any) (Role, error) {
 	var res Role
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -10062,7 +11350,26 @@ func (ec *executionContext) marshalNRole2githubᚗcomᚋdebateᚑioᚋserviceᚑ
 	return v
 }
 
-func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalNStartGameInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐStartGameInput(ctx context.Context, v any) (StartGameInput, error) {
+	res, err := ec.unmarshalInputStartGameInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNStartGameOutput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐStartGameOutput(ctx context.Context, sel ast.SelectionSet, v StartGameOutput) graphql.Marshaler {
+	return ec._StartGameOutput(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNStartGameOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐStartGameOutput(ctx context.Context, sel ast.SelectionSet, v *StartGameOutput) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._StartGameOutput(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10077,7 +11384,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNSuggestTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐSuggestTopicInput(ctx context.Context, v interface{}) (SuggestTopicInput, error) {
+func (ec *executionContext) unmarshalNSuggestTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐSuggestTopicInput(ctx context.Context, v any) (SuggestTopicInput, error) {
 	res, err := ec.unmarshalInputSuggestTopicInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10096,7 +11403,7 @@ func (ec *executionContext) marshalNSuggestTopicOutput2ᚖgithubᚗcomᚋdebate�
 	return ec._SuggestTopicOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v any) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10121,8 +11428,8 @@ func (ec *executionContext) marshalNTopic2ᚖgithubᚗcomᚋdebateᚑioᚋservic
 	return ec._Topic(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNTopicInput2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicInputᚄ(ctx context.Context, v interface{}) ([]*TopicInput, error) {
-	var vSlice []interface{}
+func (ec *executionContext) unmarshalNTopicInput2ᚕᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicInputᚄ(ctx context.Context, v any) ([]*TopicInput, error) {
+	var vSlice []any
 	if v != nil {
 		vSlice = graphql.CoerceList(v)
 	}
@@ -10138,7 +11445,7 @@ func (ec *executionContext) unmarshalNTopicInput2ᚕᚖgithubᚗcomᚋdebateᚑi
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNTopicInput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicInput(ctx context.Context, v interface{}) (*TopicInput, error) {
+func (ec *executionContext) unmarshalNTopicInput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicInput(ctx context.Context, v any) (*TopicInput, error) {
 	res, err := ec.unmarshalInputTopicInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10197,7 +11504,7 @@ func (ec *executionContext) marshalNTopicMetatopics2ᚖgithubᚗcomᚋdebateᚑi
 	return ec._TopicMetatopics(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatus(ctx context.Context, v interface{}) (TopicStatus, error) {
+func (ec *executionContext) unmarshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatus(ctx context.Context, v any) (TopicStatus, error) {
 	var res TopicStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -10207,8 +11514,8 @@ func (ec *executionContext) marshalNTopicStatus2githubᚗcomᚋdebateᚑioᚋser
 	return v
 }
 
-func (ec *executionContext) unmarshalNTopicStatus2ᚕgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatusᚄ(ctx context.Context, v interface{}) ([]TopicStatus, error) {
-	var vSlice []interface{}
+func (ec *executionContext) unmarshalNTopicStatus2ᚕgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐTopicStatusᚄ(ctx context.Context, v any) ([]TopicStatus, error) {
+	var vSlice []any
 	if v != nil {
 		vSlice = graphql.CoerceList(v)
 	}
@@ -10268,7 +11575,7 @@ func (ec *executionContext) marshalNTopicStatus2ᚕgithubᚗcomᚋdebateᚑioᚋ
 	return ret
 }
 
-func (ec *executionContext) unmarshalNUpdateEmailInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateEmailInput(ctx context.Context, v interface{}) (UpdateEmailInput, error) {
+func (ec *executionContext) unmarshalNUpdateEmailInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateEmailInput(ctx context.Context, v any) (UpdateEmailInput, error) {
 	res, err := ec.unmarshalInputUpdateEmailInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10287,7 +11594,7 @@ func (ec *executionContext) marshalNUpdateEmailOutput2ᚖgithubᚗcomᚋdebate�
 	return ec._UpdateEmailOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdatePasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdatePasswordInput(ctx context.Context, v interface{}) (UpdatePasswordInput, error) {
+func (ec *executionContext) unmarshalNUpdatePasswordInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdatePasswordInput(ctx context.Context, v any) (UpdatePasswordInput, error) {
 	res, err := ec.unmarshalInputUpdatePasswordInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10306,7 +11613,7 @@ func (ec *executionContext) marshalNUpdatePasswordOutput2ᚖgithubᚗcomᚋdebat
 	return ec._UpdatePasswordOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateTopicInput(ctx context.Context, v interface{}) (UpdateTopicInput, error) {
+func (ec *executionContext) unmarshalNUpdateTopicInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateTopicInput(ctx context.Context, v any) (UpdateTopicInput, error) {
 	res, err := ec.unmarshalInputUpdateTopicInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10325,7 +11632,7 @@ func (ec *executionContext) marshalNUpdateTopicOutput2ᚖgithubᚗcomᚋdebate�
 	return ec._UpdateTopicOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateUserInput(ctx context.Context, v interface{}) (UpdateUserInput, error) {
+func (ec *executionContext) unmarshalNUpdateUserInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUpdateUserInput(ctx context.Context, v any) (UpdateUserInput, error) {
 	res, err := ec.unmarshalInputUpdateUserInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10354,7 +11661,7 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋdebateᚑioᚋservice
 	return ec._User(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUserAchievementsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUserAchievementsInput(ctx context.Context, v interface{}) (UserAchievementsInput, error) {
+func (ec *executionContext) unmarshalNUserAchievementsInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐUserAchievementsInput(ctx context.Context, v any) (UserAchievementsInput, error) {
 	res, err := ec.unmarshalInputUserAchievementsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10373,7 +11680,7 @@ func (ec *executionContext) marshalNUserAchievementsOutput2ᚖgithubᚗcomᚋdeb
 	return ec._UserAchievementsOutput(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNVerifyRecoveryCodeInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐVerifyRecoveryCodeInput(ctx context.Context, v interface{}) (VerifyRecoveryCodeInput, error) {
+func (ec *executionContext) unmarshalNVerifyRecoveryCodeInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐVerifyRecoveryCodeInput(ctx context.Context, v any) (VerifyRecoveryCodeInput, error) {
 	res, err := ec.unmarshalInputVerifyRecoveryCodeInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10440,7 +11747,7 @@ func (ec *executionContext) marshalN__Directive2ᚕgithubᚗcomᚋ99designsᚋgq
 	return ret
 }
 
-func (ec *executionContext) unmarshalN__DirectiveLocation2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalN__DirectiveLocation2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10455,8 +11762,8 @@ func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Conte
 	return res
 }
 
-func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
+func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
 	if v != nil {
 		vSlice = graphql.CoerceList(v)
 	}
@@ -10630,7 +11937,7 @@ func (ec *executionContext) marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 	return ec.___Type(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10645,7 +11952,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
+func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10655,7 +11962,7 @@ func (ec *executionContext) marshalOBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v interface{}) (*bool, error) {
+func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v any) (*bool, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10671,7 +11978,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx context.Context, v interface{}) (*Error, error) {
+func (ec *executionContext) unmarshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐError(ctx context.Context, v any) (*Error, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10687,7 +11994,7 @@ func (ec *executionContext) marshalOError2ᚖgithubᚗcomᚋdebateᚑioᚋservic
 	return v
 }
 
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10751,7 +12058,7 @@ func (ec *executionContext) marshalOMetaTopicsStats2ᚖgithubᚗcomᚋdebateᚑi
 	return ec._MetaTopicsStats(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {
 	if v == nil {
 		return nil, nil
 	}

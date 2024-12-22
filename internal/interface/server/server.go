@@ -86,6 +86,7 @@ func (s *Server) InitRoutes(container *registry.Container, isDebug bool) {
 	s.router.Route(string(handlers.ImageUrl), func(r chi.Router) {
 		r.Put("/", restHandler.PutImageHandler)
 		r.Get("/", restHandler.GetImageHandler)
+		r.Get("/ping", restHandler.PingHandler)
 	})
 }
 

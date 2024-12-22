@@ -5,6 +5,7 @@ schema:
   - internal/interface/graphql/schema/*.graphql
   - internal/interface/graphql/schema/users/*.graphql
   - internal/interface/graphql/schema/topics/*.graphql
+  - internal/interface/graphql/schema/games/*.graphql
 
 exec:
   filename: internal/interface/graphql/gen/executor.go

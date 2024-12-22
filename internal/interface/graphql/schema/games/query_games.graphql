@@ -1,0 +1,9 @@
+##################################################
+
+input GameStatusInput {
+    Id: Int!
+}
+
+type GameStatusOutput {
+    GameStatus: GameStatus!
+}

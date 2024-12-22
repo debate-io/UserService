@@ -1,0 +1,21 @@
+input StartGameInput {
+    Id: Int!
+    FromUserId: Int!
+}
+
+type StartGameOutput {
+    GameStatus: GameStatus!
+}
+
+##################################################
+
+input FinishGameInput {
+    Id: Int!
+    FromUserId: Int!
+}
+
+type FinishGameOutput {
+    Id: String!
+    WinnerId: Int!
+    ResultText: String!
+}

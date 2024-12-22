@@ -26,6 +26,33 @@ type AuthenticateUserOutput struct {
 	Error *Error  `json:"error,omitempty"`
 }
 
+type FinishGameInput struct {
+	ID         int `json:"Id"`
+	FromUserID int `json:"FromUserId"`
+}
+
+type FinishGameOutput struct {
+	ID         string `json:"Id"`
+	WinnerID   int    `json:"WinnerId"`
+	ResultText string `json:"ResultText"`
+}
+
+type GameStatus struct {
+	ID       int       `json:"Id"`
+	Status   string    `json:"Status"`
+	WinnerID *int      `json:"WinnerId,omitempty"`
+	StartAt  time.Time `json:"StartAt"`
+	FinishAt time.Time `json:"FinishAt"`
+}
+
+type GameStatusInput struct {
+	ID int `json:"Id"`
+}
+
+type GameStatusOutput struct {
+	GameStatus *GameStatus `json:"GameStatus"`
+}
+
 type GetGamesStatsInput struct {
 	UserID int `json:"userId"`
 }
@@ -128,6 +155,15 @@ type ResetPasswordInput struct {
 
 type ResetPasswordOutput struct {
 	Error *Error `json:"error,omitempty"`
+}
+
+type StartGameInput struct {
+	ID         int `json:"Id"`
+	FromUserID int `json:"FromUserId"`
+}
+
+type StartGameOutput struct {
+	GameStatus *GameStatus `json:"GameStatus"`
 }
 
 type SuggestTopicInput struct {
@@ -261,7 +297,7 @@ func (e Error) String() string {
 	return string(e)
 }
 
-func (e *Error) UnmarshalGQL(v interface{}) error {
+func (e *Error) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -304,7 +340,7 @@ func (e Role) String() string {
 	return string(e)
 }
 
-func (e *Role) UnmarshalGQL(v interface{}) error {
+func (e *Role) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
@@ -347,7 +383,7 @@ func (e TopicStatus) String() string {
 	return string(e)
 }
 
-func (e *TopicStatus) UnmarshalGQL(v interface{}) error {
+func (e *TopicStatus) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")

@@ -109,3 +109,7 @@ func (h *RestHandler) PutImageHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Изображение успешно загружено"))
 }
+
+func (rh *RestHandler) PingHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}

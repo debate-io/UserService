@@ -8,6 +8,7 @@ import (
 type UseCases struct {
 	Users  *usecases.User
 	Topics *usecases.Topic
+	Games  *usecases.Game
 }
 
 type Container struct {

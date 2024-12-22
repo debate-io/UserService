@@ -36,3 +36,10 @@ type TopicRepository interface {
 	GetTopic(ctx context.Context, topicId int) (*model.TopicMetatopics, error)
 	GetMetatopics(ctx context.Context, pageSize, pageNumber int) ([]*model.Metatopic, int, error)
 }
+
+type GameRepository interface {
+	StartGame(ctx context.Context, startGame model.StartGame) (model.GameStatus, error)
+	GetGameById(ctx context.Context, id int) (model.GameStatus, error)
+	FinishGameByDeadline(ctx context.Context, startGameRequest model.StartGame, currentGameStatus model.GameStatus) (model.GameStatus, error)
+	FinishGame(ctx context.Context, startGame model.FinishGame) (model.GameResult, error)
+}
