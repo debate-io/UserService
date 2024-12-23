@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/debate-io/service-auth/internal/domain/model"
@@ -19,11 +20,15 @@ const (
 
 type GameRepository struct {
 	Games map[int]model.GameStatus
+	Mu    sync.Mutex
 }
 
 // IsGameOverByDeadline implements repo.GameRepository.
 func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, gameId int) bool {
+	g.Mu.Lock()
 	game, ok := g.Games[gameId]
+	g.Mu.Unlock()
+
 	if !ok {
 		return true
 	}
@@ -35,6 +40,7 @@ func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, gameId int) b
 func NewGameRepository() *GameRepository {
 	return &GameRepository{
 		Games: make(map[int]model.GameStatus),
+		Mu:    sync.Mutex{},
 	}
 }
 
@@ -52,16 +58,23 @@ func (g *GameRepository) FinishGameByDeadline(ctx context.Context, fromUserId in
 
 	currentGameStatus.FinishAt = time.Now().UTC()
 	currentGameStatus.GameStatusEnum = model.GameStatusDeclined
+
+	g.Mu.Lock()
+	defer g.Mu.Unlock()
 	g.Games[currentGameStatus.ID] = currentGameStatus
 	return g.Games[currentGameStatus.ID], nil
 }
 
 func (g *GameRepository) GetGameById(ctx context.Context, id int) (model.GameStatus, error) {
+	g.Mu.Lock()
+	defer g.Mu.Unlock()
 	return g.Games[id], nil
 }
 
 func (g *GameRepository) StartGame(ctx context.Context, startGame model.StartGame) (model.GameStatus, error) {
+	g.Mu.Lock()
 	game, exist := g.Games[startGame.ID]
+	g.Mu.Unlock()
 
 	if !exist {
 		// Пришёл первый игрок
@@ -73,7 +86,9 @@ func (g *GameRepository) StartGame(ctx context.Context, startGame model.StartGam
 			StartAt:        time.Now().UTC(),
 			FinishAt:       time.Now().UTC(),
 		}
+		g.Mu.Lock()
 		g.Games[newGame.ID] = newGame
+		g.Mu.Unlock()
 	} else {
 		// Ретрай от первого игрока
 		if game.FirstPlayerId == startGame.FromUserID {
@@ -94,8 +109,12 @@ func (g *GameRepository) StartGame(ctx context.Context, startGame model.StartGam
 			StartAt:        time.Now().UTC(),
 			FinishAt:       time.Now().Add(gameDuration).UTC(),
 		}
+		g.Mu.Lock()
 		g.Games[newGame.ID] = newGame
+		g.Mu.Unlock()
 	}
 
+	g.Mu.Lock()
+	defer g.Mu.Unlock()
 	return g.Games[startGame.ID], nil
 }

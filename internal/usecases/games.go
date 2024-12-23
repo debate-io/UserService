@@ -43,14 +43,15 @@ func (g *Game) GetGameStatus(ctx context.Context, gameID int) (model.GameStatus,
 		return model.GameStatus{}, err
 	}
 
+	// Завершение игры по дедлайну ожидания подтверждения начала игры от второго игрока
+	if g.gameRepo.IsGameOverByDeadline(ctx, gameID) {
+		return g.gameRepo.FinishGameByDeadline(ctx, claims.UserID, game)
+	}
+
 	// Ретрай от первого игрока
 	if game.FirstPlayerId == claims.UserID {
 		return game, nil
 	}
 
-	// Завершение игры по дедлайну ожидания подтверждения начала игры от второго игрока
-	// deadline := game.FirstRequest.UTC().Add(waitingDuration)
-	// if time.Now().UTC().After(deadline) {
-	return g.gameRepo.FinishGameByDeadline(ctx, claims.UserID, game)
-	// }
+	return game, nil
 }
