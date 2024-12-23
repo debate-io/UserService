@@ -68,6 +68,5 @@ type Query {
 
     ##### Games #####
         """ Получение статуса игры. """
-        GetGameStatus(input: GameStatusInput!): GameStatusOutput!
-
+        getGameStatus(input: GameStatusInput!): GameStatusOutput!
 }

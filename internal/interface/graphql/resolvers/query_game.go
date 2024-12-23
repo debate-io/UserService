@@ -7,13 +7,13 @@ import (
 )
 
 func (m *queryResolver) GetGameStatus(ctx context.Context, input gen.GameStatusInput) (*gen.GameStatusOutput, error) {
-	gameStatus, err := m.useCases.Games.GetGameStatus(ctx, input.ID)
+	gameStatus, err := m.useCases.Games.GetGameStatus(ctx, input.RoomID)
 	if err != nil {
 		return nil, err
 	}
 	return &gen.GameStatusOutput{
 		GameStatus: &gen.GameStatus{
-			ID:       gameStatus.ID,
+			RoomID:   gameStatus.ID,
 			Status:   string(gameStatus.GameStatusEnum),
 			WinnerID: &gameStatus.WinnerId,
 			StartAt:  gameStatus.StartAt,

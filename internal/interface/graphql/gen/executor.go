@@ -59,14 +59,14 @@ type ComplexityRoot struct {
 	}
 
 	FinishGameOutput struct {
-		ID         func(childComplexity int) int
 		ResultText func(childComplexity int) int
+		RoomID     func(childComplexity int) int
 		WinnerID   func(childComplexity int) int
 	}
 
 	GameStatus struct {
 		FinishAt func(childComplexity int) int
-		ID       func(childComplexity int) int
+		RoomID   func(childComplexity int) int
 		StartAt  func(childComplexity int) int
 		Status   func(childComplexity int) int
 		WinnerID func(childComplexity int) int
@@ -304,19 +304,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AuthenticateUserOutput.Jwt(childComplexity), true
 
-	case "FinishGameOutput.Id":
-		if e.complexity.FinishGameOutput.ID == nil {
-			break
-		}
-
-		return e.complexity.FinishGameOutput.ID(childComplexity), true
-
 	case "FinishGameOutput.ResultText":
 		if e.complexity.FinishGameOutput.ResultText == nil {
 			break
 		}
 
 		return e.complexity.FinishGameOutput.ResultText(childComplexity), true
+
+	case "FinishGameOutput.RoomId":
+		if e.complexity.FinishGameOutput.RoomID == nil {
+			break
+		}
+
+		return e.complexity.FinishGameOutput.RoomID(childComplexity), true
 
 	case "FinishGameOutput.WinnerId":
 		if e.complexity.FinishGameOutput.WinnerID == nil {
@@ -332,12 +332,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.GameStatus.FinishAt(childComplexity), true
 
-	case "GameStatus.Id":
-		if e.complexity.GameStatus.ID == nil {
+	case "GameStatus.RoomId":
+		if e.complexity.GameStatus.RoomID == nil {
 			break
 		}
 
-		return e.complexity.GameStatus.ID(childComplexity), true
+		return e.complexity.GameStatus.RoomID(childComplexity), true
 
 	case "GameStatus.StartAt":
 		if e.complexity.GameStatus.StartAt == nil {
@@ -667,12 +667,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.AuthenticateUser(childComplexity, args["input"].(AuthenticateUserInput)), true
 
-	case "Query.GetGameStatus":
+	case "Query.getGameStatus":
 		if e.complexity.Query.GetGameStatus == nil {
 			break
 		}
 
-		args, err := ec.field_Query_GetGameStatus_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_getGameStatus_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1179,8 +1179,7 @@ type Query {
 
     ##### Games #####
         """ Получение статуса игры. """
-        GetGameStatus(input: GameStatusInput!): GameStatusOutput!
-
+        getGameStatus(input: GameStatusInput!): GameStatusOutput!
 }
 `, BuiltIn: false},
 	{Name: "../schema/scalars.graphql", Input: `scalar Time
@@ -1438,7 +1437,7 @@ type TopicMetatopics {
 }
 `, BuiltIn: false},
 	{Name: "../schema/games/games.graphql", Input: `type GameStatus {
-    Id: Int!
+    RoomId: String!
     Status: String!
     WinnerId: Int
     StartAt: Time!
@@ -1446,7 +1445,7 @@ type TopicMetatopics {
 }
 `, BuiltIn: false},
 	{Name: "../schema/games/mutation_games.graphql", Input: `input StartGameInput {
-    Id: Int!
+    RoomId: String!
     FromUserId: Int!
 }
 
@@ -1457,12 +1456,12 @@ type StartGameOutput {
 ##################################################
 
 input FinishGameInput {
-    Id: Int!
+    RoomId: String!
     FromUserId: Int!
 }
 
 type FinishGameOutput {
-    Id: String!
+    RoomId: String!
     WinnerId: Int!
     ResultText: String!
 }
@@ -1470,7 +1469,7 @@ type FinishGameOutput {
 	{Name: "../schema/games/query_games.graphql", Input: `##################################################
 
 input GameStatusInput {
-    Id: Int!
+    RoomId: String!
 }
 
 type GameStatusOutput {
@@ -1804,38 +1803,6 @@ func (ec *executionContext) field_Mutation_updateUser_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Query_GetGameStatus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Query_GetGameStatus_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Query_GetGameStatus_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (GameStatusInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
-		var zeroVal GameStatusInput
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNGameStatusInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatusInput(ctx, tmp)
-	}
-
-	var zeroVal GameStatusInput
-	return zeroVal, nil
-}
-
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1897,6 +1864,38 @@ func (ec *executionContext) field_Query_authenticateUser_argsInput(
 	}
 
 	var zeroVal AuthenticateUserInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_getGameStatus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_getGameStatus_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_getGameStatus_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (GameStatusInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["input"]
+	if !ok {
+		var zeroVal GameStatusInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNGameStatusInput2githubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatusInput(ctx, tmp)
+	}
+
+	var zeroVal GameStatusInput
 	return zeroVal, nil
 }
 
@@ -2454,8 +2453,8 @@ func (ec *executionContext) fieldContext_AuthenticateUserOutput_error(_ context.
 	return fc, nil
 }
 
-func (ec *executionContext) _FinishGameOutput_Id(ctx context.Context, field graphql.CollectedField, obj *FinishGameOutput) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FinishGameOutput_Id(ctx, field)
+func (ec *executionContext) _FinishGameOutput_RoomId(ctx context.Context, field graphql.CollectedField, obj *FinishGameOutput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FinishGameOutput_RoomId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2468,7 +2467,7 @@ func (ec *executionContext) _FinishGameOutput_Id(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return obj.RoomID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2485,7 +2484,7 @@ func (ec *executionContext) _FinishGameOutput_Id(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_FinishGameOutput_Id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_FinishGameOutput_RoomId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "FinishGameOutput",
 		Field:      field,
@@ -2586,8 +2585,8 @@ func (ec *executionContext) fieldContext_FinishGameOutput_ResultText(_ context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _GameStatus_Id(ctx context.Context, field graphql.CollectedField, obj *GameStatus) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GameStatus_Id(ctx, field)
+func (ec *executionContext) _GameStatus_RoomId(ctx context.Context, field graphql.CollectedField, obj *GameStatus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_GameStatus_RoomId(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2600,7 +2599,7 @@ func (ec *executionContext) _GameStatus_Id(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return obj.RoomID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2612,19 +2611,19 @@ func (ec *executionContext) _GameStatus_Id(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_GameStatus_Id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_GameStatus_RoomId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "GameStatus",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2842,8 +2841,8 @@ func (ec *executionContext) fieldContext_GameStatusOutput_GameStatus(_ context.C
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "Id":
-				return ec.fieldContext_GameStatus_Id(ctx, field)
+			case "RoomId":
+				return ec.fieldContext_GameStatus_RoomId(ctx, field)
 			case "Status":
 				return ec.fieldContext_GameStatus_Status(ctx, field)
 			case "WinnerId":
@@ -4523,8 +4522,8 @@ func (ec *executionContext) fieldContext_Mutation_finishGame(ctx context.Context
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "Id":
-				return ec.fieldContext_FinishGameOutput_Id(ctx, field)
+			case "RoomId":
+				return ec.fieldContext_FinishGameOutput_RoomId(ctx, field)
 			case "WinnerId":
 				return ec.fieldContext_FinishGameOutput_WinnerId(ctx, field)
 			case "ResultText":
@@ -5047,8 +5046,8 @@ func (ec *executionContext) fieldContext_Query_getMetatopics(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_GetGameStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_GetGameStatus(ctx, field)
+func (ec *executionContext) _Query_getGameStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getGameStatus(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5078,7 +5077,7 @@ func (ec *executionContext) _Query_GetGameStatus(ctx context.Context, field grap
 	return ec.marshalNGameStatusOutput2ᚖgithubᚗcomᚋdebateᚑioᚋserviceᚑauthᚋinternalᚋinterfaceᚋgraphqlᚋgenᚐGameStatusOutput(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_GetGameStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_getGameStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -5099,7 +5098,7 @@ func (ec *executionContext) fieldContext_Query_GetGameStatus(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_GetGameStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_getGameStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5495,8 +5494,8 @@ func (ec *executionContext) fieldContext_StartGameOutput_GameStatus(_ context.Co
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "Id":
-				return ec.fieldContext_GameStatus_Id(ctx, field)
+			case "RoomId":
+				return ec.fieldContext_GameStatus_RoomId(ctx, field)
 			case "Status":
 				return ec.fieldContext_GameStatus_Status(ctx, field)
 			case "WinnerId":
@@ -8415,20 +8414,20 @@ func (ec *executionContext) unmarshalInputFinishGameInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"Id", "FromUserId"}
+	fieldsInOrder := [...]string{"RoomId", "FromUserId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "Id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+		case "RoomId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("RoomId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ID = data
+			it.RoomID = data
 		case "FromUserId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("FromUserId"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
@@ -8449,20 +8448,20 @@ func (ec *executionContext) unmarshalInputGameStatusInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"Id"}
+	fieldsInOrder := [...]string{"RoomId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "Id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+		case "RoomId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("RoomId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ID = data
+			it.RoomID = data
 		}
 	}
 
@@ -8741,20 +8740,20 @@ func (ec *executionContext) unmarshalInputStartGameInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"Id", "FromUserId"}
+	fieldsInOrder := [...]string{"RoomId", "FromUserId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "Id":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Id"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
+		case "RoomId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("RoomId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ID = data
+			it.RoomID = data
 		case "FromUserId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("FromUserId"))
 			data, err := ec.unmarshalNInt2int(ctx, v)
@@ -9193,8 +9192,8 @@ func (ec *executionContext) _FinishGameOutput(ctx context.Context, sel ast.Selec
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("FinishGameOutput")
-		case "Id":
-			out.Values[i] = ec._FinishGameOutput_Id(ctx, field, obj)
+		case "RoomId":
+			out.Values[i] = ec._FinishGameOutput_RoomId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9242,8 +9241,8 @@ func (ec *executionContext) _GameStatus(ctx context.Context, sel ast.SelectionSe
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("GameStatus")
-		case "Id":
-			out.Values[i] = ec._GameStatus_Id(ctx, field, obj)
+		case "RoomId":
+			out.Values[i] = ec._GameStatus_RoomId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -9973,7 +9972,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "GetGameStatus":
+		case "getGameStatus":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -9982,7 +9981,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_GetGameStatus(ctx, field)
+				res = ec._Query_getGameStatus(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

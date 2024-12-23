@@ -1,5 +1,5 @@
 input StartGameInput {
-    Id: Int!
+    RoomId: String!
     FromUserId: Int!
 }
 
@@ -10,12 +10,12 @@ type StartGameOutput {
 ##################################################
 
 input FinishGameInput {
-    Id: Int!
+    RoomId: String!
     FromUserId: Int!
 }
 
 type FinishGameOutput {
-    Id: String!
+    RoomId: String!
     WinnerId: Int!
     ResultText: String!
 }

@@ -27,18 +27,18 @@ type AuthenticateUserOutput struct {
 }
 
 type FinishGameInput struct {
-	ID         int `json:"Id"`
-	FromUserID int `json:"FromUserId"`
+	RoomID     string `json:"RoomId"`
+	FromUserID int    `json:"FromUserId"`
 }
 
 type FinishGameOutput struct {
-	ID         string `json:"Id"`
+	RoomID     string `json:"RoomId"`
 	WinnerID   int    `json:"WinnerId"`
 	ResultText string `json:"ResultText"`
 }
 
 type GameStatus struct {
-	ID       int       `json:"Id"`
+	RoomID   string    `json:"RoomId"`
 	Status   string    `json:"Status"`
 	WinnerID *int      `json:"WinnerId,omitempty"`
 	StartAt  time.Time `json:"StartAt"`
@@ -46,7 +46,7 @@ type GameStatus struct {
 }
 
 type GameStatusInput struct {
-	ID int `json:"Id"`
+	RoomID string `json:"RoomId"`
 }
 
 type GameStatusOutput struct {
@@ -158,8 +158,8 @@ type ResetPasswordOutput struct {
 }
 
 type StartGameInput struct {
-	ID         int `json:"Id"`
-	FromUserID int `json:"FromUserId"`
+	RoomID     string `json:"RoomId"`
+	FromUserID int    `json:"FromUserId"`
 }
 
 type StartGameOutput struct {

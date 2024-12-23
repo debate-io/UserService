@@ -1,7 +1,7 @@
 ##################################################
 
 input GameStatusInput {
-    Id: Int!
+    RoomId: String!
 }
 
 type GameStatusOutput {

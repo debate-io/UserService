@@ -9,7 +9,7 @@ import (
 
 func (m *mutationResolver) StartGame(ctx context.Context, input gen.StartGameInput) (*gen.StartGameOutput, error) {
 	startGameRequest := model.StartGame{
-		ID:         input.ID,
+		RoomID:         input.RoomID,
 		FromUserID: input.FromUserID,
 	}
 
@@ -19,7 +19,7 @@ func (m *mutationResolver) StartGame(ctx context.Context, input gen.StartGameInp
 	}
 	return &gen.StartGameOutput{
 		GameStatus: &gen.GameStatus{
-			ID:       gameStatus.ID,
+			RoomID:       gameStatus.ID,
 			Status:   string(gameStatus.GameStatusEnum),
 			WinnerID: &gameStatus.WinnerId,
 			StartAt:  gameStatus.StartAt,

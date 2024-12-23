@@ -19,14 +19,14 @@ const (
 )
 
 type GameRepository struct {
-	Games map[int]model.GameStatus
+	Games map[string]model.GameStatus
 	Mu    sync.Mutex
 }
 
 // IsGameOverByDeadline implements repo.GameRepository.
-func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, gameId int) bool {
+func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, roomId string) bool {
 	g.Mu.Lock()
-	game, ok := g.Games[gameId]
+	game, ok := g.Games[roomId]
 	g.Mu.Unlock()
 
 	if !ok {
@@ -39,7 +39,7 @@ func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, gameId int) b
 
 func NewGameRepository() *GameRepository {
 	return &GameRepository{
-		Games: make(map[int]model.GameStatus),
+		Games: make(map[string]model.GameStatus),
 		Mu:    sync.Mutex{},
 	}
 }
@@ -65,21 +65,21 @@ func (g *GameRepository) FinishGameByDeadline(ctx context.Context, fromUserId in
 	return g.Games[currentGameStatus.ID], nil
 }
 
-func (g *GameRepository) GetGameById(ctx context.Context, id int) (model.GameStatus, error) {
+func (g *GameRepository) GetGameById(ctx context.Context, roomId string) (model.GameStatus, error) {
 	g.Mu.Lock()
 	defer g.Mu.Unlock()
-	return g.Games[id], nil
+	return g.Games[roomId], nil
 }
 
 func (g *GameRepository) StartGame(ctx context.Context, startGame model.StartGame) (model.GameStatus, error) {
 	g.Mu.Lock()
-	game, exist := g.Games[startGame.ID]
+	game, exist := g.Games[startGame.RoomID]
 	g.Mu.Unlock()
 
 	if !exist {
 		// Пришёл первый игрок
 		newGame := model.GameStatus{
-			ID:             startGame.ID,
+			ID:             startGame.RoomID,
 			FirstPlayerId:  startGame.FromUserID,
 			FirstRequest:   time.Now().UTC(),
 			GameStatusEnum: model.GameStatusPending,
@@ -116,5 +116,5 @@ func (g *GameRepository) StartGame(ctx context.Context, startGame model.StartGam
 
 	g.Mu.Lock()
 	defer g.Mu.Unlock()
-	return g.Games[startGame.ID], nil
+	return g.Games[startGame.RoomID], nil
 }

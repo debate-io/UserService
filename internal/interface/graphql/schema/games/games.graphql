@@ -1,5 +1,5 @@
 type GameStatus {
-    Id: Int!
+    RoomId: String!
     Status: String!
     WinnerId: Int
     StartAt: Time!

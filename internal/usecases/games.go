@@ -32,7 +32,7 @@ func (g *Game) FinishGame(ctx context.Context, finishGameRequest model.FinishGam
 	return g.gameRepo.FinishGame(ctx, finishGameRequest)
 }
 
-func (g *Game) GetGameStatus(ctx context.Context, gameID int) (model.GameStatus, error) {
+func (g *Game) GetGameStatus(ctx context.Context, gameID string) (model.GameStatus, error) {
 	claims := ctx.Value(middleware.JwtClaimsKey).(*model.Claims)
 	if claims == nil {
 		return model.GameStatus{}, repo.ErrUnauthorized

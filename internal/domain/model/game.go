@@ -21,18 +21,18 @@ type Achievements struct {
 }
 
 type StartGame struct {
-	ID         int `pg:"id,pk"`
-	FromUserID int `pg:"from_user_id"` // references
+	RoomID     string `pg:"id,pk"`
+	FromUserID int    `pg:"from_user_id"` // references
 }
 
 type FinishGame struct {
-	ID            int `pg:"id,pk"`
-	FromUserID    int `pg:"from_user_id"` // references
-	SecondsInGame int `pg:"seconds_in_game"`
+	RoomID        string `pg:"id,pk"`
+	FromUserID    int    `pg:"from_user_id"` // references
+	SecondsInGame int    `pg:"seconds_in_game"`
 }
 
 type GameResult struct {
-	ID         int    `pg:"id,pk"`
+	RoomID     string `pg:"id,pk"`
 	WinnerId   int    `pg:"winner_id"` // references
 	ResultText string `pg:"result_text"`
 }
@@ -46,9 +46,9 @@ const (
 )
 
 type GameStatus struct {
-	ID             int `pg:"id,pk"`
-	FirstPlayerId  int `pg:"first_player_id"`  // references
-	SecondPlayerId int `pg:"second_player_id"` // references
+	ID             string `pg:"id,pk"`
+	FirstPlayerId  int    `pg:"first_player_id"`  // references
+	SecondPlayerId int    `pg:"second_player_id"` // references
 
 	FirstRequest time.Time
 
