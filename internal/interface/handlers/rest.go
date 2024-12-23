@@ -20,10 +20,11 @@ type RestHandler struct {
 	usecases *registry.UseCases
 }
 
-type imageUrls string
+type Url string
 
 const (
-	ImageUrl imageUrls = "/user/{id}/image"
+	ImageUrl Url = "/user/{id}/image"
+	PingUrl  Url = "/ping"
 )
 
 func NewRestHandler(

@@ -21,6 +21,17 @@ type GameRepository struct {
 	Games map[int]model.GameStatus
 }
 
+// IsGameOverByDeadline implements repo.GameRepository.
+func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, gameId int) bool {
+	game, ok := g.Games[gameId]
+	if !ok {
+		return true
+	}
+
+	deadline := game.FirstRequest.UTC().Add(waitingDuration)
+	return time.Now().UTC().After(deadline)
+}
+
 func NewGameRepository() *GameRepository {
 	return &GameRepository{
 		Games: make(map[int]model.GameStatus),
@@ -32,8 +43,8 @@ func (g *GameRepository) FinishGame(ctx context.Context, startGame model.FinishG
 	panic("unimplemented")
 }
 
-func (g *GameRepository) FinishGameByDeadline(ctx context.Context, startGameRequest model.StartGame, currentGameStatus model.GameStatus) (model.GameStatus, error) {
-	if startGameRequest.FromUserID == currentGameStatus.FirstPlayerId {
+func (g *GameRepository) FinishGameByDeadline(ctx context.Context, fromUserId int, currentGameStatus model.GameStatus) (model.GameStatus, error) {
+	if fromUserId == currentGameStatus.FirstPlayerId {
 		currentGameStatus.WinnerId = currentGameStatus.SecondPlayerId
 	} else {
 		currentGameStatus.WinnerId = currentGameStatus.FirstPlayerId
@@ -69,9 +80,8 @@ func (g *GameRepository) StartGame(ctx context.Context, startGame model.StartGam
 			return game, nil
 		}
 		// Завершение игры по дедлайну ожидания подтверждения начала игры от второго игрока
-		deadline := game.FirstRequest.UTC().Add(waitingDuration)
-		if time.Now().UTC().After(deadline) {
-			return g.FinishGameByDeadline(ctx, startGame, game)
+		if g.IsGameOverByDeadline(ctx, game.ID) {
+			return g.FinishGameByDeadline(ctx, startGame.FromUserID, game)
 		}
 
 		// Пришёл второй игрок

@@ -88,6 +88,9 @@ func (s *Server) InitRoutes(container *registry.Container, isDebug bool) {
 		r.Get("/", restHandler.GetImageHandler)
 		r.Get("/ping", restHandler.PingHandler)
 	})
+	s.router.Route(string(handlers.PingUrl), func(r chi.Router) {
+		r.Get("/", restHandler.PingHandler)
+	})
 }
 
 func (s *Server) ListenAndServe(address string, shutdownInitiated func()) error {

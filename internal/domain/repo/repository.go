@@ -40,6 +40,7 @@ type TopicRepository interface {
 type GameRepository interface {
 	StartGame(ctx context.Context, startGame model.StartGame) (model.GameStatus, error)
 	GetGameById(ctx context.Context, id int) (model.GameStatus, error)
-	FinishGameByDeadline(ctx context.Context, startGameRequest model.StartGame, currentGameStatus model.GameStatus) (model.GameStatus, error)
+	FinishGameByDeadline(ctx context.Context, fromUserId int, currentGameStatus model.GameStatus) (model.GameStatus, error)
+	IsGameOverByDeadline(ctx context.Context, gameId int) bool
 	FinishGame(ctx context.Context, startGame model.FinishGame) (model.GameResult, error)
 }
