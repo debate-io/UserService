@@ -16,7 +16,7 @@ var (
 )
 
 const (
-	gameDuration    = time.Minute * 10
+	gameDuration    = time.Second * 40
 	waitingDuration = time.Second * 20
 )
 
