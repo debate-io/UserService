@@ -2,11 +2,13 @@ package postgres
 
 import (
 	"context"
+	"math/rand/v2"
 	"sync"
 	"time"
 
 	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
+	"github.com/ztrue/tracerr"
 )
 
 var (
@@ -19,8 +21,9 @@ const (
 )
 
 type GameRepository struct {
-	Games map[string]model.GameStatus
-	Mu    sync.Mutex
+	Games   map[string]model.GameStatus
+	Mu      sync.Mutex
+	Results []string
 }
 
 // IsGameOverByDeadline implements repo.GameRepository.
@@ -38,15 +41,68 @@ func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, roomId string
 }
 
 func NewGameRepository() *GameRepository {
+	results := []string{
+		"Затычка %s",
+	}
 	return &GameRepository{
-		Games: make(map[string]model.GameStatus),
-		Mu:    sync.Mutex{},
+		Games:   make(map[string]model.GameStatus),
+		Mu:      sync.Mutex{},
+		Results: results,
 	}
 }
 
 // FinishGame implements repo.GameRepository.
 func (g *GameRepository) FinishGame(ctx context.Context, startGame model.FinishGame) (model.GameResult, error) {
-	panic("unimplemented")
+	g.Mu.Lock()
+	defer g.Mu.Unlock()
+
+	game, ok := g.Games[startGame.RoomID]
+	if !ok {
+		return model.GameResult{}, tracerr.New("Game not found")
+	}
+
+	if game.FirstFinishRequest == nil {
+		now := time.Now()
+		game.FirstFinishRequest = &now
+	}
+	if game.FirstPlayerId == startGame.FromUserID {
+		game.FirstPlayerScore = startGame.SecondsInGame
+	} else {
+		game.SecondPlayerScore = startGame.SecondsInGame
+	}
+
+	g.Games[startGame.RoomID] = game
+
+	gameFinished := game.FirstPlayerScore != 0 &&
+		game.SecondPlayerScore != 0 ||
+		time.Now().UTC().After(game.FirstFinishRequest.UTC().Add(waitingDuration))
+
+	if gameFinished {
+		var winnerID int
+		delta := game.FirstPlayerScore - game.SecondPlayerScore
+		if delta > int(gameDuration/10) {
+			winnerID = game.FirstPlayerId
+		} else if delta < -int(gameDuration/10) {
+			winnerID = game.SecondPlayerId
+		} else if game.FirstFinishRequest.Second()%2 == 0 {
+			winnerID = game.FirstPlayerId
+		} else {
+			winnerID = game.SecondPlayerId
+		}
+		g.Games[startGame.RoomID] = game
+
+		return model.GameResult{
+			RoomID:     game.ID,
+			WinnerId:   winnerID,
+			ResultText: g.Results[rand.Int()%len(g.Results)],
+		}, nil
+	}
+
+	return model.GameResult{
+		RoomID:     startGame.RoomID,
+		WinnerId:   0,
+		ResultText: "",
+	}, nil
 }
 
 func (g *GameRepository) FinishGameByDeadline(ctx context.Context, fromUserId int, currentGameStatus model.GameStatus) (model.GameStatus, error) {

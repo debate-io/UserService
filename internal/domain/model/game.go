@@ -43,6 +43,7 @@ const (
 	GameStatusPending  GameStatusEnum = "PENDING"
 	GameStatusStarted  GameStatusEnum = "STARTED"
 	GameStatusDeclined GameStatusEnum = "DECLINED"
+	GameStatusFinished GameStatusEnum = "FINISHED"
 )
 
 type GameStatus struct {
@@ -50,7 +51,11 @@ type GameStatus struct {
 	FirstPlayerId  int    `pg:"first_player_id"`  // references
 	SecondPlayerId int    `pg:"second_player_id"` // references
 
-	FirstRequest time.Time
+	FirstPlayerScore  int
+	SecondPlayerScore int
+
+	FirstRequest       time.Time
+	FirstFinishRequest *time.Time
 
 	GameStatusEnum GameStatusEnum `pg:"status"`
 	WinnerId       int            `pg:"winner_id"` // references
