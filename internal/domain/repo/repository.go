@@ -10,6 +10,7 @@ type UserRepository interface {
 	CreateUser(ctx context.Context, user *model.User) (*model.User, error)
 	UpdateUser(ctx context.Context, user *model.User) (*model.User, error)
 	FindUserByEmail(ctx context.Context, email string) (*model.User, error)
+	GetUsers(ctx context.Context, limit int, offset int) ([]*model.User, error)
 	FindUserByID(ctx context.Context, ID int) (*model.User, error)
 	UploadImage(ctx context.Context, userId int, image, hash []byte, contentType string) error
 	DownloadImage(ctx context.Context, userId int) ([]byte, string, error)

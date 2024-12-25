@@ -91,6 +91,23 @@ func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User,
 	return result, nil
 }
 
+func (u *UserRepository) GetUsers(ctx context.Context, limit int, offset int) ([]*model.User, error) {
+	var users []*model.User
+	q := u.db.ModelContext(ctx, &users).
+		Limit(limit).
+		Offset(offset)
+
+	if err := q.Select((&users)); err != nil {
+		if isNoRowsError(err) {
+			return nil, repo.ErrNotFound
+		}
+
+		return nil, tracerr.Errorf("failed get users: %w", err)
+	}
+
+	return users, nil
+}
+
 func (u *UserRepository) UploadImage(
 	ctx context.Context,
 	userId int,

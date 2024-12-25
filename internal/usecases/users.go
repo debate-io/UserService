@@ -165,6 +165,36 @@ func (u *User) GetUser(
 	return &gen.GetUserOutput{User: mappers.MapUserToDTO(user)}, nil
 }
 
+func (u *User) GetUsers(ctx context.Context, limit int, offset int) (*gen.GetAllUsersOutput, error) {
+	// claims := ctx.Value(middleware.JwtClaimsKey).(*model.Claims)
+	// if claims == nil {
+	// 	return &gen.GetAllUsersOutput{
+	// 		Error: mappers.NewDTOError(gen.ErrorInvalidCredentials),
+	// 	}, nil
+	// }
+
+	// role := claims.Role
+	// if role != model.RoleAdmin {
+	// 	return &gen.GetAllUsersOutput{
+	// 		Error: mappers.NewDTOError(gen.ErrorUnauthorized),
+	// 	}, nil
+	// }
+
+	users, err := u.userRepo.GetUsers(ctx, limit, offset)
+	if err != nil {
+		if errors.Is(err, repo.ErrNotFound) {
+			return &gen.GetAllUsersOutput{
+				Error: mappers.NewDTOError(gen.ErrorNotFound),
+			}, nil
+		}
+
+		return nil, err
+	}
+	fmt.Printf("%+v", users)
+	return &gen.GetAllUsersOutput{Users: mappers.MapUsersToDTO(users)}, nil
+
+}
+
 func (u *User) GetGamesStats(
 	ctx context.Context,
 	input gen.GetGamesStatsInput,

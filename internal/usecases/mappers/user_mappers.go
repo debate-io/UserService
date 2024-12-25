@@ -23,3 +23,12 @@ func MapUserToDTO(user *model.User) *gen.User {
 		ImageURL:  url,
 	}
 }
+
+func MapUsersToDTO(users []*model.User) []*gen.User {
+	var genUsers []*gen.User
+	for i := range users {
+		genUsers = append(genUsers, MapUserToDTO(users[i]))
+	}
+
+	return genUsers
+}
