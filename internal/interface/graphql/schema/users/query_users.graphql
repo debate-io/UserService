@@ -9,6 +9,18 @@ type GetUserOutput {
 
 ###############################################
 
+input GetAllUsersInput {
+    limit: Int!
+    offset: Int!
+}
+
+type GetAllUsersOutput {
+    users: [User!]!
+    error: Error
+}
+
+###############################################
+
 input AuthenticateUserInput {
     email: String!
     password: String!

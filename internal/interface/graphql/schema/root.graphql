@@ -45,6 +45,9 @@ type Query {
         """ Получение пользователя. Может вернуть ошибки: NOT_FOUND, VALIDATION """
         getUser(input: GetUserInput!): GetUserOutput!
 
+        """ Получение пользователей. Может вернуть ошибки: NOT_FOUND """
+        getUsers(input: GetAllUsersInput!): GetAllUsersOutput!
+
         """ Получение статистики пользователя по играм и метатемам. Может вернуть ошибки: NOT_FOUND """
         getGamesStats(input: GetGamesStatsInput!): GetGamesStatsOutput!
 

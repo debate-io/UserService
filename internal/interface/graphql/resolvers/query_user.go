@@ -41,6 +41,15 @@ func (q queryResolver) GetUser(ctx context.Context, input gen.GetUserInput) (*ge
 	return output, nil
 }
 
+func (q queryResolver) GetUsers(ctx context.Context, input gen.GetAllUsersInput) (*gen.GetAllUsersOutput, error) {
+	output, err := q.useCases.Users.GetUsers(ctx, input.Limit, input.Offset)
+	if err != nil {
+		return nil, NewResolverError("can't get users", err)
+	}
+
+	return output, nil
+}
+
 func (q queryResolver) GetGamesStats(ctx context.Context, input gen.GetGamesStatsInput) (*gen.GetGamesStatsOutput, error) {
 	output, err := q.useCases.Users.GetGamesStats(ctx, input)
 	if err != nil {

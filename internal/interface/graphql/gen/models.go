@@ -53,6 +53,16 @@ type GameStatusOutput struct {
 	GameStatus *GameStatus `json:"GameStatus"`
 }
 
+type GetAllUsersInput struct {
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+}
+
+type GetAllUsersOutput struct {
+	Users []*User `json:"users"`
+	Error *Error  `json:"error,omitempty"`
+}
+
 type GetGamesStatsInput struct {
 	UserID int `json:"userId"`
 }
