@@ -52,11 +52,11 @@ func NewGameRepository() *GameRepository {
 }
 
 // FinishGame implements repo.GameRepository.
-func (g *GameRepository) FinishGame(ctx context.Context, startGame model.FinishGame) (model.GameResult, error) {
+func (g *GameRepository) FinishGame(ctx context.Context, finishGame model.FinishGame) (model.GameResult, error) {
 	g.Mu.Lock()
 	defer g.Mu.Unlock()
 
-	game, ok := g.Games[startGame.RoomID]
+	game, ok := g.Games[finishGame.RoomID]
 	if !ok {
 		return model.GameResult{}, tracerr.New("Game not found")
 	}
@@ -65,13 +65,13 @@ func (g *GameRepository) FinishGame(ctx context.Context, startGame model.FinishG
 		now := time.Now()
 		game.FirstFinishRequest = &now
 	}
-	if game.FirstPlayerId == startGame.FromUserID {
-		game.FirstPlayerScore = startGame.SecondsInGame
+	if game.FirstPlayerId == finishGame.FromUserID {
+		game.FirstPlayerScore = finishGame.SecondsInGame
 	} else {
-		game.SecondPlayerScore = startGame.SecondsInGame
+		game.SecondPlayerScore = finishGame.SecondsInGame
 	}
 
-	g.Games[startGame.RoomID] = game
+	g.Games[finishGame.RoomID] = game
 
 	gameFinished := game.FirstPlayerScore != 0 &&
 		game.SecondPlayerScore != 0 ||
@@ -89,7 +89,7 @@ func (g *GameRepository) FinishGame(ctx context.Context, startGame model.FinishG
 		} else {
 			winnerID = game.SecondPlayerId
 		}
-		g.Games[startGame.RoomID] = game
+		g.Games[finishGame.RoomID] = game
 
 		return model.GameResult{
 			RoomID:     game.ID,
@@ -99,7 +99,7 @@ func (g *GameRepository) FinishGame(ctx context.Context, startGame model.FinishG
 	}
 
 	return model.GameResult{
-		RoomID:     startGame.RoomID,
+		RoomID:     finishGame.RoomID,
 		WinnerId:   0,
 		ResultText: "",
 	}, nil
