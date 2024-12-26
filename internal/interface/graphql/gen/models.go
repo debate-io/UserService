@@ -27,8 +27,9 @@ type AuthenticateUserOutput struct {
 }
 
 type FinishGameInput struct {
-	RoomID     string `json:"RoomId"`
-	FromUserID int    `json:"FromUserId"`
+	RoomID        string `json:"RoomId"`
+	FromUserID    int    `json:"FromUserId"`
+	SecondsInGame int    `json:"SecondsInGame"`
 }
 
 type FinishGameOutput struct {

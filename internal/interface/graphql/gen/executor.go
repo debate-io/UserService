@@ -1507,6 +1507,7 @@ type StartGameOutput {
 input FinishGameInput {
     RoomId: String!
     FromUserId: Int!
+    SecondsInGame: Int!
 }
 
 type FinishGameOutput {
@@ -8657,7 +8658,7 @@ func (ec *executionContext) unmarshalInputFinishGameInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"RoomId", "FromUserId"}
+	fieldsInOrder := [...]string{"RoomId", "FromUserId", "SecondsInGame"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8678,6 +8679,13 @@ func (ec *executionContext) unmarshalInputFinishGameInput(ctx context.Context, o
 				return it, err
 			}
 			it.FromUserID = data
+		case "SecondsInGame":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("SecondsInGame"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SecondsInGame = data
 		}
 	}
 

@@ -12,6 +12,7 @@ type StartGameOutput {
 input FinishGameInput {
     RoomId: String!
     FromUserId: Int!
+    SecondsInGame: Int!
 }
 
 type FinishGameOutput {
