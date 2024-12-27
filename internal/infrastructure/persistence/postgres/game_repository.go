@@ -2,12 +2,14 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"math/rand/v2"
 	"sync"
 	"time"
 
 	"github.com/debate-io/service-auth/internal/domain/model"
 	"github.com/debate-io/service-auth/internal/domain/repo"
+	"github.com/go-pg/pg/v9"
 	"github.com/ztrue/tracerr"
 )
 
@@ -24,9 +26,30 @@ type GameRepository struct {
 	Games   map[string]model.GameStatus
 	Mu      sync.Mutex
 	Results []string
+	db      *pg.DB
 }
 
-// IsGameOverByDeadline implements repo.GameRepository.
+func (g *GameRepository) SetWinnerId(ctx context.Context, roomID string, winnerID int) error {
+	game := model.Game{
+		RoomID: roomID,
+	}
+
+	fmt.Printf("%+v\n", game)
+
+	err := g.db.ModelContext(ctx, &game).Where("room_id = ?", roomID).Select()
+	if err != nil {
+		return err
+	}
+
+	game.WinnerID = int64(winnerID)
+
+	if _, err := g.db.ModelContext(ctx, &game).Column("winner_id").Update(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, roomId string) bool {
 	g.Mu.Lock()
 	game, ok := g.Games[roomId]
