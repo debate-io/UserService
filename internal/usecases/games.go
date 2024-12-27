@@ -29,7 +29,12 @@ func (g *Game) StartGame(ctx context.Context, startGameRequest model.StartGame) 
 }
 
 func (g *Game) FinishGame(ctx context.Context, finishGameRequest model.FinishGame) (model.GameResult, error) {
-	return g.gameRepo.FinishGame(ctx, finishGameRequest)
+	gameResult, err := g.gameRepo.FinishGame(ctx, finishGameRequest)
+	if gameResult.WinnerId != 0 { // Салям, Владос, спасибо за сына!
+		// g.gameRepo.SetWinnerId(ctx, finishGameRequest.RoomID, gameResult.WinnerId)
+	}
+
+	return gameResult, err
 }
 
 func (g *Game) GetGameStatus(ctx context.Context, gameID string) (model.GameStatus, error) {

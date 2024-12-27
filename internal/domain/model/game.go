@@ -20,6 +20,17 @@ type Achievements struct {
 	CreateAt    time.Time `pg:"created_at"`
 }
 
+type Game struct {
+	ID             int64     `pg:"id, pk"`
+	FirstPlayerID  int64     `pg:"first_player_id"`
+	SecondPlayerID int64     `pg:"second_player_id"`
+	RoomID         string    `pg:"room_id"`
+	WinnerID       int64     `pg:"winner_id"`
+	MetatopicID    int64     `pg:"metatopic_id"`
+	TopicID        int64     `pg:"topic_id"`
+	CreatedAt      time.Time `pg:"created_at"`
+}
+
 type StartGame struct {
 	RoomID     string `pg:"id,pk"`
 	FromUserID int    `pg:"from_user_id"` // references

@@ -42,6 +42,7 @@ type GameRepository interface {
 	StartGame(ctx context.Context, startGame model.StartGame) (model.GameStatus, error)
 	GetGameById(ctx context.Context, id string) (model.GameStatus, error)
 	FinishGameByDeadline(ctx context.Context, fromUserId int, currentGameStatus model.GameStatus) (model.GameStatus, error)
+	SetWinnerId(ctx context.Context, roomID string, winnerID int) error
 	IsGameOverByDeadline(ctx context.Context, gameId string) bool
 	FinishGame(ctx context.Context, finishGame model.FinishGame) (model.GameResult, error)
 }
