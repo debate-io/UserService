@@ -94,6 +94,7 @@ func (u *UserRepository) FindUserByID(ctx context.Context, id int) (*model.User,
 func (u *UserRepository) GetUsers(ctx context.Context, limit int, offset int) ([]*model.User, error) {
 	var users []*model.User
 	q := u.db.ModelContext(ctx, &users).
+		Relation("Image").
 		Limit(limit).
 		Offset(offset)
 
