@@ -31,7 +31,7 @@ func (g *Game) StartGame(ctx context.Context, startGameRequest model.StartGame) 
 func (g *Game) FinishGame(ctx context.Context, finishGameRequest model.FinishGame) (model.GameResult, error) {
 	gameResult, err := g.gameRepo.FinishGame(ctx, finishGameRequest)
 	if gameResult.WinnerId != 0 { // Салям, Владос, спасибо за сына!
-		// g.gameRepo.SetWinnerId(ctx, finishGameRequest.RoomID, gameResult.WinnerId)
+		g.gameRepo.SetWinnerId(ctx, finishGameRequest.RoomID, gameResult.WinnerId)
 	}
 
 	return gameResult, err
