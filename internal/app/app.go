@@ -117,7 +117,7 @@ func (app *App) NewContainer(authService *auth.AuthService) *registry.Container 
 	recoveryCodeRepo := postgres.NewRecoveryCodeRepository(app.DB)
 	gameStatsRepository := postgres.NewGameStatsRepository(app.DB)
 	achievementRepository := postgres.NewAchievementRepository(app.DB)
-	gameRepository := postgres.NewGameRepository()
+	gameRepository := postgres.NewGameRepository(app.DB)
 
 	topicRepo := postgres.NewTopicRepository(app.DB)
 

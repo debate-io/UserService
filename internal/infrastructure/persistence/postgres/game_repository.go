@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"math/rand/v2"
 	"sync"
 	"time"
 
@@ -31,19 +30,13 @@ type GameRepository struct {
 
 func (g *GameRepository) SetWinnerId(ctx context.Context, roomID string, winnerID int) error {
 	game := model.Game{
-		RoomID: roomID,
+		WinnerID: int64(winnerID),
 	}
 
 	fmt.Printf("%+v\n", game)
 
-	err := g.db.ModelContext(ctx, &game).Where("room_id = ?", roomID).Select()
+	_, err := g.db.ModelContext(ctx, &game).Where("room_uid = ?", roomID).Column("winner_id").Update()
 	if err != nil {
-		return err
-	}
-
-	game.WinnerID = int64(winnerID)
-
-	if _, err := g.db.ModelContext(ctx, &game).Column("winner_id").Update(); err != nil {
 		return err
 	}
 
@@ -63,14 +56,35 @@ func (g *GameRepository) IsGameOverByDeadline(ctx context.Context, roomId string
 	return time.Now().UTC().After(deadline)
 }
 
-func NewGameRepository() *GameRepository {
+func NewGameRepository(db *pg.DB) *GameRepository {
+
 	results := []string{
-		"Затычка %s",
+		"%s победил в дебатах: его аргументы звучали чётче и убедительнее. Второй участник не смог достойно ответить на его доводы.",
+		"В дебатах %s явно переиграл оппонента. Его логика и примеры выглядели сильнее.",
+		"%s смог убедить всех своим выступлением. Второй участник не сумел предложить равнозначную аргументацию.",
+		"Победа за %s: его речь была яркой и содержательной. Оппонент же допустил много пробелов в логике.",
+		"%s уверенно взял верх в дебатах. Его позиция звучала цельно, в отличие от разрозненной речи соперника.",
+		"Убедительность %s принесла ему победу. Его оппонент не смог достойно поддержать свою точку зрения.",
+		"%s вышел победителем благодаря продуманным доводам. Оппонент выглядел менее подготовленным.",
+		"Аргументы %s оказались неоспоримыми. Второй участник явно проиграл в убедительности.",
+		"%s выиграл дебаты своей чёткой позицией. Соперник допустил много ошибок в доказательствах.",
+		"Победа за %s, чья речь была логичной и убедительной. Его соперник, напротив, выглядел неуверенно.",
+		"%s превзошёл своего оппонента в дебатах. Его доводы звучали уверенно и продуманно.",
+		"У %s получилось донести свою точку зрения ярче. Второй участник не справился с контраргументами.",
+		"Речь %s заслужила победу благодаря логике и структуре. Его соперник запутался в собственных доводах.",
+		"%s доминировал в дебатах, приводя сильные доказательства. Второй участник оказался менее убедительным.",
+		"Победа за %s: его аргументы были чёткими и последовательными. Второй участник выглядел слабее.",
+		"%s уверенно защитил свою точку зрения. Соперник не сумел найти достойных контраргументов.",
+		"Аргументы %s оказались более весомыми. Его соперник, напротив, выглядел растерянно.",
+		"%s продемонстрировал высокий уровень подготовки. Второй участник, к сожалению, не смог удержаться на таком же уровне.",
+		"Победа %s была очевидной: его доводы оставили соперника без шансов.",
 	}
+
 	return &GameRepository{
 		Games:   make(map[string]model.GameStatus),
 		Mu:      sync.Mutex{},
 		Results: results,
+		db:      db,
 	}
 }
 
@@ -114,10 +128,16 @@ func (g *GameRepository) FinishGame(ctx context.Context, finishGame model.Finish
 		}
 		g.Games[finishGame.RoomID] = game
 
+		var chislo rune = 0x00
+
+		for _, v := range game.ID {
+			chislo = chislo ^ v
+		}
+
 		return model.GameResult{
 			RoomID:     game.ID,
 			WinnerId:   winnerID,
-			ResultText: g.Results[rand.Int()%len(g.Results)],
+			ResultText: g.Results[int(chislo)%len(g.Results)],
 		}, nil
 	}
 
